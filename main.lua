@@ -3,7 +3,7 @@
 	Loads files from the specified directory.
 --]]----------------------------------------
 
-function LoadFiles( dir )
+function loadFiles( dir )
 	local objects = love.filesystem.getDirectoryItems( dir )
 	local tbl = {}
 	for i = 1,#objects do
@@ -16,12 +16,12 @@ function LoadFiles( dir )
 	end
 	
 	for i = 1,#tbl do
-		LoadFiles( tbl[ i ] )
+		loadFiles( tbl[ i ] )
 	end
 end
 
 function love.load()
-	LoadFiles( "lua/autorun" )
+	loadFiles( "lua/autorun" )
 	game.changeState( "menu" )
 end 
 
@@ -31,8 +31,8 @@ end
 --]]----------------------------------------
 
 function love.draw()
-	gui.Draw()
-	hook.Call( "Paint" )
+	gui.draw()
+	hook.call( "paint" )
 end
 
 --[[----------------------------------------
@@ -47,12 +47,12 @@ end
 --]]----------------------------------------
 
 function GUICheck( x, y, button )
-	local in_area = util.IsInArea
-	for k, panel in pairs( gui.Objects ) do
-		local p_x,p_y = panel:GetPos()
-		local p_w,p_h = panel:GetSize()
+	local in_area = util.isInArea
+	for k, panel in pairs( gui.objects ) do
+		local p_x,p_y = panel:getPos()
+		local p_w,p_h = panel:getSize()
 		if in_area( x, y, p_x, p_y, p_w, p_h ) then
-			panel:__Click( button )
+			panel:__click( button )
 		end
 	end
 end

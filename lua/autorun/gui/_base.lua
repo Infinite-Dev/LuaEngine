@@ -17,18 +17,18 @@ local lm = love.mouse
  
 local PANEL = {}
 
-function PANEL:_Initialize()
+function PANEL:_initialize()
 end
 
-function PANEL:Init()
+function PANEL:init()
 end
 
-function PANEL:SetClampDrawing( bool )
+function PANEL:setClampDrawing( bool )
 	self.__clampDrawing = bool
 end
 
-function PANEL:SetParent( pnl )
-	local parent = self:GetParent()
+function PANEL:setParent( pnl )
+	local parent = self:getParent()
 	if parent then
 		local new_children = {}
 		for k,v in pairs( parent.__children ) do
@@ -42,75 +42,75 @@ function PANEL:SetParent( pnl )
 	pnl.__children[ #pnl.__children + 1] = self
 end
 
-function PANEL:GetParent()
+function PANEL:getParent()
 	if self.__parent ~= nil and self.__parent > 0 then
-		return gui.Objects[ self.__parent ]
+		return gui.objects[ self.__parent ]
 	end
 	return false
 end
 
-function PANEL:IsChild()
-	if type( self:GetParent() ) == "table" then
+function PANEL:isChild()
+	if type( self:getParent() ) == "table" then
 		return true
 	end
 return false
 end
 
-function PANEL:IsParent()
+function PANEL:isParent()
 	return #self.__children > 0
 end	
 
-function PANEL:SetSize( w, h )
+function PANEL:setSize( w, h )
 	self.__w = w
 	self.__h = h
-	self:OnSizeChanged()
+	self:onSizeChanged()
 end
 
-function PANEL:OnSizeChanged()
+function PANEL:onSizeChanged()
 end
 
-function PANEL:Center()
-	if self:IsChild() then
+function PANEL:center()
+	if self:isChild() then
 	
-		local parent = self:GetParent()
-		local x,y = parent:GetPos()
-		local w,h = parent:GetSize()
-		local w2,h2 = self:GetSize()
+		local parent = self:getParent()
+		local x,y = parent:getPos()
+		local w,h = parent:getSize()
+		local w2,h2 = self:getSize()
 		
-		self:SetPos( w/2 - w2/2 , h/2 - h2/2 )
+		self:setPos( w/2 - w2/2 , h/2 - h2/2 )
 		
 		self.__centred = true
 		
 	else
-		local x,y = lg.getWidth()/2 - self:GetWide()/2, lg.getHeight()/2 - self:GetTall()/2
-		self:SetPos( x, y )
+		local x,y = lg.getWidth()/2 - self:getWide()/2, lg.getHeight()/2 - self:getTall()/2
+		self:setPos( x, y )
 		self.__centred = true
 	end
 end
 
-function PANEL:GetSize()
+function PANEL:getSize()
 	return (self.__w),(self.__h)
 end
 
-function PANEL:GetTall()
+function PANEL:getTall()
 	return self.__h
 end
 
-function PANEL:GetWide()
+function PANEL:getWide()
 	return self.__w
 end
 
-function PANEL:SetPos( x, y )
+function PANEL:setPos( x, y )
 	if type( x ) == "table" then 
 		y = x.y
 		x = x.x  
 	end 
 	local x = math.floor( x )
 	local y = math.floor( y )
-	local oldx,oldy = self:GetPos()
-	if self:IsChild() then
-		local prnt = self:GetParent()
-		local _x,_y = prnt:GetPos()
+	local oldx,oldy = self:getPos()
+	if self:isChild() then
+		local prnt = self:getParent()
+		local _x,_y = prnt:getPos()
 		self.__x = x + _x
 		self.__y = y + _y
 	else
@@ -118,10 +118,10 @@ function PANEL:SetPos( x, y )
 		self.__y = y
 	end
 	
-	if self:IsParent() then
+	if self:isParent() then
 		for i = 1,#self.__children do
 			local child = self.__children[ i ]
-			local _x,_y = child:GetPos()
+			local _x,_y = child:getPos()
 			local x_add = _x - oldx 
 			local y_add = _y - oldy
 			child.__x = x + x_add
@@ -131,61 +131,61 @@ function PANEL:SetPos( x, y )
 	self.centred = false
 end
 
-function PANEL:GetPos()
+function PANEL:getPos()
 	return self.__x,self.__y
 end
 
-function PANEL:GetX()
+function PANEL:getX()
 	return self.__x
 end
 
-function PANEL:GetY()
+function PANEL:getY()
 	return self.__y
 end
 
-function PANEL:Paint( w, h )
+function PANEL:paint( w, h )
 	lg.setColor( 88, 88, 88, 255 )
 	lg.rectangle( "fill", 0, 0, w, h )
 end
 
-function PANEL:IsHovered()
-	return self.__Hovered
+function PANEL:isHovered()
+	return self.__hovered
 end
 
-function PANEL:PaintOver( w, h )
+function PANEL:paintOver( w, h )
 end
 
-function PANEL:Think()
+function PANEL:think()
 end
 
-function PANEL:OnCursorEntered()
+function PANEL:onCursorEntered()
 end	
 
-function PANEL:OnCursorExited()
+function PANEL:onCursorExited()
 end
 
-function PANEL:CanClick()
-	return self.__CanClick
+function PANEL:canClick()
+	return self.__canClick
 end
 
-function PANEL:__Click()
+function PANEL:__click()
 
 end
 
-local in_area = util.IsInArea
-function PANEL:__MouseThink()
+local in_area = util.isInArea
+function PANEL:__mouseThink()
 	local x,y = lm.getPosition()
-	if self.__Hovered == false and in_area( x, y, self.__x, self.__y, self:GetSize() ) then
-		self.__Hovered = true
-		self:OnCursorEntered()
-	elseif self.__Hovered == true and not in_area( x, y, self.__x, self.__y, self:GetSize() ) then
-		self.__Hovered = false
-		self:OnCursorExited()
+	if self.__hovered == false and in_area( x, y, self.__x, self.__y, self:getSize() ) then
+		self.__hovered = true
+		self:onCursorEntered()
+	elseif self.__hovered == true and not in_area( x, y, self.__x, self.__y, self:getSize() ) then
+		self.__hovered = false
+		self:onCursorExited()
 	end
 end
 
 function PANEL:moveTo( x, y, time, ease )
-	local pX,pY = self:GetPos()
+	local pX,pY = self:getPos()
 	local dist = math.distance( pX, pY, x, y )
 	local vec = Vector( x, y )
 	local vec2 = Vector( pX, pY )
@@ -194,21 +194,22 @@ function PANEL:moveTo( x, y, time, ease )
 	local t = love.timer.getTime()
 	local tEnd = t + time 
 	local hname = "MoveHook"..tostring( self )
-	hook.Add( "Think", hname, function()
+	hook.add( "Think", hname, function()
 		if self then 
 			local p = (love.timer.getTime()-t)/(time)
-			self:SetPos( (vec2 + add*p) ) 
+			self:setPos( (vec2 + add*p) ) 
 			if p >= 1 then 
-				hook.Remove( "Think", hname )
+				self:setPos( x, y )
+				hook.remove( "Think", hname )
 			end 
 		else 
-			hook.Remove( "Think", hname )
+			hook.remove( "Think", hname )
 		end  
 	end ) 
 end 
 
-function PANEL:Remove()
-	local parent = self:GetParent()
+function PANEL:remove()
+	local parent = self:getParent()
 	if parent then
 		local new_children = {}
 		for k,v in pairs( parent.__children ) do
@@ -219,9 +220,9 @@ function PANEL:Remove()
 		parent.__children = new_children
 	end
 	for k, child in pairs(self.__children) do
-		child:Remove()
+		child:remove()
 	end
-	gui.Objects[ self.__id ] = nil
+	gui.objects[ self.__id ] = nil
 end
 
-gui.Register( "Base", PANEL )
+gui.register( "base", PANEL )

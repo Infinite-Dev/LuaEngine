@@ -1,21 +1,21 @@
 
 ents = {}
-ents.__Index = {}
-ents.__List = {}
+ents._index = {}
+ents._list = {}
 
 function Entity( id )
-	return ents.GetIndex()[ i ]
+	return ents.getIndex()[ i ]
 end 
 
-function ents.Create( ent_name )
+function ents.create( ent_name )
 
-	local eList = ents.GetList()
+	local eList = ents.getList()
 	local ent = eList[ ent_name ]
-	local l = ents.GetIndex()
+	local l = ents.getIndex()
 
 	if ent then 
 
-		local nEnt = table.Copy( ent )
+		local nEnt = table.copy( ent )
 
 		if nEnt.Base then 
 
@@ -31,7 +31,7 @@ function ents.Create( ent_name )
 
 		end 
 
-		nEnt.__Index = #l+1
+		nEnt._index = #l+1
 		l[ #l+1 ] = nEnt
 
 		return nEnt
@@ -47,19 +47,19 @@ function ents.Create( ent_name )
 
 end
 
-function ents.GetAll()
-	return ents.GetIndex()
+function ents.getAll()
+	return ents.getIndex()
 end
 
 local dist = math.Distance
 local p = pairs 
-function ents.FindInRadius( vec, radius )
+function ents.findInRadius( vec, radius )
 
 	local e = {}
 
-	for k,v in p( ents.GetAll() ) do
+	for k,v in p( ents.getAll() ) do
 
-		local pos = v:GetPos()
+		local pos = v:getPos()
 		if dist( vec.x, vec.y, pos.x, pos.y ) <= radius then
 			e[ #e+1 ] = v
 		end
@@ -70,34 +70,34 @@ function ents.FindInRadius( vec, radius )
 
 end
 
-function ents.GetIndex()
-	return ents.__Index
+function ents.getIndex()
+	return ents._index
 end
 
-function ents.GetList()
-	return ents.__List
+function ents.getList()
+	return ents._list
 end
 
-function ents.Think()
-	for k,v in p( ents.GetAll() ) do
-		v:Think()
+function ents.think()
+	for k,v in p( ents.getAll() ) do
+		v:think()
 	end 
 end 
 
-function ents.Draw()
-	for k,v in p( ents.GetAll() ) do
-		if v:ShouldDraw() then
-			v:Draw()
+function ents.draw()
+	for k,v in p( ents.getAll() ) do
+		if v:shouldDraw() then
+			v:draw()
 		end 
 	end 
 end 
 
-function ents.RegisterEntity( name, tbl, base )
+function ents.registerEntity( name, tbl, base )
 	local tbl = setmetatable( tbl, base or _E )
-	ents.GetList()[ name ] = tbl
+	ents.getList()[ name ] = tbl
 end 
 
-function ents.LoadEntities( dir )
+function ents.loadEntities( dir )
 	dir = dir or "lua/entities"
 	local objects = love.filesystem.getDirectoryItems( dir )
 	local tbl = {}
@@ -116,6 +116,6 @@ function ents.LoadEntities( dir )
 	end
 	
 	for i = 1,#tbl do
-		ents.LoadEntities( tbl[ i ] )
+		ents.loadEntities( tbl[ i ] )
 	end
 end

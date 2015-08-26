@@ -23,11 +23,11 @@ local buttonD =
 		game.changeState( "game" )
 	end },	
 	{ "Highscores", function( self )
-		local prnt = self:GetParent()
-		local w,h = prnt:GetSize()
-		local scores = gui.Create( "scores", prnt )
+		local prnt = self:getParent()
+		local w,h = prnt:getSize()
+		local scores = gui.create( "scores", prnt )
 		
-		scores:SetPos( w, 0 )
+		scores:setPos( w, 0 )
 		prnt:moveTo( -w, 0, 1 )
 
 	end },
@@ -37,12 +37,12 @@ local buttonD =
 }
 
 local padding = 40 
-function PANEL:Init() 
+function PANEL:init() 
 
 	self.buttons = {}
 	local w, h = love.graphics.getDimensions()
-	self:SetSize( w, h )
-	self:Center()
+	self:setSize( w, h )
+	self:center()
 
 	local bWidth = w/5
 	local bHeight = h/10
@@ -51,44 +51,44 @@ function PANEL:Init()
 	for i = 1,#buttonD do
 
 		local tbl = buttonD[ i ]
-		local b = gui.Create( "Button", self )
+		local b = gui.create( "button", self )
 		local bY = gap*(i-1) + bHeight/2 -- fuk dis gey erth
-		b.DoClick = tbl[ 2 ]
-		b:SetSize( bWidth, bHeight )
-		b:SetPos( w/2 - bWidth/2, bY + padding ) 
-		b:SetText( tbl[ 1 ] )
+		b.doClick = tbl[ 2 ]
+		b:setSize( bWidth, bHeight )
+		b:setPos( w/2 - bWidth/2, bY + padding ) 
+		b:setText( tbl[ 1 ] )
 		b.clr = 120
 		b.alpha = 150
 		b.tAlpha = 150
 
-		function b:Paint( w, h )
+		function b:paint( w, h )
 
 		end 
 
-		function b:OnCursorEntered()
+		function b:onCursorEntered()
 			self.tAlpha = 255
 		end 
 
-		function b:OnCursorExited()
+		function b:onCursorExited()
 			self.tAlpha = 150
 		end 
 
-		function b:Think()
+		function b:think()
 			if self.alpha ~= self.tAlpha then
 				self.alpha = math.approach( self.alpha, self.tAlpha, 8 )
-				b:SetTextColor( { self.clr, self.clr, self.clr, self.alpha } )
+				b:setTextColor( { self.clr, self.clr, self.clr, self.alpha } )
 			end 
 		end 
 
-		b:SetTextColor( { b.clr, b.clr, b.clr, b.alpha } )
+		b:setTextColor( { b.clr, b.clr, b.clr, b.alpha } )
 	end 
 
 end 
 
-function PANEL:Paint()
+function PANEL:paint()
 
 	lg.setColor( 11, 11, 11, 120 )
-	lg.rectangle( "fill", 0, 0, self:GetWide(), self:GetTall() )
+	lg.rectangle( "fill", 0, 0, self:getWide(), self:getTall() )
 
 end
-gui.Register( "aMenu", PANEL, "Panel" )
+gui.register( "aMenu", PANEL, "panel" )

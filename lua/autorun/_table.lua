@@ -1,9 +1,9 @@
 
 --[[----------------------------------------
-	table.Copy( table )
+	table.copy( table )
 	Used to create a new instance of a table.
 --]]----------------------------------------
-table.Copy = function( tbl )
+table.copy = function( tbl )
 	local c_tbl = {}
 	for k,v in pairs( tbl ) do
 		c_tbl[ k ] = v

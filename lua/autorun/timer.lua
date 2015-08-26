@@ -5,11 +5,11 @@ timer = {}
 timer.List = {}
 
 --[[----------------------------------------
-	timer.Create( name, delay, repeats, func, start_running )
+	timer.create( name, delay, repeats, func, start_running )
 	Used to create timers. start_running determines wether or not
 	the timer starts paused.
 --]]----------------------------------------
-function timer.Create( name, delay, repeats, func, start_running )
+function timer.create( name, delay, repeats, func, start_running )
 	local infinite = (repeats <= 0 and true or false )
 	local time = lt.getTime()
 	timer.List[ name ] = { delay = delay, repeats = repeats, func = func, is_running = ( start_running or true), start = time, data =
@@ -23,20 +23,20 @@ function timer.Create( name, delay, repeats, func, start_running )
 end
 
 --[[----------------------------------------
-	timer.Simple( delay, func, repeats )
-	A simplified version of timer.Create, 
+	timer.simple( delay, func, repeats )
+	A simplified version of timer.create, 
 	useful if you need to quickly use a timer.
 	The number of repeats is optional.
 --]]----------------------------------------
-function timer.Simple( delay, func, repeats )
-	timer.Create( #timer.List+1, delay, repeats or 1, func, true )
+function timer.simple( delay, func, repeats )
+	timer.create( #timer.List+1, delay, repeats or 1, func, true )
 end
 
 --[[----------------------------------------
-	timer.Pause( name )
+	timer.pause( name )
 	Used to pause a timer, saves repeats, time left, etc.
 --]]----------------------------------------
-function timer.Pause( name )
+function timer.pause( name )
 	local t = timer.List[ name ]
 	if t then
 		if t.is_running then
@@ -53,10 +53,10 @@ function timer.Pause( name )
 end 
 
 --[[----------------------------------------
-	timer.Resume( name )
+	timer.resume( name )
 	Used to resume a paused timer.
 --]]----------------------------------------
-function timer.Resume( name )
+function timer.resume( name )
 	local t = timer.List[ name ]
 	if t then
 		if not t.is_running then
@@ -73,10 +73,10 @@ function timer.Resume( name )
 end
 
 --[[----------------------------------------
-	timer.Stop( name )
+	timer.stop( name )
 	Used to stop timers, resets all its values.
 --]]----------------------------------------
-function timer.Stop( name )
+function timer.stop( name )
 	local t = timer.List[ name ]
 	if t then
 		if t.is_running then
@@ -90,10 +90,10 @@ function timer.Stop( name )
 end 
 
 --[[----------------------------------------
-	timer.Start( name )
+	timer.start( name )
 	Restarts a stopped timer.
 --]]----------------------------------------
-function timer.Start( name )
+function timer.start( name )
 	local t = timer.List[ name ]
 	if t then
 		if not t.is_running then
@@ -110,30 +110,30 @@ function timer.Start( name )
 end 
 
 --[[----------------------------------------
-	timer.Restart( name )
+	timer.restart( name )
 	Restarts a timer, akin to immediately starting
 	and stopping it.
 --]]----------------------------------------
-function timer.Restart( name, resest )
+function timer.restart( name, resest )
 	local reset = reset or true 
 	local t = timer.List[ name ]
 	if t then
 		if reset then
-			timer.Stop( name )
-			timer.Start( name )
+			timer.stop( name )
+			timer.start( name )
 		else 
-			timer.Pause( name )
-			timer.Resume( name )
+			timer.pause( name )
+			timer.resume( name )
 		end 
 	else 
 		uerror( ERROR_TIMER, "Attempted to restart an invalid timer." )
 	end
 end
 --[[----------------------------------------
-	timer.Remove( name )
+	timer.remove( name )
 	Used to remove a timer.
 --]]----------------------------------------
-function timer.Remove( name )
+function timer.remove( name )
 	timer.List[ name ] = nil
 end
 
@@ -141,7 +141,7 @@ end
 	timer.Think()
 	Internal. Do not overwrite.
 --]]----------------------------------------
-function timer.Think()
+function timer.think()
 	local time = lt.getTime()
 	for k,v in pairs( timer.List ) do
 		if v.is_running then
@@ -149,7 +149,7 @@ function timer.Think()
 				v.func()
 				v.repeats = v.repeats - 1
 				if v.repeats <= 0 and not v.data.infinite then
-					timer.Remove( k )
+					timer.remove( k )
 				else
 					v.start = time
 				end

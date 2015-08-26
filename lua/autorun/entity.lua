@@ -2,91 +2,91 @@
 _E = {}
 _E.__index = _E
 
-function _E:Initialize()
+function _E:initialize()
 
 end
 
-function _E:GetIndex()
-	return self.__Index
+function _E:getIndex()
+	return self._index
 end
 
-function _E:Draw()
-	self:DrawImage()
+function _E:draw()
+	self:drawImage()
 end
 
-function _E:Think()
+function _E:think()
 
 end
 
-function _E:Touch()
+function _E:touch()
 
 end 
 
-function _E:PhysicsCollide()
+function _E:physicsCollide()
 
 end 
 
-function _E:SetHull( vec, vec2 )
+function _E:setHull( vec, vec2 )
 	self.__Mins = vec 
 	self.__Max = vec2 
 end 
 
-function _E:GetColor()
+function _E:getColor()
 	return self.__Color
 end 
 
-function _E:SetColor( clr )
+function _E:setColor( clr )
 	self.__Color = clr 
 end
 
-function _E:SetAlpha( a )
+function _E:setAlpha( a )
 
 end  
 
-function _E:PhysicsInit()
+function _E:physicsinit()
 
 end 
 
-function _E:PhysWake()
+function _E:physWake()
 
 end 
 
-function _E:PhysSleep()
+function _E:physSleep()
 
 end
 
-function _E:SetImage( img )
+function _E:setImage( img )
 	if type( img ) == "image" then 
-		self.__Image = img 
+		self.__image = img 
 	else 
-		self.__Image = love.graphics.newImage( "sprites/"..img )
+		self.__image = love.graphics.newImage( "sprites/"..img )
 	end 
 end 
 
-function _E:GetImage() 
-	return self.__Image
+function _E:getImage() 
+	return self.__image
 end 
 
-function _E:DrawImage()
+function _E:drawImage()
 	love.graphics.draw( self:GetImage() )
 end
 
-function _E:Draw()
+function _E:draw()
 	self:DrawImage()
 end
 
-function _E:SetNoDraw( bool )
+function _E:setNoDraw( bool )
 	self.__shouldDraw = bool 
 end 
 
-function _E:ShouldDraw()
+function _E:shouldDraw()
 	return self.__shouldDraw
 end 
 
-function _E:SetPos( vec )
+function _E:setPos( vec )
 	self.__pos = vec 
 end 
 
-function _E:GetPos()
+function _E:getPos()
 	return self.__pos or Vector( 0, 0 )
 end 

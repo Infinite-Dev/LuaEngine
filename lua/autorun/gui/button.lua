@@ -15,7 +15,7 @@ local lg = love.graphics
 local lm = love.mouse
 local PANEL = {}
 
-function PANEL:_Initialize()
+function PANEL:_initialize()
 	self.__down = false
 	self.__down_delay = 2
 	self.__down_time = 0
@@ -24,26 +24,26 @@ function PANEL:_Initialize()
 	self.__textcolor = { 120, 120, 120, 255 }
 	self.__gradient = 2
 	self.__text = "Click me!"
-	self.__CanClick = true
+	self.__canClick = true
 end
 
-function PANEL:SetGradient( grad )
+function PANEL:setGradient( grad )
 	self.__gradient = grad
 end
 
-function PANEL:GetGradient()
+function PANEL:getGradient()
 	return self.__gradient
 end
 
-function PANEL:SetText( text )
+function PANEL:setText( text )
 	self.__text = text
 end
 
-function PANEL:GetText( text )
+function PANEL:getText( text )
 	return self.__text
 end
 
-function PANEL:SetTextColor( r, g, b, a )
+function PANEL:setTextColor( r, g, b, a )
 	if type( r ) == "table" then
 		self.__textcolor = r
 	else
@@ -51,36 +51,36 @@ function PANEL:SetTextColor( r, g, b, a )
 	end
 end
 
-function PANEL:GetTextColor()
+function PANEL:getTextColor()
 	return self.__textcolor 
 end
 
-function PANEL:SetFont()
+function PANEL:setFont()
 
 end
 
-function PANEL:DoClick()
+function PANEL:doClick()
 
 end
 
-function PANEL:DoRightClick()
+function PANEL:doRightClick()
 
 end
 
 local key_funcs = 
 {
 	[ "l" ] = function( pnl )
-		if pnl.DoClick then
-			pnl:DoClick()
+		if pnl.doClick then
+			pnl:doClick()
 		end
 	end,
 	[ "r" ] = function( pnl )
-		if pnl.DoRightClick then
-			pnl:DoRightClick()
+		if pnl.doRightClick then
+			pnl:doRightClick()
 		end
 	end
 }
-function PANEL:__Click( key )
+function PANEL:__click( key )
 	if key_funcs[ key ] then
 		key_funcs[ key ]( self )
 	end
@@ -88,8 +88,8 @@ function PANEL:__Click( key )
 	self.__down_time = love.timer.getTime() + self.__down_delay
 end
 
-function PANEL:Paint( w, h )
-	local grad = self:GetGradient()
+function PANEL:paint( w, h )
+	local grad = self:getGradient()
 	for i = 1,grad do
 		lg.setColor( self.__color[ 1 ], self.__color[ 2 ], self.__color[ 3 ], self.__color[ 4 ]/i )
 		lg.rectangle( "fill", grad - i, grad - i, w - grad*2 + i*2, h - grad*2 + i*2 )
@@ -98,13 +98,13 @@ function PANEL:Paint( w, h )
 	lg.rectangle( "fill", grad, grad, w-grad*2, h-grad*2 )
 end
 
-function PANEL:PaintOver( w, h )
-	local text = self:GetText() or "Click me!"
+function PANEL:paintOver( w, h )
+	local text = self:getText() or "Click me!"
 	local font = love.graphics.getFont()
 	local w2,h2 = font:getWidth( text ),font:getHeight( text )
-	lg.setColor( unpack( self:GetTextColor() ) )
+	lg.setColor( unpack( self:getTextColor() ) )
 	lg.print( text, w/2 - w2/2, h/2 - h2/2 )
 end
 
-gui.Register( "Button", PANEL, "Base" )
+gui.register( "button", PANEL, "base" )
 

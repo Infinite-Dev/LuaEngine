@@ -30,11 +30,11 @@ end
 game.states.changeFuncs =
 {
 	paused = function()
-		local resume = gui.Create( "DButton" )
-		resume:SetSize( 40, 20 )
+		local resume = gui.create( "DButton" )
+		resume:setSize( 40, 20 )
 		resume:Centre()
-		resume:SetText( "Resume" )
-		resume.DoClick = function()
+		resume:setText( "Resume" )
+		resume.doClick = function()
 			game.changeState( "running" )
 		end
 		game.pause()
@@ -43,7 +43,7 @@ game.states.changeFuncs =
 		game.unpause()
 	end,
 	menu = function()
-		local mainMenu = gui.Create( "aMenu" )
+		local mainMenu = gui.create( "aMenu" )
 		game.stop()
 	end 
 } 
@@ -51,17 +51,17 @@ game.states.changeFuncs =
 game.states.thinkFuncs = 
 {
 	paused = function()
-		gui.Update()
+		gui.update()
 	end, 
 	game = function()
-		gui.Update()
-		timer.Think()
-		ents.Think()
-		hook.Call( "Think" )
+		gui.update()
+		timer.think()
+		ents.think()
+		hook.call( "Think" )
 	end,
 	menu = function()
-		gui.Update()
-		timer.Think()
-		hook.Call( "Think" )
+		gui.update()
+		timer.think()
+		hook.call( "Think" )
 	end 
 }
