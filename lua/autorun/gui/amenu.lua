@@ -15,15 +15,21 @@ local PANEL = {}
 
 local buttonD =
 {
-	{ "New Game", function()
+	{ "New Game", function( self)
 		game.changeState( "game" )
 	end },
 
 	{ "Load", function()
 		game.changeState( "game" )
 	end },	
-	{ "Highscores", function()
-		game.changeState( "game" )
+	{ "Highscores", function( self )
+		local prnt = self:GetParent()
+		local w,h = prnt:GetSize()
+		local scores = gui.Create( "scores", prnt )
+		
+		scores:SetPos( w, 0 )
+		prnt:moveTo( -w, 0, 1 )
+
 	end },
 	{ "Quit", function()
 		game.changeState( "game" )
@@ -51,9 +57,9 @@ function PANEL:Init()
 		b:SetSize( bWidth, bHeight )
 		b:SetPos( w/2 - bWidth/2, bY + padding ) 
 		b:SetText( tbl[ 1 ] )
-		b.clr = 88
-		b.alpha = 180
-		b.tAlpha = 180
+		b.clr = 120
+		b.alpha = 150
+		b.tAlpha = 150
 
 		function b:Paint( w, h )
 
@@ -64,12 +70,13 @@ function PANEL:Init()
 		end 
 
 		function b:OnCursorExited()
-			self.tAlpha = 180
+			self.tAlpha = 150
 		end 
 
 		function b:Think()
 			if self.alpha ~= self.tAlpha then
-				self.alpha = math.approach( self.alpha, self.tAlpha, 2 )
+				self.alpha = math.approach( self.alpha, self.tAlpha, 8 )
+				b:SetTextColor( { self.clr, self.clr, self.clr, self.alpha } )
 			end 
 		end 
 

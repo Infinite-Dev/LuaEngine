@@ -184,6 +184,29 @@ function PANEL:__MouseThink()
 	end
 end
 
+function PANEL:moveTo( x, y, time, ease )
+	local pX,pY = self:GetPos()
+	local dist = math.distance( pX, pY, x, y )
+	local vec = Vector( x, y )
+	local vec2 = Vector( pX, pY )
+	local norm = (vec-vec2):normalized()
+	local add = (norm*dist)
+	local t = love.timer.getTime()
+	local tEnd = t + time 
+	local hname = "MoveHook"..tostring( self )
+	hook.Add( "Think", hname, function()
+		if self then 
+			local p = (love.timer.getTime()-t)/(time)
+			self:SetPos( (vec2 + add*p) ) 
+			if p >= 1 then 
+				hook.Remove( "Think", hname )
+			end 
+		else 
+			hook.Remove( "Think", hname )
+		end  
+	end ) 
+end 
+
 function PANEL:Remove()
 	local parent = self:GetParent()
 	if parent then
