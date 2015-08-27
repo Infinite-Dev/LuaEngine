@@ -15,23 +15,12 @@ function ents.create( ent_name )
 
 	if ent then 
 
-		local nEnt = table.copy( ent )
-
-		if nEnt.Base then 
-
-			if eList[ nEnt.Base ] then
-
-			 	setmetatable( nEnt, eList[ nEnt.Base ] )
-
-			else
-
-				uerror( ERROR_ENTIY, "Invalid entity base specified, expect errors!" )
-			
-			end 
-
-		end 
+		local nEnt = table.copy( ent[ 1 ] )
+		setmetatable( nEnt, ent[ 2 ] )
 
 		nEnt._index = #l+1
+		nEnt:_initialize()
+		nEnt:initialize()
 		l[ #l+1 ] = nEnt
 
 		return nEnt
@@ -86,15 +75,14 @@ end
 
 function ents.draw()
 	for k,v in p( ents.getAll() ) do
-		if v:shouldDraw() then
+		--if v:shouldDraw() then
 			v:draw()
-		end 
+		--end 
 	end 
 end 
 
 function ents.registerEntity( name, tbl, base )
-	local tbl = setmetatable( tbl, base or _E )
-	ents.getList()[ name ] = tbl
+	ents.getList()[ name ] = { tbl, (base or _E ) }
 end 
 
 function ents.loadEntities( dir )
@@ -105,13 +93,8 @@ function ents.loadEntities( dir )
 		if love.filesystem.isDirectory( dir.."/"..objects[ i ] ) then
 			tbl[ #tbl + 1 ] = dir.."/"..objects[ i ]
 		else 
-			local e = dir.."/"..string.sub( objects[ i ], 0, string.len( objects[ i ] ) )
-			local ok, chunk, result
-			ok, chunk = pcall( love.filesystem.load,  e )
-			print( e )
-			if ok then 
-				chunk()
-			end 
+			local e = dir.."/"..string.sub( objects[ i ], 0, string.len( objects[ i ] )-4 )
+			require( e )
 		end
 	end
 	
@@ -119,3 +102,5 @@ function ents.loadEntities( dir )
 		ents.loadEntities( tbl[ i ] )
 	end
 end
+
+ents.loadEntities()

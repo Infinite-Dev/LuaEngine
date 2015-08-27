@@ -32,6 +32,7 @@ end
 
 function love.draw()
 	gui.draw()
+	ents.draw()
 	hook.call( "paint" )
 end
 

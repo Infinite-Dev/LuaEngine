@@ -2,6 +2,13 @@
 _E = {}
 _E.__index = _E
 
+function _E:_initialize()
+	self:setPos( Vector( 0, 0 ) )
+	self:generateBody( game.getWorld(), "static" )
+	self:setHull( 5, 5 )
+	self.__shouldDraw = true 
+end
+
 function _E:initialize()
 
 end
@@ -26,9 +33,79 @@ function _E:physicsCollide()
 
 end 
 
-function _E:setHull( vec, vec2 )
-	self.__Mins = vec 
-	self.__Max = vec2 
+function _E:setBodyType( type )
+	self:getBody():setType( type )
+end 
+
+function _E:generateBody( world, type )
+	local x,y = self:getNumPos()
+	local body = love.physics.newBody( world, x, y, type )
+	self:setBody( body )
+end 
+
+function _E:setBody( body )
+	self.__body = body
+end 
+
+function _E:getBody()
+	local fix = self:getFixture()
+	if fix then
+		return fix:getBody()
+	else
+		return self.__body 
+	end
+end 
+
+function _E:getFixture()
+	return self.__fixture 
+end 
+
+function _E:setFixture( fix )
+	self.__fixture = fix 
+end 
+
+function _E:setGroupIndex( group )
+	if self:getFixture() then
+		self:getFixture():setGroupIndex( group )
+	end
+end 
+
+function _E:setShape( shape, density )
+	self.__shape = shape 
+	local fix = love.physics.newFixture( self:getBody(), self:getShape(), density or 1 )
+	self:setFixture( fix )
+end 
+
+function _E:newCircleShape( rad )
+	local shape = love.physics.newCircleShape( rad )
+	self:setShape( shape )
+end 
+
+function _E:newChainShape( ... )
+	local shape = love.physics.newChainShape( unpack( ... ) )
+	self:setShape( shape )
+end 
+
+function _E:newPolygonShape( ... )
+	local shape = love.physics.newPolygonShape( unpack( ... ) )
+	self:setShape( shape )
+end
+
+function _E:newRectangleShape( width, height )
+	local shape = love.physics.newRectangleShape( width, height )
+	self:setShape( shape )
+end 
+
+function _E:getShape()
+	if not self:getFixture() then
+		return self.__shape 
+	else 
+		return self:getFixture():getShape()
+	end 
+end 
+
+function _E:setHull( width, height )
+	self:newRectangleShape( width, height )
 end 
 
 function _E:getColor()
@@ -83,10 +160,27 @@ function _E:shouldDraw()
 	return self.__shouldDraw
 end 
 
-function _E:setPos( vec )
-	self.__pos = vec 
+function _E:setPos( vec, y )
+	if y then
+		self.__pos = Vector( vec, y )
+	else 
+		self.__pos = vec 
+	end
+	local body = self:getBody()
+	body:setPosition( self:getNumPos() )
 end 
 
 function _E:getPos()
-	return self.__pos or Vector( 0, 0 )
+	local body = self:getBody()
+	if body then
+		local x,y = body:getPosition()
+		return Vector( x, y )
+	else 
+		return  self.__pos or Vector( 0, 0 )
+	end
+end 
+
+function _E:getNumPos()
+	local p = self:getPos()
+	return p.x,p.y
 end 

@@ -26,7 +26,7 @@ function PANEL:_initialize()
 		self.close_btn:getParent():remove()
 	end
 	
-	self:SetTitleColor( {255, 255, 255, 255 } )
+	self:setTitleColor( {255, 255, 255, 255 } )
 end
 
 function PANEL:onSizeChanged()

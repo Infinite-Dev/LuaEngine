@@ -13,40 +13,59 @@ local lg = love.graphics
 local lm = love.mouse
 local PANEL = {}
 
-local titleFont = lg.newFont( "resources/fonts/FREEDOM.ttf", 40 )
+local titleFont = lg.newFont( "resources/fonts/FREEDOM.ttf", 20 )
 
 function PANEL:init()
-	local w, h = love.graphics.getDimensions()
-	self:setSize( w, h )
+	self.yButton = gui.create( "button", self )
+	self.yButton:setText( "Yes" )
+	self.yButton.doClick = function( btn )
+		self:yesFunc()
+	end 
 
-	local prnt = self:getParent()
-
-	local sz = 40
-	local csz = sz*0.8
-	local pad = 10
-	local b = gui.create( "button", self )
-	b:setPos( pad, pad )
-	b:setSize( sz, sz )
-	b:setText( "back" )
-	function b:paint( w, h )
-		lg.setColor( 255, 255, 255, 220 )
-		love.graphics.circle( "line", w/2, w/2, csz/2, 100 )
-	end
-	function b:doClick()
-		prnt:moveTo( 0, 0, 1, 0.5, 0.5 )
-	end  
+	self.nButton = gui.create( "button", self )
+	self.nButton:setText( "No" )
+	self.nButton.doClick = function( btn )
+		self:noFunc()
+	end 
 end 
 
-local hText = "HIGHSCORES"
+function PANEL:yesFunc()
+
+end 
+
+function PANEL:noFunc()
+
+end 
+
+function PANEL:setText( txt )
+	self.__text = txt 
+end
+
+function PANEL:getText()
+	return self.__text or "Are you sure"
+end 
+
+function PANEL:onSizeChanged()
+	local w,h = self:getSize()
+
+	local bW,bH = w/4, 30
+	self.yButton:setSize( bW, bH )
+	self.yButton:setPos( bW/2 , h - h/3 - bH/2 )
+
+	self.nButton:setSize( bW, bH )
+	self.nButton:setPos( w - bW*1.5, h - h/3 - bH/2 )
+end 
+
 function PANEL:paint( w, h )
 
-	lg.setColor( 11, 11, 11, 120 )
+	lg.setColor( 33, 33, 33, 240 )
 	lg.rectangle( "fill", 0, 0, w, h )
 
+	local hText = self:getText()
 	lg.setColor( 255, 255, 255, 230 )
 	lg.setFont( titleFont )
 	local fW,fH = titleFont:getWidth( hText ),titleFont:getHeight( hText )
-	lg.print( hText, w/2 - fW/2 , h/10 )
+	lg.print( hText, w/2 - fW/2 , h/3 - fH/2 )
 
 end
-gui.register( "scores", PANEL, "base" )
+gui.register( "ynBox", PANEL, "panel" )

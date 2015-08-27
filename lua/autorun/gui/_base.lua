@@ -38,15 +38,12 @@ function PANEL:setParent( pnl )
 		end
 		parent.__children = new_children
 	end
-	self.__parent = pnl.__id
+	self.__parent = pnl
 	pnl.__children[ #pnl.__children + 1] = self
 end
 
 function PANEL:getParent()
-	if self.__parent ~= nil and self.__parent > 0 then
-		return gui.objects[ self.__parent ]
-	end
-	return false
+	return self.__parent or false 
 end
 
 function PANEL:isChild()
@@ -57,8 +54,12 @@ return false
 end
 
 function PANEL:isParent()
-	return #self.__children > 0
+	return #self:getChildren() > 0
 end	
+
+function PANEL:getChildren()
+	return self.__children
+end 
 
 function PANEL:setSize( w, h )
 	self.__w = w
@@ -100,14 +101,20 @@ function PANEL:getWide()
 	return self.__w
 end
 
-function PANEL:setPos( x, y )
+function PANEL:setPos( x, y, floor )
+	floor = floor or true 
 	if type( x ) == "table" then 
 		y = x.y
 		x = x.x  
+		if type( y ) == "bool" then
+			floor = y 
+		end
 	end 
-	local x = math.floor( x )
-	local y = math.floor( y )
-	local oldx,oldy = self:getPos()
+	if floor then 
+		x = math.floor( x )
+		y = math.floor( y )
+	end 
+	local oldX,oldY = self:getPos()
 	if self:isChild() then
 		local prnt = self:getParent()
 		local _x,_y = prnt:getPos()
@@ -119,13 +126,11 @@ function PANEL:setPos( x, y )
 	end
 	
 	if self:isParent() then
-		for i = 1,#self.__children do
-			local child = self.__children[ i ]
-			local _x,_y = child:getPos()
-			local x_add = _x - oldx 
-			local y_add = _y - oldy
-			child.__x = x + x_add
-			child.__y = y + y_add
+		local cTbl = self:getChildren()
+		for i = 1,#cTbl do
+			local child = cTbl[ i ]
+			local cX,cY = child:getPos()
+			child:setPos( cX - oldX  , cY - oldY )
 		end
 	end
 	self.centred = false
@@ -184,7 +189,7 @@ function PANEL:__mouseThink()
 	end
 end
 
-function PANEL:moveTo( x, y, time, ease )
+function PANEL:moveTo( x, y, time, easein, easeout, callback )
 	local pX,pY = self:getPos()
 	local dist = math.distance( pX, pY, x, y )
 	local vec = Vector( x, y )
@@ -194,19 +199,30 @@ function PANEL:moveTo( x, y, time, ease )
 	local t = love.timer.getTime()
 	local tEnd = t + time 
 	local hname = "MoveHook"..tostring( self )
+	local delay = 0.01
+	local thinkTime = t 
 	hook.add( "Think", hname, function()
 		if self then 
-			local p = (love.timer.getTime()-t)/(time)
-			self:setPos( (vec2 + add*p) ) 
-			if p >= 1 then 
-				self:setPos( x, y )
-				hook.remove( "Think", hname )
+			local t2 = love.timer.getTime()
+			if t2 > thinkTime then  
+				local p = (t2-t)/(time)
+				local drawP = math.easeInOut( p, easein, easeout )
+				self:setPos( (vec2 + add*drawP), false ) 
+				if p >= 1 then 
+					self:setPos( x, y )
+					hook.remove( "Think", hname )
+					if callback then
+						callback( self )
+					end
+				end 
+				thinkTime = t2 + delay 
 			end 
 		else 
 			hook.remove( "Think", hname )
 		end  
 	end ) 
 end 
+
 
 function PANEL:remove()
 	local parent = self:getParent()

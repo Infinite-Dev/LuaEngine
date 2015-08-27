@@ -15,9 +15,11 @@ local lg = love.graphics
 local lm = love.mouse
 local PANEL = {}
 
+local defaultFont = lg.newFont( "resources/fonts/FREEDOM.ttf", 20 )
+
 function PANEL:_initialize()
 	self.__down = false
-	self.__down_delay = 2
+	self.__down_delay = 0.5
 	self.__down_time = 0
 	self.__alpha = 240
 	self.__color = { 230, 230, 230, 240 }
@@ -25,6 +27,7 @@ function PANEL:_initialize()
 	self.__gradient = 2
 	self.__text = "Click me!"
 	self.__canClick = true
+	self.__font = defaultFont 
 end
 
 function PANEL:setGradient( grad )
@@ -43,6 +46,14 @@ function PANEL:getText( text )
 	return self.__text
 end
 
+function PANEL:setEnabled( bool )
+	self.__enabled = bool 
+end 
+
+function PANEL:isEnabled()
+	return self.__enabled 
+end 
+
 function PANEL:setTextColor( r, g, b, a )
 	if type( r ) == "table" then
 		self.__textcolor = r
@@ -55,9 +66,13 @@ function PANEL:getTextColor()
 	return self.__textcolor 
 end
 
-function PANEL:setFont()
-
+function PANEL:setFont( font )
+	self.__font = font 
 end
+
+function PANEL:getFont()
+	return self.__font 
+end 
 
 function PANEL:doClick()
 
@@ -99,11 +114,16 @@ function PANEL:paint( w, h )
 end
 
 function PANEL:paintOver( w, h )
+
 	local text = self:getText() or "Click me!"
-	local font = love.graphics.getFont()
+	local font = self:getFont()
+
+	lg.setFont( font )
+
 	local w2,h2 = font:getWidth( text ),font:getHeight( text )
 	lg.setColor( unpack( self:getTextColor() ) )
 	lg.print( text, w/2 - w2/2, h/2 - h2/2 )
+
 end
 
 gui.register( "button", PANEL, "base" )

@@ -15,24 +15,34 @@ local PANEL = {}
 
 local buttonD =
 {
-	{ "New Game", function( self)
+	{ "New Game", function( self )
+		self:getParent():remove()
 		game.changeState( "game" )
 	end },
-
-	{ "Load", function()
+	{ "Load", function( self )
 		game.changeState( "game" )
 	end },	
 	{ "Highscores", function( self )
 		local prnt = self:getParent()
 		local w,h = prnt:getSize()
-		local scores = gui.create( "scores", prnt )
-		
-		scores:setPos( w, 0 )
-		prnt:moveTo( -w, 0, 1 )
-
+		if not self.scores then
+			self.scores = gui.create( "scores", prnt )
+			self.scores:setPos( w, 0 )
+		end 
+		prnt:moveTo( -w, 0, 1, 0.5, 0.5 )
 	end },
-	{ "Quit", function()
-		game.changeState( "game" )
+	{ "Quit", function( self )
+		local w,h = self:getParent():getSize()
+		local qConfirm = gui.create( "ynBox" )
+		qConfirm:setText( "Are you sure?" )
+		qConfirm:setSize( w/4, h/5 )
+		qConfirm:center()
+		function qConfirm:yesFunc()
+			love.event.quit( )
+		end 
+		function qConfirm:noFunc()
+			self:remove()
+		end 
 	end }
 }
 

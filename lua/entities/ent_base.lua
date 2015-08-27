@@ -1,4 +1,4 @@
 
 local ENT = {}
 
-ents.RegisterEntity( "ent_base", ENT )
+ents.registerEntity( "ent_base", ENT )
