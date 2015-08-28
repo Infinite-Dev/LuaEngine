@@ -116,4 +116,7 @@ function Vector:cross(other)
   return self.x * other.y - self.y * other.x
 end
 
+function vectorRandom()
+  return Vector( math.random( -1, 1), math.random( -1, 1 ) )
+end 
 setmetatable(Vector, { __call = function(_, ...) return Vector.new(...) end })

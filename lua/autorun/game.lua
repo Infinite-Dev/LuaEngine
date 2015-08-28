@@ -49,13 +49,18 @@ game.states.changeFuncs =
 	end,
 	game = function()
 		game.unpause()
-		game.setWorld( love.physics.newWorld( 0, 0, false ) )
+
+		love.physics.setMeter(64)
+		game.setWorld( love.physics.newWorld( 0, 0, true ) )
 
 		local ast = ents.create( "ent_asteroids" )
 		ast:setPos( 400, 300 )
 
-		local w,h = love.graphics.getDimensions()
-		local bounds = love.physics.newEdgeShape( 0, 0, w, 0, w, h, 0, h )
+		local top = ents.create( "ent_boundrytop" )
+		local left = ents.create( "ent_boundryleft" )
+		local bottom = ents.create( "ent_boundrybottom" )
+		local right = ents.create( "ent_boundryright" )
+
 	end,
 	menu = function()
 		local mainMenu = gui.create( "aMenu" )
@@ -72,7 +77,7 @@ game.states.thinkFuncs =
 		gui.update()
 		timer.think()
 		ents.think()
-		game.getWorld():update( love.timer.getTime() )
+		game.getWorld():update( love.timer.getDelta() )
 		hook.call( "Think" )
 	end,
 	menu = function()

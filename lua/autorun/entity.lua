@@ -4,9 +4,6 @@ _E.__index = _E
 
 function _E:_initialize()
 	self:setPos( Vector( 0, 0 ) )
-	self:generateBody( game.getWorld(), "static" )
-	self:setHull( 5, 5 )
-	self.__shouldDraw = true 
 end
 
 function _E:initialize()
@@ -48,12 +45,7 @@ function _E:setBody( body )
 end 
 
 function _E:getBody()
-	local fix = self:getFixture()
-	if fix then
-		return fix:getBody()
-	else
-		return self.__body 
-	end
+	return self.__body 
 end 
 
 function _E:getFixture()
@@ -70,38 +62,12 @@ function _E:setGroupIndex( group )
 	end
 end 
 
-function _E:setShape( shape, density )
+function _E:setShape( shape )
 	self.__shape = shape 
-	local fix = love.physics.newFixture( self:getBody(), self:getShape(), density or 1 )
-	self:setFixture( fix )
-end 
-
-function _E:newCircleShape( rad )
-	local shape = love.physics.newCircleShape( rad )
-	self:setShape( shape )
-end 
-
-function _E:newChainShape( ... )
-	local shape = love.physics.newChainShape( unpack( ... ) )
-	self:setShape( shape )
-end 
-
-function _E:newPolygonShape( ... )
-	local shape = love.physics.newPolygonShape( unpack( ... ) )
-	self:setShape( shape )
-end
-
-function _E:newRectangleShape( width, height )
-	local shape = love.physics.newRectangleShape( width, height )
-	self:setShape( shape )
 end 
 
 function _E:getShape()
-	if not self:getFixture() then
-		return self.__shape 
-	else 
-		return self:getFixture():getShape()
-	end 
+	return self.__shape 
 end 
 
 function _E:setHull( width, height )
@@ -167,7 +133,9 @@ function _E:setPos( vec, y )
 		self.__pos = vec 
 	end
 	local body = self:getBody()
-	body:setPosition( self:getNumPos() )
+	if body then 
+		body:setPosition( self:getNumPos() )
+	end 
 end 
 
 function _E:getPos()
