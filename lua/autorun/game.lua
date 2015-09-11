@@ -31,7 +31,24 @@ function game.getWorld()
 	return game.__world 
 end 
 
+function game.beginContact( a, b, coll )
+	hook.call( "beginContact", a, b, coll )
+end 
+
+function game.endContact( a, b, coll )
+	hook.call( "endContact", a, b, coll )
+end 
+
+function game.preSolve( a, b, coll )
+	hook.call( "preSolve", a, b, coll )
+end 
+
+function game.postSolve( a, b, coll, normalimpulse1, tangentimpulse1, normalimpulse2, tangentimpulse2 )
+	hook.call( "postSolve", a, b, coll, normalimpulse1, tangentimpulse1, normalimpulse2, tangentimpulse2 )
+end 
+
 function game.setWorld( world )
+	world:setCallbacks( game.beginContact, game.endContact, game.preSolve, game.postSolve )
 	game.__world = world 
 end 
 
@@ -53,13 +70,7 @@ game.states.changeFuncs =
 		love.physics.setMeter(64)
 		game.setWorld( love.physics.newWorld( 0, 0, true ) )
 
-		local ast = ents.create( "ent_asteroids" )
-		ast:setPos( 400, 300 )
-
-		local top = ents.create( "ent_boundrytop" )
-		local left = ents.create( "ent_boundryleft" )
-		local bottom = ents.create( "ent_boundrybottom" )
-		local right = ents.create( "ent_boundryright" )
+		game.setUp()
 
 	end,
 	menu = function()
@@ -86,3 +97,21 @@ game.states.thinkFuncs =
 		hook.call( "Think" )
 	end 
 }
+
+
+function game.setUp()
+	love.keyboard.setKeyRepeat(true)
+	for i = 1,4 do 
+		local ast = ents.create( "ent_asteroids" )
+		ast:setPos( math.random( 30, 400 ), math.random( 30, 400 ) )
+		ast:setMinMax( 40, 60 )
+		ast:setSize()
+		ast:generate()
+
+		local mul = ast.r*100
+		ast:moveRandom( mul )
+	end 
+
+	local ply = ents.create( "ent_player" )
+	ply:setPos( 400, 400 )
+end 

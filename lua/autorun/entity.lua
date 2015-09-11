@@ -127,14 +127,17 @@ function _E:shouldDraw()
 end 
 
 function _E:setPos( vec, y )
-	if y then
-		self.__pos = Vector( vec, y )
+	local p 
+	if y then 
+		p = { x = vec, y = y }
 	else 
-		self.__pos = vec 
+		p = { x = vec.x, y = vec.y }
 	end
 	local body = self:getBody()
-	if body then 
-		body:setPosition( self:getNumPos() )
+	if body then
+		body:setPosition( p.x, p.y )
+	else 
+		self.__pos = p 
 	end 
 end 
 
@@ -142,13 +145,12 @@ function _E:getPos()
 	local body = self:getBody()
 	if body then
 		local x,y = body:getPosition()
-		return Vector( x, y )
+		return x, y
 	else 
-		return  self.__pos or Vector( 0, 0 )
+		return  self.__pos.x, self.__pos.y 
 	end
 end 
 
-function _E:getNumPos()
-	local p = self:getPos()
-	return p.x,p.y
+function _E:remove()
+	self = nil 
 end 
