@@ -20,7 +20,7 @@ local buttonD =
 		game.changeState( "game" )
 	end },
 	{ "Load", function( self )
-		game.changeState( "game" )
+		
 	end },	
 	{ "Highscores", function( self )
 		local prnt = self:getParent()

@@ -177,6 +177,42 @@ function ENT:draw()
 	local points = {body:getWorldPoints( self:getShape():getPoints() )}
 	lg.polygon( "line", unpack( points ) )
 	
+	if self.moving then 
+		local x = points[ 1 ]
+		local y = points[ 2 ]
+
+		local v = Vector( x, y )
+
+		local x2 = points[ 5 ]
+		local y2 = points[ 6 ]
+
+		local v2 = Vector( x2, y2 )
+
+		local a = body:getAngle() + math.pi/2
+		local aX = math.cos( a )
+		local aY = math.sin( a )
+
+		local norm = (v2 - v):normalized()
+		local dist = math.distance( x, y, x2, y2 )
+		local distNorm = norm*dist 
+		local gap = norm*dist/3.5 
+
+		local x3 = x + gap.x - aX 
+		local y3 = y + gap.y - aY
+
+		local x4 = x + distNorm.x - gap.x - aX 
+		local y4 = y + distNorm.y - gap.y - aY 
+
+		local midX = (x + x2)/2 
+		local midY = (y + y2)/2
+
+		local r = 6
+		local x5 = midX - aX*r
+		local y5 = midY - aY*r
+
+
+		lg.polygon( "line", x3, y3, x4, y4, x5, y5 )
+	end 
 
 
 end 
