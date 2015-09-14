@@ -151,6 +151,28 @@ function _E:getPos()
 	end
 end 
 
+function _E:getIndex()
+	return self._index 
+end 
+
 function _E:remove()
-	self = nil 
+	local b = self:getBody()
+	local f = self:getFixture()
+	local s = self:getShape()
+
+	if f then 
+		f:destroy()
+	end 
+
+	if b then 
+		b:destroy()
+	end 
+
+	if s then 
+		--s:destroy()
+	end 
+
+	local e = ents.getIndex()
+	e[ self:getIndex() ] = nil 
+
 end 

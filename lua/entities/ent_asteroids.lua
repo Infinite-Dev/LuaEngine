@@ -50,10 +50,6 @@ function ENT:moveRandom( mul )
 	b:applyForce( self.direction.x, self.direction.y )
 end 
 
-function ENT:teleport( x, y )
-	self:setPos( x, y )
-end 
-
 function ENT:think()
 
 	local x,y = self:getPos()
@@ -65,13 +61,13 @@ function ENT:think()
 	local x3,y3 = x - compare, y - compare
 
 	if x3 > w + compare/2 then 
-		self:teleport( -compare, y )
+		self:setPos( -compare, y )
 	elseif y3 > h + compare/2 then
-		self:teleport( x, -compare )
+		self:setPos( x, -compare )
 	elseif x2 < -compare/2 then 
-		self:teleport( w + compare, y )
+		self:setPos( w + compare, y )
 	elseif y2 < -compare/2 then 
-		self:teleport( x, h + compare )
+		self:setPos( x, h + compare )
 	end  
 
 end 

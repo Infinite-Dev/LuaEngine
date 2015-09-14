@@ -36,6 +36,8 @@ function ENT:initialize()
 	self.health = 0 
 	self.moving = false 
 
+	self.bulletDelay = 0 
+
 end 
 
 function ENT:getHealth()
@@ -83,6 +85,22 @@ function ENT:physicsCollide( body, entBody, coll )
 	end 
 end 
 
+function ENT:getShootPos()
+	local body = self:getBody()
+	local points = {body:getWorldPoints( self:getShape():getPoints() )}
+	local x = points[ 3 ]
+	local y = points[ 4 ]
+	return x,y 
+end 
+
+function ENT:getAimDir()
+	local b = self:getBody()
+	local a = b:getAngle() + math.pi/2
+	local x = math.cos( a )
+	local y = math.sin( a )
+	return x, y 
+end 
+
 local isDown = love.keyboard.isDown
 local rMax = math.pi*2
 local speed = 12
@@ -92,6 +110,16 @@ function ENT:think()
 	if self:isAlive() then 
 
 		local b = self:getBody()
+
+		local t = love.timer.getTime()
+		if isDown( "w" ) and t > self.bulletDelay then 
+			local bullet = ents.create( "ent_bullet" )
+			local x,y = self:getShootPos()
+			local xdir,ydir = self:getAimDir()
+			bullet:setBulletData( x, y, xdir, ydir, 100 )
+			self.bulletDelay = t + 0.35
+		end 
+
 		if isDown( "s" ) then 
 			local a = b:getAngle() + math.pi/2
 			local x = math.cos( a )*speed
@@ -149,8 +177,7 @@ function ENT:draw()
 	local points = {body:getWorldPoints( self:getShape():getPoints() )}
 	lg.polygon( "line", unpack( points ) )
 	
-	
+
 
 end 
-
 ents.registerEntity( "ent_player", ENT )
