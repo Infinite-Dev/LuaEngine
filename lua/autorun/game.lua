@@ -2,8 +2,10 @@
 game = {}
 game.paused = false 
 game.states = {}
+game.state = ""
 function game.pause()
 	game.paused = true 
+	game.pauseMenu = gui.create( "pMenu" )
 end 
 
 function game.unpause()
@@ -14,17 +16,22 @@ function game.isPaused()
 	return game.paused 
 end 
 
+function game.getState()
+	return game.state 
+end 
+
 function game.changeState( state )
 	local func = game.states.changeFuncs[ state ]
 	local tFunc = game.states.thinkFuncs[ state ]
 	if func then
 		func()
 	end 
+	game.state = state 
 	game.think = tFunc 
 end
 
 function game.stop()
-
+	
 end
 
 function game.getWorld()
@@ -43,7 +50,28 @@ function game.preSolve( a, b, coll )
 	hook.call( "preSolve", a, b, coll )
 end 
 
+local p = pairs 
 function game.postSolve( a, b, coll, normalimpulse1, tangentimpulse1, normalimpulse2, tangentimpulse2 )
+	local ent1
+	local ent2 
+	for k,v in p( ents.getAll() ) do
+		local f = v:getFixture()
+		if f then 
+			if f == a then 
+				ent1 = v
+			elseif f == b then 
+				ent2 = v
+			end 
+		end 
+	end 
+
+	if ent1 then 
+		ent1:collisionPostSolve( ent2 or b, coll, normalimpulse1, tangentimpulse1, normalimpulse2, tangentimpulse2 )
+	end 
+
+	if ent2 then 
+		ent2:collisionPostSolve( ent1 or a, coll, normalimpulse1, tangentimpulse1, normalimpulse2, tangentimpulse2 )
+	end 
 	hook.call( "postSolve", a, b, coll, normalimpulse1, tangentimpulse1, normalimpulse2, tangentimpulse2 )
 end 
 
@@ -75,7 +103,7 @@ game.states.changeFuncs =
 	end,
 	menu = function()
 		local mainMenu = gui.create( "aMenu" )
-		game.stop()
+		game.cleanUp()
 	end 
 } 
 
@@ -84,11 +112,14 @@ game.states.thinkFuncs =
 	paused = function()
 		gui.update()
 	end, 
-	game = function()
+	game = function( dt )
 		gui.update()
 		timer.think()
-		ents.think()
-		game.getWorld():update( love.timer.getDelta() )
+		if not game.isPaused() then 
+			ents.think()
+			game.logic()
+			game.getWorld():update( dt )
+		end 
 		hook.call( "Think" )
 	end,
 	menu = function()
@@ -101,17 +132,65 @@ game.states.thinkFuncs =
 
 function game.setUp()
 	love.keyboard.setKeyRepeat(true)
-	for i = 1,4 do 
-		local ast = ents.create( "ent_asteroids" )
-		ast:setPos( math.random( 30, 400 ), math.random( 30, 400 ) )
-		ast:setMinMax( 40, 60 )
-		ast:setSize()
-		ast:generate()
-
-		local mul = ast.r*100
-		ast:moveRandom( mul )
+	for i = 1,asteroids.max do 
+		asteroids.createNewAsteroid()
 	end 
 
-	local ply = ents.create( "ent_player" )
-	ply:setPos( 400, 400 )
+	game.player = ents.create( "ent_player" )
+	game.player:setPos( 400, 400 )
 end 
+
+function game.cleanUp()
+	for k,v in pairs( ents.getAll() ) do 
+		v:remove()
+	end
+	local w = game.getWorld()
+	if w then 
+		game.getWorld():destroy()
+	end 
+end
+
+function game.restart()
+	game.cleanUp()
+	game.changeState( "game" )
+end 
+
+function game.logic()
+	local numRoids = 0
+	for k,v in pairs( ents.getAll() ) do 
+		if v:getClass() == "ent_asteroid" then 
+			if v.r > asteroids.minSize then 
+				numRoids = numRoids + 1 
+			end 
+		end 
+	end 
+
+	local t = love.timer.getTime()
+	if numRoids < asteroids.max then 
+		for i = 1,(asteroids.max-numRoids) do 
+			if t > asteroids.lastDelayTime then 
+				asteroids.createNewAsteroid()
+				asteroids.lastDelayTime = t + asteroids.delay 
+			end 
+		end 
+	end 
+end 
+	
+
+local lg = love.graphics 
+local barw = 150
+local barh = 13
+local x = 25
+local y = 15
+function game.drawHUD()
+	if game.player then 
+		local w,h = love.graphics.getDimensions()
+		lg.setColor( 255, 50, 50, 255 )
+		lg.rectangle( "line", x, y, barw, barh )
+
+		local hp = game.player:getHealth()
+		local maxHP = 100 
+		local p = hp/maxHP
+		lg.rectangle( "fill", x, y, barw*p, barh )
+	end
+end

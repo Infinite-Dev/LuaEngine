@@ -9,7 +9,7 @@ function ENT:initialize()
 
 	local x,y = self:getPos()
 	local body = love.physics.newBody( game.getWorld(), x, y, "dynamic" )
-	body:setMass( 35 )
+	body:setMass( self.r )
 	body:setLinearDamping( 0 )
 	self:setBody( body )
 
@@ -27,6 +27,13 @@ function ENT:setBulletData( x, y, xdir, ydir, speed )
 	local b = self:getBody()
 	local dt = love.timer.getDelta()
 	b:applyForce( xdir*speed, ydir*speed )
+end 
+
+function ENT:collisionPostSolve( ent, coll, norm1, tan1, norm2, tan2  )
+	if isEntity( ent ) and ent:getClass() == "ent_asteroid" then 
+		ent:destroy()
+		self:remove()
+	end 
 end 
 
 function ENT:think()

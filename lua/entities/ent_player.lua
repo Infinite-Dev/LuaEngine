@@ -33,11 +33,14 @@ function ENT:initialize()
 	self:setFixture( fix )
 
 	self.alive = true 
-	self.health = 0 
+	self.health = 100
 	self.moving = false 
 
 	self.bulletDelay = 0 
-
+	self.fireDelay = 0.25
+	self.shouldGib = false
+	self.gibDelay = 0 
+	
 end 
 
 function ENT:getHealth()
@@ -45,7 +48,7 @@ function ENT:getHealth()
 end 
 
 function ENT:setHealth( hp )
-	self.health = hp 
+	self.health = math.max( hp, 0 ) 
 end 
 
 function ENT:isAlive()
@@ -73,15 +76,35 @@ function ENT:shouldRespawn()
 end 
 
 function ENT:doDeath()
+
 	self:setAlive( false )
 	self:setRespawnTime( 2 )
+	self.moving = false 
+	local b = self:getBody()
+	b:setLinearDamping( 0.4 )
+	b:setAngularDamping( 0.7 )
+
+	self.gibDelay = love.timer.getTime() + 1
+	self.shouldGib = true 
+
 end 
 
-function ENT:physicsCollide( body, entBody, coll )
-	local dmg = entBody:getMass()*2
-	self:setHealth( self:getHealth() - 100 )
-	if self:getHealth() <= 0 then 
-		self:doDeath()
+function ENT:collisionPostSolve( ent, coll, norm1, tan1, norm2, tan2  )
+	if self:isAlive() then 
+		if isEntity( ent ) and ent:getClass() == "ent_asteroid" then 
+
+			local b = self:getBody()
+			local d,e,f,g = b:getMassData()
+
+			local mult = norm1/11
+			local dmg = (f^2)*mult + (norm1^2)*mult + 3
+
+			self:setHealth( self:getHealth() - dmg )
+			if self:getHealth() <= 0 then 
+				self:doDeath()
+			end 
+
+		end 
 	end 
 end 
 
@@ -107,17 +130,17 @@ local speed = 12
 local sens = 6
 function ENT:think()
 
+	local t = love.timer.getTime()
 	if self:isAlive() then 
 
 		local b = self:getBody()
 
-		local t = love.timer.getTime()
 		if isDown( "w" ) and t > self.bulletDelay then 
 			local bullet = ents.create( "ent_bullet" )
 			local x,y = self:getShootPos()
 			local xdir,ydir = self:getAimDir()
 			bullet:setBulletData( x, y, xdir, ydir, 100 )
-			self.bulletDelay = t + 0.35
+			self.bulletDelay = t + self.fireDelay 
 		end 
 
 		if isDown( "s" ) then 
@@ -141,15 +164,13 @@ function ENT:think()
 			b:setAngle( a + sens*dt )
 		end 
 
-		--local prevAng = b:getAngul
-
 	end
 
 
 	local x,y = self:getPos()
 	local w,h = love.graphics.getDimensions()
 
-	local mult = 1.2
+	local mult = 1.1
 	local compare = 10
 	local x2,y2 = x + compare, y + compare
 	local x3,y3 = x - compare, y - compare
@@ -163,6 +184,44 @@ function ENT:think()
 	elseif y2 < -compare/2 then 
 		self:setPos( x, h + compare )
 	end  
+
+	if t > self.gibDelay and self.shouldGib then 
+
+		local min,max = 0.6, 0.4
+
+		local body = self:getBody()
+		local points = {body:getWorldPoints( self:getShape():getPoints() )}
+
+		local xa = body:getAngularVelocity()
+
+
+		local xf,yf = body:getLinearVelocity()
+		xf = xf*math.random( min, max )
+		yf = yf*math.random( min, max )
+
+		local gib1 = ents.create( "ent_playergib" )
+		gib1:setUp( points[ 1 ], points[ 2 ], points[ 3 ], points[ 4 ] )
+		gib1:getBody():setLinearVelocity( xf, yf )
+
+		local xf,yf = body:getLinearVelocity()
+		xf = xf*math.random( min, max )
+		yf = yf*math.random( min, max )
+
+		local gib2 = ents.create( "ent_playergib" )
+		gib2:setUp( points[ 3 ], points[ 4 ], points[ 5 ], points[ 6 ] )
+		gib2:getBody():setLinearVelocity( xf, yf )
+
+		local xf,yf = body:getLinearVelocity()
+		xf = xf*math.random( min, max )
+		yf = yf*math.random( min, max )
+
+		local gib3 = ents.create( "ent_playergib" )
+		gib3:setUp( points[ 5 ], points[ 6 ], points[ 1 ], points[ 2 ] )
+		gib3:getBody():setLinearVelocity( xf, yf )
+
+		self:remove()
+
+	end 
 
 end 
 
@@ -206,11 +265,11 @@ function ENT:draw()
 		local midX = (x + x2)/2 
 		local midY = (y + y2)/2
 
-		local r = 6
+		local r = math.random( 5, 6 )
 		local x5 = midX - aX*r
 		local y5 = midY - aY*r
 
-
+		lg.setColor( 255, 120, 0, 255 )
 		lg.polygon( "line", x3, y3, x4, y4, x5, y5 )
 	end 
 

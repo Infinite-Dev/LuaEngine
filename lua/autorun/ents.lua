@@ -2,6 +2,7 @@
 ents = {}
 ents._index = {}
 ents._list = {}
+ents._createList = {}
 
 function Entity( id )
 	return ents.getIndex()[ i ]
@@ -19,6 +20,8 @@ function ents.create( ent_name )
 		setmetatable( nEnt, ent[ 2 ] )
 
 		nEnt._index = #l+1
+		nEnt._isEntity = true 
+		nEnt._class = ent_name 
 		nEnt:_initialize()
 		nEnt:initialize()
 		l[ #l+1 ] = nEnt
@@ -102,5 +105,13 @@ function ents.loadEntities( dir )
 		ents.loadEntities( tbl[ i ] )
 	end
 end
+
+function isEntity( obj )
+	if type( obj ) == "table" then 
+		if obj._isEntity then 
+			return true 
+		end 
+	end 
+end 
 
 ents.loadEntities()

@@ -33,6 +33,7 @@ end
 function love.draw()
 	gui.draw()
 	ents.draw()
+	game.drawHUD()
 	hook.call( "paint" )
 end
 
@@ -40,7 +41,7 @@ end
 	Run these functions on tick.
 --]]----------------------------------------
 function love.update( dt )
-	game.think()
+	game.think( dt )
 end 
 
 --[[----------------------------------------
@@ -62,3 +63,26 @@ function love.mousepressed( x, y, button )
 	GUICheck( x, y, button )
 end
 
+local keyFuncs = 
+{
+	[ "escape" ] = function()
+		if game.isPaused() then 
+			game.unpause()
+			if game.pauseMenu then
+				game.pauseMenu:remove()
+			end 
+		else 
+			game.pause()
+		end 
+	end,
+	[ "r" ] = function()
+		if game.getState() == "game" then 
+			game.restart()
+		end 
+	end
+}
+function love.keypressed(key)
+	if keyFuncs[ key ] then 
+		keyFuncs[ key ]()
+	end 
+end

@@ -155,6 +155,14 @@ function _E:getIndex()
 	return self._index 
 end 
 
+function _E:getClass()
+	return self._class
+end
+
+function _E:collisionPostSolve()
+
+end  
+
 function _E:remove()
 	local b = self:getBody()
 	local f = self:getFixture()

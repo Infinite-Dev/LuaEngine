@@ -2,12 +2,14 @@
 local ENT = {}
 
 function ENT:initialize()
-	self.min = 20
-	self.max = 40 
+	self.min = asteroids.minSize 
+	self.max = asteroids.maxSize 
+	self.r = math.random( self.min, self.max )
+	self.alive = true 
 end 
 
 function ENT:generate()
-	local circle = love.physics.newCircleShape( self.r or math.random( 10, 30 ) )
+	local circle = love.physics.newCircleShape( self.r or math.random( self.min, self.max ) )
 	self:setShape( circle )
 
 	local x,y = self:getPos()
@@ -35,10 +37,6 @@ function ENT:setSize( sz )
 	end 
 end 
 
-function ENT:physicsCollide( b, coll )
-
-end 
-
 function ENT:move( dir )
 	self.direction = dir 
 	self:getBody():applyForce( dir.x, dir.y )
@@ -48,6 +46,10 @@ function ENT:moveRandom( mul )
 	self.direction = vectorRandom()*mul 
 	local b = self:getBody()
 	b:applyForce( self.direction.x, self.direction.y )
+end 
+
+function ENT:destroy()
+	self.alive = false 
 end 
 
 function ENT:think()
@@ -70,6 +72,24 @@ function ENT:think()
 		self:setPos( x, h + compare )
 	end  
 
+	if not self.alive then 
+		if self.r > 15 then 
+			local num = 2
+			local sz = self.r/num
+			for i = 1,num do 
+				local vec = vectorRandom()*10
+				local x,y = self:getPos()
+				local ast = ents.create( "ent_asteroid" )
+				ast:setPos( x + vec.x, y + vec.y )
+				ast:setSize( sz )
+				ast:generate()
+				local mul = ast.r*asteroids.speed*( self.r/asteroids.maxSize ) 
+				ast:moveRandom( mul )
+			end 
+		end 
+		self:remove()
+	end 
+
 end 
 
 local lg = love.graphics
@@ -79,4 +99,4 @@ function ENT:draw()
 	lg.circle( "line", x, y, self.r )
 end 
 
-ents.registerEntity( "ent_asteroids", ENT )
+ents.registerEntity( "ent_asteroid", ENT )
