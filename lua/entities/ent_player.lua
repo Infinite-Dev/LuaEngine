@@ -40,7 +40,7 @@ function ENT:initialize()
 	self.fireDelay = 0.25
 	self.shouldGib = false
 	self.gibDelay = 0 
-	
+
 end 
 
 function ENT:getHealth()
@@ -187,42 +187,49 @@ function ENT:think()
 
 	if t > self.gibDelay and self.shouldGib then 
 
-		local min,max = 0.6, 0.4
-
-		local body = self:getBody()
-		local points = {body:getWorldPoints( self:getShape():getPoints() )}
-
-		local xa = body:getAngularVelocity()
-
-
-		local xf,yf = body:getLinearVelocity()
-		xf = xf*math.random( min, max )
-		yf = yf*math.random( min, max )
-
-		local gib1 = ents.create( "ent_playergib" )
-		gib1:setUp( points[ 1 ], points[ 2 ], points[ 3 ], points[ 4 ] )
-		gib1:getBody():setLinearVelocity( xf, yf )
-
-		local xf,yf = body:getLinearVelocity()
-		xf = xf*math.random( min, max )
-		yf = yf*math.random( min, max )
-
-		local gib2 = ents.create( "ent_playergib" )
-		gib2:setUp( points[ 3 ], points[ 4 ], points[ 5 ], points[ 6 ] )
-		gib2:getBody():setLinearVelocity( xf, yf )
-
-		local xf,yf = body:getLinearVelocity()
-		xf = xf*math.random( min, max )
-		yf = yf*math.random( min, max )
-
-		local gib3 = ents.create( "ent_playergib" )
-		gib3:setUp( points[ 5 ], points[ 6 ], points[ 1 ], points[ 2 ] )
-		gib3:getBody():setLinearVelocity( xf, yf )
+		self:gib()
 
 		self:remove()
 
 	end 
 
+end 
+
+function ENT:gib()
+	local min,max = 0.9,1.1
+	local tspeed = 1000
+
+	local body = self:getBody()
+	local bX,bY = body:getPosition()
+	local lpoints = {self:getShape():getPoints()}
+	local wpoints = {body:getWorldPoints( self:getShape():getPoints() )}
+	local pNo = { 1, 2, 3, 4, 3, 4, 5, 6, 1, 2, 5, 6 }
+	local xa = body:getAngularVelocity()
+
+	for i = 1,3 do 
+
+		local j = (i-1)*4
+		local xf,yf = body:getLinearVelocity()
+		xf = xf*math.random( min, max )
+		yf = yf*math.random( min, max )
+
+		local x1, y1, x2, y2 = lpoints[pNo[ j + 1 ]], lpoints[pNo[ j + 2 ]], lpoints[pNo[ j + 3 ]], lpoints[pNo[ j + 4 ]]
+
+		local gib = ents.create( "ent_playergib" )
+		gib:setUp( x1, y1, x2, y2, bX, bY )
+
+		local b = gib:getBody()
+		b:setLinearVelocity( xf, yf )
+
+		b:setAngularVelocity( xa*math.random( -1, 1 ) )
+
+
+		local m1,m2 = (x1+x2)/2,(y1+y2)/2
+		local norm = ( Vector( m1, m2 ) - Vector( bX, bY ) ):normalized()*3000
+		local t = math.random( -tspeed, tspeed )
+		b:applyForce( norm.x, norm.y )
+
+	end 
 end 
 
 local lg = love.graphics 

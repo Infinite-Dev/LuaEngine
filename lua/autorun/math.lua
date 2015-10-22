@@ -52,3 +52,11 @@ function math.easeInOut( fProgress, fEaseIn, fEaseOut )
 		return (1.0 - (fProgressCalc / fEaseOut) * fProgress * fProgress); 
 	end
 end
+
+function math.loop( num, min, max, incr )
+	num = num + ( incr or 1 )
+	if num > max then 
+		num = min 
+	end 
+	return num 
+end 

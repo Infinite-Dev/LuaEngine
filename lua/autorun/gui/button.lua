@@ -15,7 +15,7 @@ local lg = love.graphics
 local lm = love.mouse
 local PANEL = {}
 
-local defaultFont = lg.newFont( "resources/fonts/FREEDOM.ttf", 20 )
+local defaultFont = lg.newFont( 20 )
 
 function PANEL:_initialize()
 	self.__down = false
@@ -23,7 +23,7 @@ function PANEL:_initialize()
 	self.__down_time = 0
 	self.__alpha = 240
 	self.__color = { 230, 230, 230, 240 }
-	self.__textcolor = { 120, 120, 120, 255 }
+	self.__textcolor = { 60, 60, 60, 255 }
 	self.__gradient = 2
 	self.__text = "Click me!"
 	self.__canClick = true

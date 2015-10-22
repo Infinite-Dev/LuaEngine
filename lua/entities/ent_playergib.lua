@@ -1,16 +1,16 @@
 
 local ENT = {}
 
-function ENT:setUp( x1, y1, x2, y2 )
+function ENT:setUp( x1, y1, x2, y2, xpos, ypos )
 
 	local poly = love.physics.newEdgeShape( x1, y1, x2, y2 )
 	self:setShape( poly )
 
 	local x,y = self:getPos()
-	local body = love.physics.newBody( game.getWorld(), x, y, "dynamic" )
+	local body = love.physics.newBody( game.getWorld(), xpos, ypos, "dynamic" )
 	body:setMass( 35/3 )
 	body:setLinearDamping( 0.4 )
-	body:setAngularDamping( 0.7 )
+	body:setAngularDamping( 0.5 )
 	self:setBody( body )
 
 	local d = 5 

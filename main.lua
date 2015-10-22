@@ -30,6 +30,7 @@ end
 	the draw hook.
 --]]----------------------------------------
 
+
 function love.draw()
 	gui.draw()
 	ents.draw()
@@ -44,23 +45,8 @@ function love.update( dt )
 	game.think( dt )
 end 
 
---[[----------------------------------------
-	Check to see if we clicked on a gui panel.
---]]----------------------------------------
-
-function GUICheck( x, y, button )
-	local in_area = util.isInArea
-	for k, panel in pairs( gui.objects ) do
-		local p_x,p_y = panel:getPos()
-		local p_w,p_h = panel:getSize()
-		if in_area( x, y, p_x, p_y, p_w, p_h ) then
-			panel:__click( button )
-		end
-	end
-end
-
 function love.mousepressed( x, y, button )
-	GUICheck( x, y, button )
+	gui.buttonCheck( x, y, button )
 end
 
 local keyFuncs = 

@@ -11,6 +11,7 @@ function ENT:initialize()
 	local body = love.physics.newBody( game.getWorld(), x, y, "dynamic" )
 	body:setMass( self.r )
 	body:setLinearDamping( 0 )
+	body:setBullet( true )
 	self:setBody( body )
 
 	local d = 5 

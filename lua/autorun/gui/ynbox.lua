@@ -13,7 +13,7 @@ local lg = love.graphics
 local lm = love.mouse
 local PANEL = {}
 
-local titleFont = lg.newFont( "resources/fonts/FREEDOM.ttf", 20 )
+local titleFont = lg.newFont( 20 )
 
 function PANEL:init()
 	self.yButton = gui.create( "button", self )
@@ -56,10 +56,14 @@ function PANEL:onSizeChanged()
 	self.nButton:setPos( w - bW*1.5, h - h/3 - bH/2 )
 end 
 
+local b = 4
 function PANEL:paint( w, h )
 
-	lg.setColor( 33, 33, 33, 240 )
+	lg.setColor( 44, 44, 44, 240 )
 	lg.rectangle( "fill", 0, 0, w, h )
+
+	lg.setColor( 22, 22, 22, 240 )
+	lg.rectangle( "fill", b, b, w - b*2, h - b*2 )
 
 	local hText = self:getText()
 	lg.setColor( 255, 255, 255, 230 )

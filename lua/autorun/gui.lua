@@ -7,6 +7,8 @@ gui = {}
 gui.objects = {} -- Objects that have been created.
 gui.panels = {} -- Panels that have been registered.
 gui.cache = {}
+gui._maxz = 0
+gui._minz = 0
 
 
 --[[----------------------------------------
@@ -35,10 +37,13 @@ function gui.create( base, parent )
 	panel.__y = 0
 	panel.__w = 15
 	panel.__h = 5
+	panel.__class = base 
 	
 	local pos = #gui.objects+1 
 	panel.__id = pos
 	gui.objects[ pos ] = panel
+
+	panel:setZ( gui.getMaxZ() + 1 )
 	panel:_initialize()
 	panel:init()
 	return panel 
@@ -59,7 +64,7 @@ return new_panel
 end
 
 function gui.cacheUI( name, panel, base, bValidBase )
-	gui.cache[ #gui.cache +1 ] = { name, panel, base, bValidBase or false }
+	gui.cache[ #gui.cache +1 ] = { name, panel, base, bValidBase }
 end 
 
 function gui.checkCache( name )
@@ -107,21 +112,63 @@ function gui.register( name, panel, base )
 			gui.cache[ i ] = nil 
 		end 
 	end 
-	
 end
+
+function gui.getMaxZ()
+	return gui._maxz 
+end 
+
+function gui.setMaxZ( num )
+	gui._maxz = num 
+end 
+
+function gui.getMinZ()
+	return gui._minz 
+end 
+
+function gui.setMinZ( num )
+	gui._minz = num 
+end 
+
+function gui.setModal( pnl )
+	gui.__modal = pnl 
+end 
+
+function gui.getModal()
+	return gui.__modal 
+end 
+
+function gui.getObjects()
+	return gui.objects 
+end 
+
+function gui.generateDrawOrder()
+	local list = table.copy( gui.getObjects() )
+	table.sort( list, function( t, t2 ) 
+		return ( t and t2 and t:getZ() < t2:getZ() or false )
+	end )
+	gui.__drawOrder = list 
+end 
+
+function gui.getDrawOrder()
+	return gui.__drawOrder or {}
+end 
 
 --Internal.
 function gui.draw()
-	for k, panel in pairs( gui.objects ) do 
-		lg.translate( panel.__x, panel.__y )
+	local tbl = gui.getDrawOrder() 
+	for k,panel in ipairs( tbl ) do 
+		local w,h = panel:getSize()
+		local x,y = panel:getPos()
+		lg.translate( x, y )
 			if panel.__clampDrawing then 
-				lg.setScissor( panel.__x, panel.__y, panel.__w, panel.__h )
+				lg.setScissor( x, y, w, h )
 			end
-			panel:paint( panel.__w, panel.__h )
-			panel:paintOver( panel.__w, panel.__h )
+			panel:paint( w, h )
+			panel:paintOver( w, h )
 			lg.setScissor()
 		lg.origin()
-	end
+	end 
 end
 
 --Internal.
@@ -130,6 +177,75 @@ function gui.update()
 		panel:think()
 		panel:__mouseThink()
 	end
+end
+
+--[[----------------------------------------
+	Check to see if we clicked on a gui panel.
+--]]----------------------------------------
+
+function gui.buttonCheck( x, y, button )
+
+	local in_area = util.isInArea
+	local p = gui.getModal()
+	if p then 
+		local tbl = { p, unpack( p:getChildren() ) }
+		local pnls = {}
+		for k,v in pairs( tbl ) do 
+			local p_x,p_y = v:getPos()
+			local p_w,p_h = v:getSize()
+			if in_area( x, y, p_x, p_y, p_w, p_h ) then
+				pnls[ #pnls + 1 ] = v
+			end
+		end 
+
+		local z = -math.huge 
+		local targ = nil 
+		for i = 1,#pnls do 
+			local p2 = pnls[ i ]
+			if p2:getZ() > z then 
+				z = p2:getZ()
+				targ = p2 
+			end 	
+		end 
+
+		if targ then 
+			if targ:canClick() then 
+				targ:__click( button )
+			end 
+			if not targ:isChild() then 
+				targ:bringToFront()
+			end 
+		end
+		return 
+	end
+
+	local tbl = {}
+	for k, panel in pairs( gui.objects ) do
+		local p_x,p_y = panel:getPos()
+		local p_w,p_h = panel:getSize()
+		if in_area( x, y, p_x, p_y, p_w, p_h ) then
+			tbl[ #tbl + 1 ] = panel 
+		end
+	end
+
+	local z = -math.huge 
+	local p = nil 
+	for i = 1,#tbl do
+		local pnl = tbl[ i ]
+		if pnl:getZ() >= z then 
+			z = pnl:getZ()
+			p = pnl 
+		end 
+	end 
+	if p then 
+		if p:canClick() then 
+			p:__click( button )
+		end 
+		if not p:isChild() then 
+			p:bringToFront()
+		end 
+	end
+	
 end
 
 

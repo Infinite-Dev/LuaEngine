@@ -41,7 +41,7 @@ local buttonD =
 			love.event.quit( )
 		end 
 		function qConfirm:noFunc()
-			self:remove()
+			qConfirm:remove()
 		end 
 	end }
 }

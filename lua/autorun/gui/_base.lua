@@ -133,6 +133,7 @@ function PANEL:setPos( x, y, floor )
 			child:setPos( cX - oldX  , cY - oldY )
 		end
 	end
+	gui.generateDrawOrder()
 	self.centred = false
 end
 
@@ -189,7 +190,46 @@ function PANEL:__mouseThink()
 	end
 end
 
-function PANEL:moveTo( x, y, time, easein, easeout, callback )
+function PANEL:getID()
+	return self.__id 
+end
+
+function PANEL:setZ( num, b )
+	self.__z = num
+	if num > gui.getMaxZ() then 
+		gui.setMaxZ( num )
+	elseif num < gui.getMinZ() then 
+		gui.setMinZ( num )
+	end 
+	if self:isParent() then
+		local c = self:getChildren()
+		for i = 1,#c do 
+			c[ i ]:setZ( num + 1 )
+		end 
+	end 
+	if b then 
+		gui.generateDrawOrder()
+	end 
+end 
+
+function PANEL:getZ()
+	return self.__z 
+end 
+
+function PANEL:bringToFront()
+	local z =gui.getMaxZ()+1
+	self:setZ( z )
+end 
+
+function PANEL:sendToBack()
+	self:setZ( gui.getMinZ() - 1 )
+end 
+
+function PANEL:getClass()
+	return self.__class
+end 
+
+function PANEL:moveTo( x, y, time, easein, easeout, callback, ... )
 	local pX,pY = self:getPos()
 	local dist = math.distance( pX, pY, x, y )
 	local vec = Vector( x, y )
@@ -211,8 +251,8 @@ function PANEL:moveTo( x, y, time, easein, easeout, callback )
 				if p >= 1 then 
 					self:setPos( x, y )
 					hook.remove( "Think", hname )
-					if callback then
-						callback( self )
+					if callback then 
+						callback( self, unpack( args ) )
 					end
 				end 
 				thinkTime = t2 + delay 
@@ -223,8 +263,20 @@ function PANEL:moveTo( x, y, time, easein, easeout, callback )
 	end ) 
 end 
 
+function PANEL:doModal( b )
+	if b then
+		gui.setModal( self )
+	elseif gui.getModal == self then 
+	    gui.setModal()
+	end
+end
+
+function PANEL:isModal()
+	return gui.getModal() == self 
+end 
 
 function PANEL:remove()
+
 	local parent = self:getParent()
 	if parent then
 		local new_children = {}
@@ -235,10 +287,17 @@ function PANEL:remove()
 		end
 		parent.__children = new_children
 	end
-	for k, child in pairs(self.__children) do
+
+	for k, child in pairs(self:getChildren()) do
 		child:remove()
 	end
+
+	if self:isModal() then 
+		gui.setModal( nil )
+	end 
 	gui.objects[ self.__id ] = nil
+	gui.generateDrawOrder()
+	
 end
 
 gui.register( "base", PANEL )
