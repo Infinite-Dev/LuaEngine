@@ -32,10 +32,10 @@ end
 
 
 function love.draw()
-	gui.draw()
 	ents.draw()
 	game.drawHUD()
 	hook.call( "paint" )
+	gui.draw()
 end
 
 --[[----------------------------------------

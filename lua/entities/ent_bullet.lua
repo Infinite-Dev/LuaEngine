@@ -19,6 +19,7 @@ function ENT:initialize()
 	fix:setRestitution( 1 )
 	fix:setFriction( 0 )
 	fix:setDensity( 1 )
+	fix:setMask( 2 )
 	self:setFixture( fix )
 
 end 

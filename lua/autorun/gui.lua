@@ -9,6 +9,7 @@ gui.panels = {} -- Panels that have been registered.
 gui.cache = {}
 gui._maxz = 0
 gui._minz = 0
+gui.pos = 0
 
 
 --[[----------------------------------------
@@ -39,7 +40,8 @@ function gui.create( base, parent )
 	panel.__h = 5
 	panel.__class = base 
 	
-	local pos = #gui.objects+1 
+	gui.pos = gui.pos + 1
+	local pos = gui.pos 
 	panel.__id = pos
 	gui.objects[ pos ] = panel
 
@@ -156,8 +158,8 @@ end
 
 --Internal.
 function gui.draw()
-	local tbl = gui.getDrawOrder() 
-	for k,panel in ipairs( tbl ) do 
+	local tbl = gui.getDrawOrder()
+	for k,panel in orderedPairs( tbl ) do 
 		local w,h = panel:getSize()
 		local x,y = panel:getPos()
 		lg.translate( x, y )
@@ -202,7 +204,7 @@ function gui.buttonCheck( x, y, button )
 		local targ = nil 
 		for i = 1,#pnls do 
 			local p2 = pnls[ i ]
-			if p2:getZ() > z then 
+			if p2:getZ() >= z then 
 				z = p2:getZ()
 				targ = p2 
 			end 	
@@ -245,7 +247,7 @@ function gui.buttonCheck( x, y, button )
 			p:bringToFront()
 		end 
 	end
-	
+
 end
 
 

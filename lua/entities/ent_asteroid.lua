@@ -21,6 +21,7 @@ function ENT:generate()
 	local fix = love.physics.newFixture( self:getBody(), self:getShape(), 1 )
 	fix:setRestitution( 1 )
 	fix:setFriction( 0 )
+	fix:setMask( 2 )
 	self:setFixture( fix )
 end 
 
@@ -85,8 +86,15 @@ function ENT:think()
 				ast:generate()
 				local mul = ast.r*asteroids.speed*( self.r/asteroids.maxSize ) 
 				ast:moveRandom( mul )
-			end 
+			end
 		end 
+		for i = 1,math.random( 2, 5 ) do 
+			local vec = vectorRandom()*5
+			local x,y = self:getPos()
+			local e = ents.create( "ent_asteroidgib" )
+			e:generate( self.r*0.08, self.r*0.11 )
+			e:setPos( x + vec.x, y + vec.y )
+		end
 		self:remove()
 	end 
 

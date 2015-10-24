@@ -22,21 +22,10 @@ local buttonD =
 	{ "Save", function( self )
 		
 	end },
-	{ "Save and Exit", function( self )
-		local p = self:getParent()
-		local w,h = p:getSize()
-		local qConfirm = gui.create( "ynBox" )
-		qConfirm:setText( "Are you sure?" )
-		qConfirm:setSize( w/4, h/5 )
-		qConfirm:center()
-		function qConfirm:yesFunc()
-			game.changeState( "menu" )
-			p:remove()
-			self:remove()
-		end 
-		function qConfirm:noFunc()
-			self:remove()
-		end 
+	{ "Save and Exit", function( button )
+		local p = button:getParent()
+		p:remove()
+		game.changeState( "menu" )
 	end }
 }
 
@@ -47,6 +36,7 @@ function PANEL:init()
 	local w, h = love.graphics.getDimensions()
 	self:setSize( w, h )
 	self:center()
+	self:blurBackground( true, 0.1 )
 
 	local bWidth = w/5
 	local bHeight = h/10

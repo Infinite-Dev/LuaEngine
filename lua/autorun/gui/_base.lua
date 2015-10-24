@@ -61,6 +61,28 @@ function PANEL:getChildren()
 	return self.__children
 end 
 
+function PANEL:isChildOf( pnl )
+	if pnl then 
+		local c = pnl:getChildren()
+		for i = 1,#c do 
+			if c[ i ] == self then 
+				return true 
+			end 
+		end 
+	end
+	return false 
+end 
+
+function PANEL:isParentOf( pnl )
+	if pnl then 
+		local p = pnl:getParent()
+		if p == self then 
+			return true 
+		end 
+	end
+	return false  
+end 
+
 function PANEL:setSize( w, h )
 	self.__w = w
 	self.__h = h
@@ -275,6 +297,31 @@ function PANEL:isModal()
 	return gui.getModal() == self 
 end 
 
+function PANEL:blurBackground( b, fadetime )
+	if b then 
+		local startTime = love.timer.getTime()
+		local time = startTime + (fadetime or 0)
+		local endAlpha = 200
+		self.__backblur = b 
+		self.__blurpnl = gui.create( "panel" )
+		local p = self.__blurpnl 
+
+		local scrw, scrh = lg.getDimensions()
+		p:setSize( scrw, scrh )
+		p:bringToFront()
+		function p:paint( w, h )
+			local p = math.min( (love.timer.getTime()-startTime)/(time-startTime), 1 )
+			lg.setColor( 0, 0, 0, p*endAlpha )
+			lg.rectangle( "fill", 0, 0, scrw, scrh )
+		end
+	else 
+		if self.__blurpnl then 
+			self.__blurpnl:remove()
+		end 
+		self.__backblur = false 
+	end 
+end 
+
 function PANEL:remove()
 
 	local parent = self:getParent()
@@ -292,12 +339,16 @@ function PANEL:remove()
 		child:remove()
 	end
 
+	if self.__backblur then 
+		self.__blurpnl:remove()
+	end 
+
 	if self:isModal() then 
 		gui.setModal( nil )
 	end 
 	gui.objects[ self.__id ] = nil
 	gui.generateDrawOrder()
-	
+
 end
 
 gui.register( "base", PANEL )

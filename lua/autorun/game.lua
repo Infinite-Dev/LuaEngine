@@ -93,6 +93,7 @@ game.states.changeFuncs =
 		game.pause()
 	end,
 	game = function()
+
 		game.unpause()
 
 		love.physics.setMeter(64)
@@ -102,8 +103,10 @@ game.states.changeFuncs =
 
 	end,
 	menu = function()
+
 		local mainMenu = gui.create( "aMenu" )
 		game.cleanUp()
+
 	end 
 } 
 
@@ -146,7 +149,7 @@ function game.cleanUp()
 	end
 	local w = game.getWorld()
 	if w then 
-		game.getWorld():destroy()
+		w:destroy() 
 	end 
 end
 
@@ -183,7 +186,7 @@ local barh = 13
 local x = 25
 local y = 15
 function game.drawHUD()
-	if game.player then 
+	if game.player and game.getState() == "game" then 
 		local w,h = love.graphics.getDimensions()
 		lg.setColor( 255, 50, 50, 255 )
 		lg.rectangle( "line", x, y, barw, barh )
@@ -194,3 +197,12 @@ function game.drawHUD()
 		lg.rectangle( "fill", x, y, barw*p, barh )
 	end
 end
+
+function game.generateBackground()
+	local tbl = {}
+	
+end 
+
+function game.drawBackground()
+
+end 

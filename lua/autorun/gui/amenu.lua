@@ -37,6 +37,7 @@ local buttonD =
 		qConfirm:setText( "Are you sure?" )
 		qConfirm:setSize( w/4, h/5 )
 		qConfirm:center()
+		qConfirm:doModal( true )
 		function qConfirm:yesFunc()
 			love.event.quit( )
 		end 
@@ -95,10 +96,10 @@ function PANEL:init()
 
 end 
 
-function PANEL:paint()
+function PANEL:paint( w, h )
 
 	lg.setColor( 11, 11, 11, 120 )
-	lg.rectangle( "fill", 0, 0, self:getWide(), self:getTall() )
+	lg.rectangle( "fill", 0, 0, w, h )
 
 end
 gui.register( "aMenu", PANEL, "panel" )
