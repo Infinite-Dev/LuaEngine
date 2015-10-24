@@ -121,7 +121,7 @@ game.states.thinkFuncs =
 		if not game.isPaused() then 
 			ents.think()
 			game.logic()
-			game.getWorld():update( 0.027 )
+			game.getWorld():update( dt )
 		end 
 		hook.call( "Think" )
 	end,

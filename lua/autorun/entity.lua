@@ -4,10 +4,10 @@ _E.__index = _E
 
 function _E:_initialize()
 	self:setPos( Vector( 0, 0 ) )
-end
+	self:setAngle( 0 )
+end 
 
 function _E:initialize()
-
 end
 
 function _E:getIndex()
@@ -136,6 +136,7 @@ function _E:setPos( vec, y )
 	local body = self:getBody()
 	if body then
 		body:setPosition( p.x, p.y )
+		self.__pos = p 
 	else 
 		self.__pos = p 
 	end 
@@ -149,6 +150,25 @@ function _E:getPos()
 	else 
 		return  self.__pos.x, self.__pos.y 
 	end
+end 
+
+function _E:getAngle()
+	local body = self:getBody()
+	if body then 
+		return body:getAngle()
+	else 
+		return self.__angle 
+	end 
+end 
+
+function _E:setAngle( a )
+	local body = self:getBody()
+	if body then 
+		body:setAngle( a )
+		self.__angle = a 
+	else 
+		self.__angle = a 
+	end 
 end 
 
 function _E:getIndex()
@@ -174,10 +194,6 @@ function _E:remove()
 
 	if b then 
 		b:destroy()
-	end 
-
-	if s then 
-		--s:destroy()
 	end 
 
 	local e = ents.getIndex()

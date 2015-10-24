@@ -4,18 +4,18 @@ local ENT = {}
 function ENT:initialize()
 
 	local sz = 7
-	local tbl = {}
+	self.tbl = {}
 	local points = 3
 	local incr = 360/points 
 	for i = 1,points do 
 		if i == 3 then 
 			sz = 13
 		end 
-		tbl[ #tbl+1 ] = math.sin( math.rad( incr*i ) )*sz 
-		tbl[ #tbl+1 ] = math.cos( math.rad( incr*i ) )*sz 
+		self.tbl[ #self.tbl+1 ] = math.sin( math.rad( incr*i ) )*sz 
+		self.tbl[ #self.tbl+1 ] = math.cos( math.rad( incr*i ) )*sz 
 	end 
 
-	local poly = love.physics.newPolygonShape( unpack( tbl ) )
+	local poly = love.physics.newPolygonShape( unpack( self.tbl ) )
 	self:setShape( poly )
 
 	local x,y = self:getPos()
@@ -80,11 +80,7 @@ function ENT:doDeath()
 	self:setAlive( false )
 	self:setRespawnTime( 2 )
 	self.moving = false 
-	local b = self:getBody()
-	b:setLinearDamping( 0.4 )
-	b:setAngularDamping( 0.7 )
 
-	self.gibDelay = love.timer.getTime() + 1
 	self.shouldGib = true 
 
 end 
@@ -139,7 +135,7 @@ function ENT:think()
 			local bullet = ents.create( "ent_bullet" )
 			local x,y = self:getShootPos()
 			local xdir,ydir = self:getAimDir()
-			bullet:setBulletData( x, y, xdir, ydir, 100 )
+			bullet:setBulletData( x + xdir*2, y+ydir*2, xdir, ydir, 60, self:getAngle()  )
 			self.bulletDelay = t + self.fireDelay 
 		end 
 
@@ -156,12 +152,12 @@ function ENT:think()
 		local dt = love.timer.getDelta()
 		if isDown( "a" ) then 
 			local a = b:getAngle()
-			b:setAngle( a - sens*dt )
+			self:setAngle( a - sens*dt )
 		end 
 
 		if isDown( "d" ) then 
 			local a = b:getAngle()
-			b:setAngle( a + sens*dt )
+			self:setAngle( a + sens*dt )
 		end 
 
 	end
@@ -185,7 +181,7 @@ function ENT:think()
 		self:setPos( x, h + compare )
 	end  
 
-	if t > self.gibDelay and self.shouldGib then 
+	if self.shouldGib then 
 
 		self:gib()
 
@@ -201,14 +197,18 @@ function ENT:gib()
 
 	local body = self:getBody()
 	local bX,bY = body:getPosition()
-	local lpoints = {self:getShape():getPoints()}
+	local lpoints = self.tbl
 	local wpoints = {body:getWorldPoints( self:getShape():getPoints() )}
-	local pNo = { 1, 2, 3, 4, 3, 4, 5, 6, 1, 2, 5, 6 }
+	local pNo = 
+	{ 	1, 2, 3, 4,
+	 	5, 6, 1, 2,
+	 	3, 4, 5, 6 
+	}
 	local xa = body:getAngularVelocity()
 
 	for i = 1,3 do 
 
-		local j = (i-1)*4
+		local j = (3-i)*4
 		local xf,yf = body:getLinearVelocity()
 		xf = xf*math.random( min, max )
 		yf = yf*math.random( min, max )
@@ -221,13 +221,7 @@ function ENT:gib()
 		local b = gib:getBody()
 		b:setLinearVelocity( xf, yf )
 
-		b:setAngularVelocity( xa*math.random( -1, 1 ) )
-
-
-		local m1,m2 = (x1+x2)/2,(y1+y2)/2
-		local norm = ( Vector( m1, m2 ) - Vector( bX, bY ) ):normalized()*3000
-		local t = math.random( -tspeed, tspeed )
-		b:applyForce( norm.x, norm.y )
+		b:setAngularVelocity( xa*0.1 )
 
 	end 
 end 

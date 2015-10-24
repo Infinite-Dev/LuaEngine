@@ -38,6 +38,10 @@ function ENT:setSize( sz )
 	end 
 end 
 
+function ENT:isAlive()
+	return self.alive 
+end
+
 function ENT:move( dir )
 	self.direction = dir 
 	self:getBody():applyForce( dir.x, dir.y )
@@ -49,8 +53,30 @@ function ENT:moveRandom( mul )
 	b:applyForce( self.direction.x, self.direction.y )
 end 
 
-function ENT:destroy()
+function ENT:destroy( hitx, hity )
 	self.alive = false 
+	self.hitx = hitx 
+	self.hity = hity 
+end 
+
+function ENT:explode()
+	if (self.r) > 20 then 
+		local num = 2
+		local sz = self.r/1.5 - math.random( 2, 4 )
+		if sz > 10 then 
+			for i = 1,num do 
+				local vec = vectorRandom()*10
+				local x,y = self:getPos()
+				local ast = ents.create( "ent_asteroid" )
+				ast:setPos( x + vec.x, y + vec.y )
+				ast:setSize( sz )
+				ast:generate()
+				local mul = ast.r*asteroids.speed*( self.r/asteroids.maxSize ) 
+				ast:moveRandom( mul )
+			end
+		end 
+	end 
+	self:remove()
 end 
 
 function ENT:think()
@@ -73,31 +99,9 @@ function ENT:think()
 		self:setPos( x, h + compare )
 	end  
 
-	if not self.alive then 
-		if self.r > 15 then 
-			local num = 2
-			local sz = self.r/num
-			for i = 1,num do 
-				local vec = vectorRandom()*10
-				local x,y = self:getPos()
-				local ast = ents.create( "ent_asteroid" )
-				ast:setPos( x + vec.x, y + vec.y )
-				ast:setSize( sz )
-				ast:generate()
-				local mul = ast.r*asteroids.speed*( self.r/asteroids.maxSize ) 
-				ast:moveRandom( mul )
-			end
-		end 
-		for i = 1,math.random( 2, 5 ) do 
-			local vec = vectorRandom()*5
-			local x,y = self:getPos()
-			local e = ents.create( "ent_asteroidgib" )
-			e:generate( self.r*0.08, self.r*0.11 )
-			e:setPos( x + vec.x, y + vec.y )
-		end
-		self:remove()
+	if not self:isAlive() then 
+		self:explode()
 	end 
-
 end 
 
 local lg = love.graphics
