@@ -200,9 +200,10 @@ function ENT:gib()
 	local lpoints = self.tbl
 	local wpoints = {body:getWorldPoints( self:getShape():getPoints() )}
 	local pNo = 
-	{ 	1, 2, 3, 4,
-	 	5, 6, 1, 2,
-	 	3, 4, 5, 6 
+	{ 	
+		1,2,3,4,
+		3,4,5,6,
+		5,6,1,2
 	}
 	local xa = body:getAngularVelocity()
 
@@ -210,16 +211,17 @@ function ENT:gib()
 
 		local j = (3-i)*4
 		local xf,yf = body:getLinearVelocity()
-		xf = xf*math.random( min, max )
-		yf = yf*math.random( min, max )
+		xf = xf*love.math.random( min, max )
+		yf = yf*love.math.random( min, max )
 
 		local x1, y1, x2, y2 = lpoints[pNo[ j + 1 ]], lpoints[pNo[ j + 2 ]], lpoints[pNo[ j + 3 ]], lpoints[pNo[ j + 4 ]]
 
 		local gib = ents.create( "ent_playergib" )
 		gib:setUp( x1, y1, x2, y2, bX, bY )
+		gib:setAngle( self:getAngle() )
 
 		local b = gib:getBody()
-		b:setLinearVelocity( xf, yf )
+		b:setLinearVelocity( xf*love.math.random( 0.6,1), yf*love.math.random( 0.6,1) )
 
 		b:setAngularVelocity( xa*0.1 )
 
@@ -266,7 +268,7 @@ function ENT:draw()
 		local midX = (x + x2)/2 
 		local midY = (y + y2)/2
 
-		local r = math.random( 5, 6 )
+		local r = love.math.random( 5, 6 )
 		local x5 = midX - aX*r
 		local y5 = midY - aY*r
 

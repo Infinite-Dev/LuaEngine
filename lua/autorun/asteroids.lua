@@ -14,26 +14,26 @@ local posFuncs =
 {
 	function( r )
 		local w,h = love.graphics.getDimensions()
-		local x = math.random( 0, w )
+		local x = love.math.random( 0, w )
 		local y = -r*1.1
 		return x,y
 	end, 	
 	function( r )
 		local w,h = love.graphics.getDimensions()
-		local x = math.random( 0, w )
+		local x = love.math.random( 0, w )
 		local y = h + r*1.1
 		return x,y
 	end, 	
 	function( r )
 		local w,h = love.graphics.getDimensions()
 		local x = -r*1.1
-		local y = math.random( 0, h )
+		local y = love.math.random( 0, h )
 		return x,y  
 	end, 	
 	function( r )
 		local w,h = love.graphics.getDimensions()
 		local x = w + r*1.1
-		local y = math.random( 0, h )
+		local y = love.math.random( 0, h )
 		return x,y 
 	end
 }
@@ -43,7 +43,7 @@ function asteroids.createNewAsteroid()
 	ast:generate()
 
 	local w,h = love.graphics.getDimensions()
-	local x, y = posFuncs[ math.random( 1, 4 ) ]( ast.r )
+	local x, y = posFuncs[ love.math.random( 1, 4 ) ]( ast.r )
 
 	ast:setPos( x, y )
 

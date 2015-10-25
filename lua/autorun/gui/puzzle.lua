@@ -303,7 +303,7 @@ function PANEL:crack()
 	local preSolve = table.copy( self.numbers )
 	while not self.solved do
 		for i = 1,num do 
-			local targ = math.random( 1,25 )
+			local targ = love.math.random( 1,25 )
 			self.puzzle[ targ ]:change()
 			tbl[ i ] = targ 
 			local b = true 

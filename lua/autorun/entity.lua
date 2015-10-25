@@ -179,6 +179,13 @@ function _E:getClass()
 	return self._class
 end
 
+function _E:applyForce( x, y )
+	local b = self:getBody()
+	if b then 
+		b:applyForce( x, y )
+	end  
+end
+
 function _E:collisionPostSolve()
 
 end  

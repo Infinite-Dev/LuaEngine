@@ -117,6 +117,6 @@ function Vector:cross(other)
 end
 
 function vectorRandom()
-  return Vector( math.random( -1, 1), math.random( -1, 1 ) )
+  return Vector( love.math.random( -1, 1 )*love.math.random(), love.math.random( -1, 1 )*love.math.random() )
 end 
 setmetatable(Vector, { __call = function(_, ...) return Vector.new(...) end })

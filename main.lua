@@ -23,6 +23,7 @@ end
 function love.load()
 	loadFiles( "lua/autorun" )
 	game.changeState( "menu" )
+	love.math.setRandomSeed( os.time() )
 end 
 
 --[[----------------------------------------

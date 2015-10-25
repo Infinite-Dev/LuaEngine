@@ -4,12 +4,12 @@ local ENT = {}
 function ENT:initialize()
 	self.min = asteroids.minSize 
 	self.max = asteroids.maxSize 
-	self.r = math.random( self.min, self.max )
+	self.r = love.math.random( self.min, self.max )
 	self.alive = true 
 end 
 
 function ENT:generate()
-	local circle = love.physics.newCircleShape( self.r or math.random( self.min, self.max ) )
+	local circle = love.physics.newCircleShape( self.r or love.math.random( self.min, self.max ) )
 	self:setShape( circle )
 
 	local x,y = self:getPos()
@@ -32,7 +32,7 @@ end
 
 function ENT:setSize( sz )
 	if not sz then
-		self.r = math.random( self.min, self.max )
+		self.r = love.math.random( self.min, self.max )
 	else 
 		self.r = sz 
 	end 
@@ -62,7 +62,7 @@ end
 function ENT:explode()
 	if (self.r) > 20 then 
 		local num = 2
-		local sz = self.r/1.5 - math.random( 2, 4 )
+		local sz = self.r/1.5 - love.math.random( 2, 4 )
 		if sz > 10 then 
 			for i = 1,num do 
 				local vec = vectorRandom()*10

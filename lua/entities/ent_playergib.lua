@@ -8,7 +8,7 @@ function ENT:setUp( x1, y1, x2, y2, xpos, ypos )
 
 	local x,y = self:getPos()
 	local body = love.physics.newBody( game.getWorld(), xpos, ypos, "dynamic" )
-	body:setMass( 5 )
+	body:setMass( 0.01 )
 	body:setLinearDamping( 0.4 )
 	body:setAngularDamping( 0.5 )
 	self:setBody( body )
@@ -21,6 +21,10 @@ function ENT:setUp( x1, y1, x2, y2, xpos, ypos )
 	fix:setCategory( 3 )
 	fix:setMask( 3 )
 	self:setFixture( fix )
+
+	local vec =  vectorRandom()*5
+	print( vec.x, vec.y )
+	self:applyForce( vec.x, vec.y )
 
 end 
 

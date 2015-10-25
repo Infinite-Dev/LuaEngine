@@ -29,7 +29,7 @@ local buttonD =
 			self.scores = gui.create( "scores", prnt )
 			self.scores:setPos( w, 0 )
 		end 
-		prnt:moveTo( -w, 0, 1, 0.5, 0.5 )
+		prnt:moveTo( -w, 0, 0.7, 0.5, 0.5 )
 	end },
 	{ "Quit", function( self )
 		local w,h = self:getParent():getSize()

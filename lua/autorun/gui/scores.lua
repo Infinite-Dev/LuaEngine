@@ -37,7 +37,7 @@ function PANEL:init()
 		love.graphics.circle( "line", w/2, w/2, csz/2, 100 )
 	end
 	function b:doClick()
-		prnt:moveTo( 0, 0, 1, 0.5, 0.5 )
+		prnt:moveTo( 0, 0, 0.7, 0.5, 0.5 )
 	end  
 
 	local b = 6

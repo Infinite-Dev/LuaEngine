@@ -198,9 +198,11 @@ function game.drawHUD()
 	end
 end
 
+local stars = 30 
 function game.generateBackground()
+	local w,h = love.graphics.getDimensions()
 	local tbl = {}
-	
+	local gWidth 
 end 
 
 function game.drawBackground()
