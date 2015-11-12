@@ -23,7 +23,6 @@ function ENT:setUp( x1, y1, x2, y2, xpos, ypos )
 	self:setFixture( fix )
 
 	local vec =  vectorRandom()*5
-	print( vec.x, vec.y )
 	self:applyForce( vec.x, vec.y )
 
 end 

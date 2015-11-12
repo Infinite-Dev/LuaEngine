@@ -105,7 +105,7 @@ function PANEL:center()
 		self.__centred = true
 		
 	else
-		local x,y = lg.getWidth()/2 - self:getWide()/2, lg.getHeight()/2 - self:getTall()/2
+		local x,y = lg.getWidth()/2 - self:getWidth()/2, lg.getHeight()/2 - self:getHeight()/2
 		self:setPos( x, y )
 		self.__centred = true
 	end
@@ -115,11 +115,11 @@ function PANEL:getSize()
 	return (self.__w),(self.__h)
 end
 
-function PANEL:getTall()
+function PANEL:getHeight()
 	return self.__h
 end
 
-function PANEL:getWide()
+function PANEL:getWidth()
 	return self.__w
 end
 
@@ -263,7 +263,7 @@ function PANEL:moveTo( x, y, time, easein, easeout, callback, ... )
 	local hname = "MoveHook"..tostring( self )
 	local delay = 0.01
 	local thinkTime = t 
-	hook.add( "Think", hname, function()
+	hook.add( "think", hname, function()
 		if self then 
 			local t2 = love.timer.getTime()
 			if t2 > thinkTime then  
@@ -272,7 +272,7 @@ function PANEL:moveTo( x, y, time, easein, easeout, callback, ... )
 				self:setPos( (vec2 + add*drawP), false ) 
 				if p >= 1 then 
 					self:setPos( x, y )
-					hook.remove( "Think", hname )
+					hook.remove( "think", hname )
 					if callback then 
 						callback( self, unpack( args ) )
 					end
@@ -280,7 +280,7 @@ function PANEL:moveTo( x, y, time, easein, easeout, callback, ... )
 				thinkTime = t2 + delay 
 			end 
 		else 
-			hook.remove( "Think", hname )
+			hook.remove( "think", hname )
 		end  
 	end ) 
 end 

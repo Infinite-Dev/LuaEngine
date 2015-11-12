@@ -3,6 +3,11 @@ game = {}
 game.paused = false 
 game.states = {}
 game.state = ""
+game.__curScore = 0
+game.__highScore = 0
+game.__spawnTime = 0
+game.__wave = 1 
+
 function game.pause()
 	game.paused = true 
 	game.pauseMenu = gui.create( "pMenu" )
@@ -101,11 +106,21 @@ game.states.changeFuncs =
 
 		game.setUp()
 
+		game.setNextSpawn( 0 )
+		game.setWave( 1 )
+
 	end,
 	menu = function()
 
 		local mainMenu = gui.create( "aMenu" )
 		game.cleanUp()
+		game.generateBackground()
+
+		if game.endGame then 
+			game.endGame:remove()
+		end
+
+		hook.remove( "think", "playerDeathDelay" )
 
 	end 
 } 
@@ -123,21 +138,22 @@ game.states.thinkFuncs =
 			game.logic()
 			game.getWorld():update( dt )
 		end 
-		hook.call( "Think" )
+		hook.call( "think" )
 	end,
 	menu = function()
 		gui.update()
 		timer.think()
-		hook.call( "Think" )
+		hook.call( "think" )
 	end 
 }
 
 
+function game.getPlayer()
+	return game.player 
+end 
+
 function game.setUp()
 	love.keyboard.setKeyRepeat(true)
-	for i = 1,asteroids.max do 
-		asteroids.createNewAsteroid()
-	end 
 
 	game.player = ents.create( "ent_player" )
 	game.player:setPos( 400, 400 )
@@ -156,29 +172,75 @@ end
 function game.restart()
 	game.cleanUp()
 	game.changeState( "game" )
+	if game.endGame then 
+		game.endGame:remove()
+	end
+	hook.remove( "think", "playerDeathDelay" )
+end 
+
+
+local posFuncs =
+{
+	function( w, h )
+		local w,h = love.graphics.getDimensions()
+		local x = love.math.random( 0, w )
+		local y = -h*1.1
+		return x,y
+	end, 	
+	function( w, h )
+		local _,scrh = love.graphics.getDimensions()
+		local x = love.math.random( 0, w )
+		local y = scrh + h*1.1
+		return x,y
+	end, 	
+	function( w, h )
+		local scrw,_ = love.graphics.getDimensions()
+		local x = -w*1.1
+		local y = love.math.random( 0, h )
+		return x,y  
+	end, 	
+	function( w, h )
+		local scrw,_ = love.graphics.getDimensions()
+		local x = scrw + w*1.1
+		local y = love.math.random( 0, h )
+		return x,y 
+	end
+}
+function game.getSpawnPosition( ent )
+	local x1,y1,x2,y2 = ent:getBoundingBox()
+	local w,h = x2-x1,y2-y1
+	local p = love.math.random( 1, 4 )
+	local x,y = posFuncs[ p ]( w, h )
+	return x,y 
+end 
+
+function game.createEnemy( class )
+	if class == "ent_asteroid" then 
+		asteroids.createNewAsteroid()
+	else
+		local ent = ents.create( class )
+		local x,y = game.getSpawnPosition( ent )
+		ent:setPos( x, y )
+		ent:spawn()
+ 	end 
 end 
 
 function game.logic()
-	local numRoids = 0
-	for k,v in pairs( ents.getAll() ) do 
-		if v:getClass() == "ent_asteroid" then 
-			if v.r > asteroids.minSize then 
-				numRoids = numRoids + 1 
-			end 
-		end 
-	end 
+	if game.shouldSpawn() then 
 
-	local t = love.timer.getTime()
-	if numRoids < asteroids.max then 
-		for i = 1,(asteroids.max-numRoids) do 
-			if t > asteroids.lastDelayTime then 
-				asteroids.createNewAsteroid()
-				asteroids.lastDelayTime = t + asteroids.delay 
+		local data = game.getWaveData()
+		for i = 1,#data do 
+			local enemyData = data[ i ]
+			for i2 = 1,enemyData[ 1 ] do 
+				game.createEnemy( enemyData[ 2 ] )
 			end 
 		end 
-	end 
+
+		game.nextWave()
+		game.setNextSpawn()
+
+	end
 end 
-	
 
 local lg = love.graphics 
 local barw = 150
@@ -188,23 +250,102 @@ local y = 15
 function game.drawHUD()
 	if game.player and game.getState() == "game" then 
 		local w,h = love.graphics.getDimensions()
-		lg.setColor( 255, 50, 50, 255 )
-		lg.rectangle( "line", x, y, barw, barh )
 
 		local hp = game.player:getHealth()
-		local maxHP = 100 
+		local maxHP = asteroids.playerHealth
 		local p = hp/maxHP
+		local c = { 30 + 225*(1-p), 30 + 225*p, 30, 255}
+
+		lg.setColor( unpack( c ) )
+		lg.rectangle( "line", x, y, barw, barh )
+
+		lg.setColor( unpack( c ) )
 		lg.rectangle( "fill", x, y, barw*p, barh )
 	end
 end
 
-local stars = 30 
+local targStars = 30
+local border = 5 
+local starMin = 2
+local starMax = 4
+local starTable = {}
 function game.generateBackground()
 	local w,h = love.graphics.getDimensions()
-	local tbl = {}
-	local gWidth 
+	local r = math.ceil( math.sqrt( targStars ) )
+	local c = math.floor( math.sqrt( targStars ) )
+	local grid = r*c 
+	local gw = w/c 
+	local gh = h/r 
+	local j = 1 
+	for i = 1,grid do 
+		local x = gw*(j-1) + love.math.random( border, gw - border )
+		local y = math.floor( (i-1)/c )*gh + love.math.random( border, gh - border )
+		starTable[ i ] = {x, y, love.math.random( 10, 20 )/100 }
+		j = math.loop( j, 1, c )
+	end 
 end 
 
 function game.drawBackground()
+	if game.getState() == "game" then 
+		for i = 1,#starTable do 
+			local t = starTable[ i ]
+			love.graphics.setColor( 255, 255, 255, 255 )
+			love.graphics.draw(starImage, t[ 1 ], t[ 2 ], 0, t[ 3 ], t[ 3 ] )
+		end
+	end 
+end 
 
+function game.setScore( num )
+	game.__curScore = num 
+end 
+
+function game.addScore( num )
+	game.setScore( game.getScore() + num )
+end 
+
+function game.getScore()
+	return game.__curScore
+end 
+
+function game.setHighScore( num )
+
+end 
+
+function game.playerDeath()
+	local w,h = love.graphics.getDimensions()
+	game.endGame = gui.create( "gameOverScreen" )
+	game.endGame:setSize( w*0.4, h*0.3 )
+	game.endGame:center()	
+	game.endGame:createButton()
+end 
+
+function game.setWave( n )
+	game.__wave = n 
+end
+
+function game.getWaveNumber()
+	return game.__wave 
+end 
+
+function game.getWaveData()
+	return WAVE[ game.getWaveNumber() ]
+end 
+
+function game.nextWave()
+	game.setWave( math.min( game.getWaveNumber() + 1, game.getMaxWave() ) )
+end 
+
+function game.getMaxWave()
+	return #WAVE - 1
+end
+
+function game.shouldSpawn()
+	return game.__spawnTime <= love.timer.getTime()
+end 
+
+function game.setNextSpawn( t )
+	if not t then 
+		t = WAVE.delay 
+	end 
+	game.__spawnTime = love.timer.getTime() + t 
 end 

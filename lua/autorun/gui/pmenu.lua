@@ -82,7 +82,7 @@ end
 function PANEL:paint()
 
 	lg.setColor( 11, 11, 11, 120 )
-	lg.rectangle( "fill", 0, 0, self:getWide(), self:getTall() )
+	lg.rectangle( "fill", 0, 0, self:getWidth(), self:getHeight() )
 
 end
 gui.register( "pMenu", PANEL, "panel" )

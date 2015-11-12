@@ -24,15 +24,21 @@ function love.load()
 	loadFiles( "lua/autorun" )
 	game.changeState( "menu" )
 	love.math.setRandomSeed( os.time() )
+
+	starImage = love.graphics.newImage( "materials/star.png" )
+
+	laserSound = love.audio.newSource("sound/laser.wav", "static" )
+	expSound = love.audio.newSource("sound/exp.wav", "static" )
 end 
 
 --[[----------------------------------------
 	Call our basic draw functions and call 
 	the draw hook.
---]]----------------------------------------
+--]]-----------------nekb-----------------------
 
 
 function love.draw()
+	game.drawBackground()
 	ents.draw()
 	game.drawHUD()
 	hook.call( "paint" )
@@ -65,6 +71,11 @@ local keyFuncs =
 	[ "r" ] = function()
 		if game.getState() == "game" then 
 			game.restart()
+		end 
+	end,
+	[ "q" ] = function()
+		if game.getState() == "game" and not game.player:isAlive() then 
+			game.changeState( "menu" )
 		end 
 	end
 }

@@ -19,7 +19,7 @@ function ENT:initialize()
 	fix:setRestitution( 1 )
 	fix:setFriction( 0 )
 	fix:setDensity( 1 )
-	fix:setMask( 2 )
+	fix:setGroupIndex( -1 )
 	self:setFixture( fix )
 
 	self.drawx = x 
@@ -32,32 +32,24 @@ function ENT:setBulletData( x, y, xdir, ydir, speed, damage, angle )
 	local b = self:getBody()
 	b:setLinearVelocity( xdir*speed, ydir*speed )
 
-	self:setAngle( angle )
+	self:setAngle( angle or 0 )
 
-	local a = angle + math.pi/2
-	local a2 = angle + math.pi*1.5
-	self.xadd = math.cos( a )*self.r 
-	self.xadd2 = math.cos( a2 )*self.r 
-	self.yadd = math.sin( a )*self.r
-	self.yadd2 = math.sin( a2 )*self.r 
+	self.damage = damage 
 
+	if angle then 
+		local a = angle + math.pi/2
+		local a2 = angle + math.pi*1.5
+		self.xadd = math.cos( a )*self.r 
+		self.xadd2 = math.cos( a2 )*self.r 
+		self.yadd = math.sin( a )*self.r
+		self.yadd2 = math.sin( a2 )*self.r 
+	end 
 end 
 
 function ENT:collisionPostSolve( ent, coll, norm1, tan1, norm2, tan2  )
 	if not isEntity( ent ) then return end 
-	if ent:getClass() == "ent_asteroid" then
-		local x,y = coll:getPositions() 
-		ent:destroy( x, y )
-		self:remove()
-
-	elseif ent:getClass() == "npc_drone" then 
-		ent:remove()
-		self:remove()
-	elseif ent:getClass() == "npc_droneboss" then
-		ent.hp = ent.hp - 1 
-		if ent.hp < 0 then
-			ent:remove()
-		end 
+	if ent:getClass() == "ent_player" then
+		ent:setHealth( ent:getHealth() - self.damage )
 		self:remove()
 	end 
 end 
@@ -89,11 +81,9 @@ local lg = love.graphics
 function ENT:draw()
 
 	local x,y = self:getPos()
-	local x1,y1 = self.xadd + x,self.yadd + y
-	local x2,y2 = self.xadd2 + x,self.yadd2 + y
 
 	lg.setColor( 255, 230, 0, 255 )
-	lg.line( x1, y1, x2, y2 )
+	lg.circle( "fill", x, y, self.r )
 
 end 
-ents.registerEntity( "ent_bullet", ENT )
+ents.registerEntity( "ent_droneBullet", ENT )

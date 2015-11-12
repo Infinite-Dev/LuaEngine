@@ -119,4 +119,8 @@ end
 function vectorRandom()
   return Vector( love.math.random( -1, 1 )*love.math.random(), love.math.random( -1, 1 )*love.math.random() )
 end 
+
+function vector( ... )
+  return Vector.new( ... )
+end 
 setmetatable(Vector, { __call = function(_, ...) return Vector.new(...) end })

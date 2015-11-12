@@ -1,0 +1,144 @@
+
+local ENT = {}
+
+local size = 60
+local range = 500
+local alert = 700
+local speed = 30
+local mass = 100
+local damage = 100
+local hp = 100
+function ENT:initialize()
+	local circle = love.physics.newCircleShape( size )
+	self:setShape( circle )
+
+	local x,y = self:getPos()
+	local body = love.physics.newBody( game.getWorld(), x, y, "dynamic" )
+	body:setMass( 100 )
+	body:setLinearDamping( 0.45 )
+	self:setBody( body )
+
+	local d = 5 
+	local fix = love.physics.newFixture( self:getBody(), self:getShape(), 1 )
+	fix:setRestitution( 1 )
+	fix:setFriction( 0 )
+	fix:setGroupIndex( -1 )
+	self:setFixture( fix )
+	self.centreColor = { 255, 255, 255, 255 }
+	self.damage = damage
+	self.hp = hp 
+	self.eventTimer = love.timer.getTime() + love.math.random( 5, 12 )
+end 
+
+function ENT:spawn()
+	local w,h = love.graphics.getDimensions()
+	local midx, midy = w/2, h/2 
+	local x,y = self:getPos()
+	local vec1 = vector( midx, midy )
+	local vec2 = vector( x, y )
+	local norm = (vec1-vec2):normalized()
+	self:setVelocity( norm*200 )
+end 
+
+function ENT:shouldDoEvent()
+	return love.timer.getTime() > self.eventTimer
+end 
+
+function ENT:setNextEvent( t )
+	self.eventTimer = love.timer.getTime() + t 
+end 
+
+
+local bulletSpeed = 120
+local numBullets = 18
+local damage = 10
+local eTable =
+{
+	function( self )
+		local x,y = self:getPos()
+		for i = 1,2 do 
+			local vecR = vectorRandom()*(size*0.5)
+			local x2,y2 = x + vecR.x, y + vecR.y
+			local norm = ( vector( x, y ) - vector( x2, y2 ) ):normalized()
+			local drone = ents.create( "npc_drone" )
+			drone:setPos( x + vecR.x , y + vecR.y )
+			drone:applyForce( norm*16 )
+		end 
+	end,
+	function( self )
+		local x,y = self:getPos()
+		for i = 1,numBullets do 
+			local p = (i/numBullets)*(2*math.pi)
+			local bulletX = math.sin( p )*(size*1.05) + x
+			local bulletY  = math.cos( p )*(size*1.05) + y 
+
+			local vec = vector( x, y )
+			local vec2 = vector( bulletX, bulletY )
+			local norm = (vec2-vec):normalized()
+			local bullet = ents.create( "ent_droneBullet" )
+			bullet:setBulletData( bulletX, bulletY, norm.x, norm.y, bulletSpeed, damage )
+		end
+	end
+}	
+function ENT:doEvent()
+	eTable[ love.math.random( 1, #eTable ) ]( self )
+	self:setNextEvent( love.math.random( 5, 12 ) ) 
+end 
+
+function ENT:think()
+
+	if self:shouldDoEvent() then 
+		self:doEvent()
+	end 
+
+	local x,y = self:getPos()
+	local w,h = love.graphics.getDimensions()
+
+	local mult = 1.1
+	local compare = size
+	local x2,y2 = x + compare, y + compare
+	local x3,y3 = x - compare, y - compare
+
+	if x3 > w + compare/2 then 
+		self:setPos( -compare, y )
+	elseif y3 > h + compare/2 then
+		self:setPos( x, -compare )
+	elseif x2 < -compare/2 then 
+		self:setPos( w + compare, y )
+	elseif y2 < -compare/2 then 
+		self:setPos( x, h + compare )
+	end  
+
+	local p = game.getPlayer()
+	if not p:isAlive() then return end 
+
+	local pVec = vector( p:getPos() )
+	local eVec = vector( self:getPos() )
+	if pVec:distance( eVec ) <= range then 
+		local norm = (pVec-eVec):normalized()*speed
+		self:applyForce( norm )
+		self.centreColor = { 255, 25, 25, 255 }
+	elseif pVec:distance( eVec ) <= alert then 
+		local norm = (pVec-eVec):normalized()*(speed/3)
+		self:applyForce( norm )
+		self.centreColor = { 200, 120, 0, 255 }
+	else 
+		self.centreColor = { 0, 255, 0, 255 }
+	end 
+end 
+
+local lg = love.graphics
+function ENT:draw()
+	local x,y = self:getPos()
+	lg.setColor( 0, 0, 0, 255 )
+	lg.circle( "fill", x, y, size )
+
+	lg.setColor( 255, 255, 255, 255 )
+	lg.circle( "line", x, y, size )
+
+	lg.setColor( unpack( self.centreColor ) )
+	lg.circle( "line", x, y, size*0.4 )
+	lg.circle( "line", x, y, 1 )
+end 
+
+ents.registerEntity( "npc_droneboss", ENT )

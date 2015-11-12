@@ -33,11 +33,12 @@ function ENT:initialize()
 	self:setFixture( fix )
 
 	self.alive = true 
-	self.health = 100
-	self.moving = false 
+	self.health = asteroids.playerHealth
+	self.moving = false
+	self.damage = 1 
 
 	self.bulletDelay = 0 
-	self.fireDelay = 0.25
+	self.fireDelay = 0.15
 	self.shouldGib = false
 	self.gibDelay = 0 
 
@@ -47,8 +48,16 @@ function ENT:getHealth()
 	return self.health 
 end 
 
+function ENT:getMaxHealth()
+	return asteroids.playerHealth
+end
+
 function ENT:setHealth( hp )
 	self.health = math.max( hp, 0 ) 
+
+	if self:getHealth() <= 0 then 
+		self:doDeath()
+	end 
 end 
 
 function ENT:isAlive()
@@ -87,7 +96,8 @@ end
 
 function ENT:collisionPostSolve( ent, coll, norm1, tan1, norm2, tan2  )
 	if self:isAlive() then 
-		if isEntity( ent ) and ent:getClass() == "ent_asteroid" then 
+		if not isEntity( ent ) then return end 
+		if ent:getClass() == "ent_asteroid" then 
 
 			local b = self:getBody()
 			local d,e,f,g = b:getMassData()
@@ -96,10 +106,9 @@ function ENT:collisionPostSolve( ent, coll, norm1, tan1, norm2, tan2  )
 			local dmg = (f^2)*mult + (norm1^2)*mult + 3
 
 			self:setHealth( self:getHealth() - dmg )
-			if self:getHealth() <= 0 then 
-				self:doDeath()
-			end 
-
+		elseif ent:getClass() == "npc_drone" or ent:getClass() == "npc_droneboss" then 
+			ent:remove()
+			self:setHealth( self:getHealth() - ent.damage )
 		end 
 	end 
 end 
@@ -135,8 +144,10 @@ function ENT:think()
 			local bullet = ents.create( "ent_bullet" )
 			local x,y = self:getShootPos()
 			local xdir,ydir = self:getAimDir()
-			bullet:setBulletData( x + xdir*2, y+ydir*2, xdir, ydir, 60, self:getAngle()  )
+			bullet:setBulletData( x + xdir*2, y+ydir*2, xdir, ydir, 400, self.damage, self:getAngle()  )
 			self.bulletDelay = t + self.fireDelay 
+
+			love.audio.play( laserSound )
 		end 
 
 		if isDown( "s" ) then 
@@ -226,6 +237,14 @@ function ENT:gib()
 		b:setAngularVelocity( xa*0.1 )
 
 	end 
+
+	local t = love.timer.getTime() + 3 
+	hook.add( "think", "playerDeathDelay", function()
+		if love.timer.getTime() >= t then 
+			game.playerDeath()
+			hook.remove( "think", "playerDeathDelay" )
+		end 
+	end )
 end 
 
 local lg = love.graphics 

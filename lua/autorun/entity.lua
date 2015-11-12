@@ -182,9 +182,32 @@ end
 function _E:applyForce( x, y )
 	local b = self:getBody()
 	if b then 
-		b:applyForce( x, y )
+		if type( x ) == "table" then 
+			b:applyForce( x.x, x.y )
+		else 
+			b:applyForce( x, y )
+		end 
 	end  
 end
+
+function _E:setVelocity( x, y )
+	local b = self:getBody()
+	if b then 
+		if type( x ) == "table" then 
+			b:setLinearVelocity( x.x, x.y )
+		else 
+			b:setLinearVelocity( x, y )
+		end 
+	end
+end
+
+function _E:getBoundingBox()
+	local f = self:getFixture()
+	if f then 
+		return f:getBoundingBox()
+	end 
+	return 1,1
+end 
 
 function _E:collisionPostSolve()
 

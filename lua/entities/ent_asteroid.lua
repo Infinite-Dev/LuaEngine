@@ -107,6 +107,8 @@ end
 local lg = love.graphics
 function ENT:draw()
 	local x,y = self:getPos()
+	lg.setColor( 0, 0, 0, 255 )
+	lg.circle( "fill", x, y, self.r )
 	lg.setColor( 255, 255, 255, 255 )
 	lg.circle( "line", x, y, self.r )
 end 

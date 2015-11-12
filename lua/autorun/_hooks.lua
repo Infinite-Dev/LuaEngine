@@ -37,5 +37,7 @@ end
 --]]----------------------------------------
 
 function hook.remove( name, id )
-	hook.list[ name ][ id ] = nil
+	if hook.list[ name ] then 
+		hook.list[ name ][ id ] = nil
+	end 
 end

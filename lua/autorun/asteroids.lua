@@ -9,6 +9,7 @@ asteroids.speed = 100
 asteroids.health = 1 
 asteroids.delay = 5
 asteroids.lastDelayTime = 0 
+asteroids.playerHealth = 100
 
 local posFuncs =
 {
