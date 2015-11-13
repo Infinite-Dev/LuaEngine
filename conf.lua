@@ -1,3 +1,3 @@
 function love.conf( t )
-	t.title = "Shitty Asteroids"
+	t.title = "Generic Space Bullet Hell"
 end

@@ -7,7 +7,7 @@ function ENT:setUp( x1, y1, x2, y2, xpos, ypos )
 	self:setShape( poly )
 
 	local x,y = self:getPos()
-	local body = love.physics.newBody( game.getWorld(), xpos, ypos, "dynamic" )
+	local body = love.physics.newBody( game.getWorld(), x, y, "dynamic" )
 	body:setMass( 0.01 )
 	body:setLinearDamping( 0.4 )
 	body:setAngularDamping( 0.5 )

@@ -243,6 +243,8 @@ function game.logic()
 end 
 
 local lg = love.graphics 
+local bossFont = lg.newFont( 30 )
+local bossFontSmall = lg.newFont( 15 )
 local barw = 150
 local barh = 13
 local x = 25
@@ -257,10 +259,34 @@ function game.drawHUD()
 		local c = { 30 + 225*(1-p), 30 + 225*p, 30, 255}
 
 		lg.setColor( unpack( c ) )
-		lg.rectangle( "line", x, y, barw, barh )
+		lg.rectangle( "line", x, h - y - barh , barw, barh )
 
 		lg.setColor( unpack( c ) )
-		lg.rectangle( "fill", x, y, barw*p, barh )
+		lg.rectangle( "fill", x, h - y - barh, barw*p, barh )
+
+		local bosstbl = {}
+		for k,v in pairs (ents.getAll()) do 
+			if v.isBoss then 
+				bosstbl[ #bosstbl+1 ] = { v.name, v.desc, v.hp, v.maxhp }
+			end 
+		end 
+
+		for i = 1,#bosstbl do 
+			local name = bosstbl[ i ][ 1 ]
+			local desc = bosstbl[ i ][ 2 ]
+			local hp = bosstbl[ i ][ 3 ]
+			local maxhp = bosstbl[ i ][ 4 ]
+			local p = hp/maxhp 
+			lg.setColor( 255, 255, 255, 255 )
+			lg.setFont( bossFont )
+			local nameW,nameH = bossFont:getWidth( name ),bossFont:getHeight( name )
+			local y = nameH/2 + 60*(i-1)
+			lg.print( name, w/2 - nameW/2, y )
+
+			lg.setFont( bossFontSmall )
+			local descW,descH = bossFontSmall:getWidth( desc ),bossFontSmall:getHeight( desc )
+			lg.print( desc, w/2 - descW/2, y + nameH + 4)
+		end 
 	end
 end
 

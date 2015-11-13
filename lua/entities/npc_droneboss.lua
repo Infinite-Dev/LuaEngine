@@ -27,7 +27,12 @@ function ENT:initialize()
 	self.centreColor = { 255, 255, 255, 255 }
 	self.damage = damage
 	self.hp = hp 
+	self.maxhp = hp 
 	self.eventTimer = love.timer.getTime() + love.math.random( 5, 12 )
+
+	self.isBoss = true 
+	self.name = "Mega Drone"
+	self.desc = "It's... uh... big."
 end 
 
 function ENT:spawn()
@@ -50,7 +55,7 @@ end
 
 
 local bulletSpeed = 120
-local numBullets = 18
+local numBullets = 28
 local damage = 10
 local eTable =
 {
@@ -78,21 +83,71 @@ local eTable =
 			local bullet = ents.create( "ent_droneBullet" )
 			bullet:setBulletData( bulletX, bulletY, norm.x, norm.y, bulletSpeed, damage )
 		end
-	end
+	end,
+	function( self )
+		self:doSpinAttack( 0.02, 2, 2, 10, 80 )
+	end 
 }	
 function ENT:doEvent()
 	eTable[ love.math.random( 1, #eTable ) ]( self )
-	self:setNextEvent( love.math.random( 5, 12 ) ) 
+	self:setNextEvent( love.math.random( 5, 8 ) ) 
+end 
+
+function ENT:doSpinAttack( delay, loops, duration, bulletDamage, bulletSpeed )
+	self.spinAngle = 0
+	self.spinDamage = bulletDamage
+	self.spinFireDelay = delay 
+	self.spinStartTime = love.timer.getTime()
+	self.nextSpinFire = 0 
+	self.spinLoops = (2*math.pi)*loops 
+	self.spinDuration = duration 
+	self.spinRealTime = self.spinStartTime + self.spinDuration 
+	self.spinBulletSpeed = bulletSpeed 
+	self.spinAttack = true
+
+	self:setEventThink( function( self, time )
+		local x,y = self:getPos()
+		if self.spinAttack then 
+			if time < self.spinRealTime then 
+				if time >= self.nextSpinFire then 
+					local r = size*1.05
+					local bulletX = math.sin( self.spinAngle )*r + x
+					local bulletY = math.cos( self.spinAngle )*r + y 
+
+					local vec = vector( x, y )
+					local vec2 = vector( bulletX, bulletY )
+					local norm = (vec2-vec):normalized()
+
+					local bullet = ents.create( "ent_droneBullet" )
+					bullet:setBulletData( bulletX, bulletY, norm.x, norm.y, self.spinBulletSpeed, self.spinDamage )
+					self.nextSpinFire = time + self.spinFireDelay
+				end
+				local p = math.min( (love.timer.getTime()-self.spinStartTime)/self.spinDuration, 1 )
+				self.spinAngle = self.spinLoops*p 
+			else 
+				self.spinAttack = false 
+			end 
+		end
+	end)
+end 
+
+function ENT:setEventThink( func )
+	self.eventThink = func 
 end 
 
 function ENT:think()
 
-	if self:shouldDoEvent() then 
-		self:doEvent()
-	end 
-
 	local x,y = self:getPos()
 	local w,h = love.graphics.getDimensions()
+	local time = love.timer.getTime()
+
+	if self:shouldDoEvent() then 
+		self:doEvent()
+	end
+
+	if self.eventThink then 
+		self:eventThink( time )
+	end  
 
 	local mult = 1.1
 	local compare = size
