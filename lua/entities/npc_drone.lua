@@ -21,9 +21,18 @@ function ENT:initialize()
 	local fix = love.physics.newFixture( self:getBody(), self:getShape(), 1 )
 	fix:setRestitution( 1 )
 	fix:setFriction( 0 )
+	fix:setGroupIndex( -20 )
 	self:setFixture( fix )
 	self.centreColor = { 255, 255, 255, 255 }
 	self.damage = 25 
+end 
+
+function ENT:collisionPostSolve( ent, coll, norm1, tan1, norm2, tan2  )
+	if not isEntity( ent ) then return end 
+	if ent:getClass() == "ent_player" and ent:isAlive() then 
+		ent:takeDamage( self.damage )
+		self:remove()
+	end 
 end 
 
 function ENT:spawn()
@@ -87,4 +96,4 @@ function ENT:draw()
 	lg.circle( "line", x, y, 1 )
 end 
 
-ents.registerEntity( "npc_drone", ENT )
+ents.registerEntity( "npc_drone", ENT, "npc_base" )

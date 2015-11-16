@@ -4,10 +4,57 @@ local ENT = {}
 local size = 60
 local range = 500
 local alert = 700
-local speed = 30
+local speed = 50
 local mass = 100
 local damage = 100
+local colDamage = 20 
 local hp = 100
+local bulletSpeed = 120
+local numBullets = 28
+local damage = 10
+local numDrones = 2 
+local eTable =
+{
+	function( self )
+		local x,y = self:getPos()
+		local spawnArea = size*1.5
+		for i = 1,numDrones do 
+			local r = (i/numDrones)*(2*math.pi)
+			local x2,y2 = math.sin( r )*spawnArea, math.cos( r )*spawnArea
+			local norm = ( vector( x, y ) - vector( x2, y2 ) ):normalized()
+			local drone = ents.create( "npc_drone" )
+			drone:setPos( x + x2 , y + y2 )
+			drone:applyForce( norm*120 )
+		end 
+	end,
+	function( self )
+		local x,y = self:getPos()
+		for i = 1,numBullets do 
+			local p = (i/numBullets)*(2*math.pi)
+			local bulletX = math.sin( p )*(size*1.05) + x
+			local bulletY  = math.cos( p )*(size*1.05) + y 
+
+			local vec = vector( x, y )
+			local vec2 = vector( bulletX, bulletY )
+			local norm = (vec2-vec):normalized()
+			
+			local bulletData = {}
+			bulletData.damage = damage 
+			bulletData.force = 50 
+			bulletData.startPos = vec 
+			bulletData.dir = norm 
+			bulletData.size = 2
+			bulletData.owner = self 
+			bulletData.speed = bulletSpeed
+			bulletData.color = { 0, 102, 255, 255 }
+			game.createBullet( bulletData )
+
+		end
+	end,
+	function( self )
+		self:doSpinAttack( 0.06, 2, 2, 10, 80 )
+	end 
+}	
 function ENT:initialize()
 	local circle = love.physics.newCircleShape( size )
 	self:setShape( circle )
@@ -22,17 +69,34 @@ function ENT:initialize()
 	local fix = love.physics.newFixture( self:getBody(), self:getShape(), 1 )
 	fix:setRestitution( 1 )
 	fix:setFriction( 0 )
-	fix:setGroupIndex( -1 )
+	fix:setGroupIndex( -20 )
 	self:setFixture( fix )
+
 	self.centreColor = { 255, 255, 255, 255 }
-	self.damage = damage
-	self.hp = hp 
-	self.maxhp = hp 
+	self.damage = colDamage
+	self:setHealth( hp )
+	self:setMaxHealth( hp )
 	self.eventTimer = love.timer.getTime() + love.math.random( 5, 12 )
 
-	self.isBoss = true 
-	self.name = "Mega Drone"
-	self.desc = "It's... uh... big."
+	self:setBoss( true ) 
+	self:setName(  "Mega Drone" )
+	self:setDescription( "It's... uh... big." )
+
+	self:setEventTable( eTable )
+end 
+
+local bounceForce = 300
+function ENT:collisionPostSolve( ent, coll, norm1, tan1, norm2, tan2  )
+	if not isEntity( ent ) then return end 
+	if ent:getClass() == "ent_player" and ent:isAlive() then
+		local x,y = ent:getPos()
+		local vec1 = vector( x, y )
+		local x,y = self:getPos()
+		local vec2 = vector( x, y )
+		local norm = ( vec1 - vec2 ):normalized()
+		ent:setVelocity( norm*bounceForce ) 
+		ent:takeDamage( self.damage )
+	end 
 end 
 
 function ENT:spawn()
@@ -51,46 +115,6 @@ end
 
 function ENT:setNextEvent( t )
 	self.eventTimer = love.timer.getTime() + t 
-end 
-
-
-local bulletSpeed = 120
-local numBullets = 28
-local damage = 10
-local eTable =
-{
-	function( self )
-		local x,y = self:getPos()
-		for i = 1,2 do 
-			local vecR = vectorRandom()*(size*0.5)
-			local x2,y2 = x + vecR.x, y + vecR.y
-			local norm = ( vector( x, y ) - vector( x2, y2 ) ):normalized()
-			local drone = ents.create( "npc_drone" )
-			drone:setPos( x + vecR.x , y + vecR.y )
-			drone:applyForce( norm*16 )
-		end 
-	end,
-	function( self )
-		local x,y = self:getPos()
-		for i = 1,numBullets do 
-			local p = (i/numBullets)*(2*math.pi)
-			local bulletX = math.sin( p )*(size*1.05) + x
-			local bulletY  = math.cos( p )*(size*1.05) + y 
-
-			local vec = vector( x, y )
-			local vec2 = vector( bulletX, bulletY )
-			local norm = (vec2-vec):normalized()
-			local bullet = ents.create( "ent_droneBullet" )
-			bullet:setBulletData( bulletX, bulletY, norm.x, norm.y, bulletSpeed, damage )
-		end
-	end,
-	function( self )
-		self:doSpinAttack( 0.02, 2, 2, 10, 80 )
-	end 
-}	
-function ENT:doEvent()
-	eTable[ love.math.random( 1, #eTable ) ]( self )
-	self:setNextEvent( love.math.random( 5, 8 ) ) 
 end 
 
 function ENT:doSpinAttack( delay, loops, duration, bulletDamage, bulletSpeed )
@@ -118,8 +142,17 @@ function ENT:doSpinAttack( delay, loops, duration, bulletDamage, bulletSpeed )
 					local vec2 = vector( bulletX, bulletY )
 					local norm = (vec2-vec):normalized()
 
-					local bullet = ents.create( "ent_droneBullet" )
-					bullet:setBulletData( bulletX, bulletY, norm.x, norm.y, self.spinBulletSpeed, self.spinDamage )
+					local bulletData = {}
+					bulletData.damage = self.spinDamage 
+					bulletData.force = 50 
+					bulletData.startPos = vec 
+					bulletData.dir = norm 
+					bulletData.size = 2
+					bulletData.owner = self 
+					bulletData.speed = self.spinBulletSpeed
+					bulletData.color = { 0, 102, 255, 255 }
+					game.createBullet( bulletData )
+
 					self.nextSpinFire = time + self.spinFireDelay
 				end
 				local p = math.min( (love.timer.getTime()-self.spinStartTime)/self.spinDuration, 1 )
@@ -141,8 +174,10 @@ function ENT:think()
 	local w,h = love.graphics.getDimensions()
 	local time = love.timer.getTime()
 
+	local e = love.math.random( 1, #self:getEventTable() )
+	local n = love.math.random( 5, 8 )
 	if self:shouldDoEvent() then 
-		self:doEvent()
+		self:doEvent( e, n )
 	end
 
 	if self.eventThink then 
@@ -196,4 +231,4 @@ function ENT:draw()
 	lg.circle( "line", x, y, 1 )
 end 
 
-ents.registerEntity( "npc_droneboss", ENT )
+ents.registerEntity( "npc_droneboss", ENT, "npc_base" )

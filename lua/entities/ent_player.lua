@@ -30,11 +30,11 @@ function ENT:initialize()
 	fix:setRestitution( 1 )
 	fix:setFriction( 0 )
 	fix:setDensity( 1 )
+	fix:setGroupIndex( GROUPINDEX_PLAYER )
 	self:setFixture( fix )
 
-	self.alive = true 
-	self.health = asteroids.playerHealth
-	self.moving = false
+	self:setHealth( asteroids.playerHealth )
+	self:setMaxHealth( asteroids.playerHealth )
 	self.damage = 1 
 
 	self.bulletDelay = 0 
@@ -42,30 +42,8 @@ function ENT:initialize()
 	self.shouldGib = false
 	self.gibDelay = 0 
 
-end 
+	self.moving = false 
 
-function ENT:getHealth()
-	return self.health 
-end 
-
-function ENT:getMaxHealth()
-	return asteroids.playerHealth
-end
-
-function ENT:setHealth( hp )
-	self.health = math.max( hp, 0 ) 
-
-	if self:getHealth() <= 0 then 
-		self:doDeath()
-	end 
-end 
-
-function ENT:isAlive()
-	return self.alive
-end 
-
-function ENT:setAlive( bool )
-	self.alive = bool 
 end 
 
 function ENT:setRespawnTime( t )
@@ -84,33 +62,45 @@ function ENT:shouldRespawn()
 	return self:getRespawnTime() < love.timer.getTime()
 end 
 
-function ENT:doDeath()
-
-	self:setAlive( false )
-	self:setRespawnTime( 2 )
-	self.moving = false 
-
-	self.shouldGib = true 
-
+local godTime = 1
+function ENT:onTakeDamage( dmgInfo )
+	if self:isGod() then 
+		dmgInfo:scaleDamage( 0 )
+	else 
+		self:doFlashAnim( godTime, 0.05 )
+		self:godMode( godTime )
+	end 
 end 
 
-function ENT:collisionPostSolve( ent, coll, norm1, tan1, norm2, tan2  )
-	if self:isAlive() then 
-		if not isEntity( ent ) then return end 
-		if ent:getClass() == "ent_asteroid" then 
+function ENT:godMode( dur )
+	local t = love.timer.getTime()
+	self.godTimer = t + dur 
+	self:setGod( true )
+end 
 
-			local b = self:getBody()
-			local d,e,f,g = b:getMassData()
+function ENT:setGod( b )
+	self.god = b 
+end 
 
-			local mult = norm1/11
-			local dmg = (f^2)*mult + (norm1^2)*mult + 3
+function ENT:isGod()
+	return self.god 
+end 
 
-			self:setHealth( self:getHealth() - dmg )
-		elseif ent:getClass() == "npc_drone" or ent:getClass() == "npc_droneboss" then 
-			ent:remove()
-			self:setHealth( self:getHealth() - ent.damage )
-		end 
-	end 
+function ENT:doFlashAnim( dur, ftime )
+	local t = love.timer.getTime()
+	self.flashDrawTime = ftime 
+	self.flashTime = t + ftime 
+	self.flashNum = math.floor( dur/ftime )
+	self.curFlash = 0 
+	self.flashing = true 
+end 
+
+function ENT:onDeath()
+
+	self:setRespawnTime( 2 )
+	self.moving = false 
+	self.shouldGib = true 
+
 end 
 
 function ENT:getShootPos()
@@ -118,7 +108,7 @@ function ENT:getShootPos()
 	local points = {body:getWorldPoints( self:getShape():getPoints() )}
 	local x = points[ 3 ]
 	local y = points[ 4 ]
-	return x,y 
+	return vector( x, y ) 
 end 
 
 function ENT:getAimDir()
@@ -126,7 +116,7 @@ function ENT:getAimDir()
 	local a = b:getAngle() + math.pi/2
 	local x = math.cos( a )
 	local y = math.sin( a )
-	return x, y 
+	return vector( x, y )
 end 
 
 local isDown = love.keyboard.isDown
@@ -141,13 +131,21 @@ function ENT:think()
 		local b = self:getBody()
 
 		if isDown( "w" ) and t > self.bulletDelay then 
-			local bullet = ents.create( "ent_bullet" )
-			local x,y = self:getShootPos()
-			local xdir,ydir = self:getAimDir()
-			bullet:setBulletData( x + xdir*2, y+ydir*2, xdir, ydir, 400, self.damage, self:getAngle()  )
-			self.bulletDelay = t + self.fireDelay 
 
-			love.audio.play( laserSound )
+			local bulletData = {}
+			bulletData.damage = 1
+			bulletData.force = 50
+			bulletData.startPos = self:getShootPos()
+			bulletData.dir = self:getAimDir()
+			bulletData.angle = self:getAngle() 
+			bulletData.size = 2
+			bulletData.owner = self 
+			bulletData.speed = 400
+			bulletData.color = { 255, 125, 30, 255 }
+			bulletData.drawMode = BULLET_DRAWMODE_LINE
+			game.createBullet( bulletData )
+
+			self.bulletDelay = t + self.fireDelay 
 		end 
 
 		if isDown( "s" ) then 
@@ -173,6 +171,23 @@ function ENT:think()
 
 	end
 
+	if self:isGod() then 
+		if t > self.godTimer then 
+			self:setGod( false )
+		end 
+	end 
+
+	if self.flashing then 
+		if t > self.flashTime then 
+			self:setDraw( not self:shouldDraw() )
+			self.flashNum = self.flashNum - 1
+			self.flashTime = self.flashTime + self.flashDrawTime 
+			if self.flashNum <= 0 then 
+				self.flashing = false 
+				self:setDraw( true )
+			end 
+		end 
+	end 
 
 	local x,y = self:getPos()
 	local w,h = love.graphics.getDimensions()

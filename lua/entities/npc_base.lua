@@ -1,37 +1,40 @@
 
 local ENT = {}
 
-function _E:_initialize()
+function ENT:_initialize()
 	self:setPos( Vector( 0, 0 ) )
 	self:setAngle( 0 )
-	self.__health = 1
-	self.__maxhealth = 1
-	self.__armorType = 1 
+	self:setHealth( 1 )
+	self:setMaxHealth( 1 )
+	self:setArmorType( 1 )
+	self:setArmor( 0 )
+	self:setArmorRatio( 0.8 )
+	self:setName( self:getClass() )
+	self:setDescription( self:getIndex() )
+	self:setAlive( true )
+	self:setDraw( true )
+	self._npc = true 
+end 
+
+function ENT:setName( name )
+	self.__name = name 
+end 
+
+function ENT:getName()
+	return self.__name 
+end 
+
+function ENT:setDescription( desc )
+	self.__desc = desc 
+end 
+
+function ENT:getDescription()
+	return self.__desc 
 end 
 
 function ENT:spawn()
 
 end 
-
-function ENT:setHealth( hp )
-	self.__health = hp 
-end 
-
-function ENT:setMaxHealth( max )
-	self.__maxhealth = max 
-end 
-
-function ENT:getHealth()
-	return self.__health 
-end 
-
-function ENT:getMaxHealth()
-	return self.__maxhealth 
-end 
-
-function ENT:getHealthPercentage()
-	return self:getHealth()/self:getMaxHealth()
-end
 
 function ENT:setArmor( n )
 	self.__armor = n 
@@ -92,15 +95,30 @@ function ENT:getArmorTable()
 end
 
 function ENT:takeDamage( n )
+	local dmg = damageInfo()
+	dmg:setDamage( n )
+	dmg:setDamageForce( 0 )
+	self:takeDamageInfo( dmg )
+end 
+
+function ENT:takeDamageInfo( dmgInfo )
+
+	local dmg = dmgInfo:getDamage()
+	local force = dmgInfo:getDamageForce()
+	local dir = dmgInfo:getDamageDirection()
+	local type = dmgInfo:getDamageType()
+
+
 	local hp = self:getHealth()
 	local armor = self:getArmor()
 	local r = self:getArmorRatio()
-	local hp, armor = self:getArmorTable()[ self:getArmorType() ]( hp, armor, r )
+	local hp, armor = self:getArmorTable()[ self:getArmorType() ]( hp, armor, dmg, r )
 	self:setHealth( hp ) 
 	self:setArmor( armor ) 
-	if self.health <= 0 then 
+	if self:getHealth() <= 0 then 
 		self:doDeath()
 	end 
+
 end 
 
 function ENT:setBoss( b )
@@ -114,9 +132,13 @@ end
 function ENT:setEventTable( tbl )
 	self.eTable = tbl 
 end 
+
+function ENT:getEventTable()
+	return self.eTable 
+end 
 	
 function ENT:doEvent( num, nextEvent )
-	self.eTable[ num ]( self )
+	self:getEventTable()[ num ]( self )
 	self:setNextEvent( nextEvent ) 
 end 
 
@@ -131,7 +153,5 @@ end
 
 function ENT:onDeath()
 end
-
-
 
 ents.registerEntity( "npc_base", ENT )

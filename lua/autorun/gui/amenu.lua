@@ -15,12 +15,18 @@ local PANEL = {}
 
 local buttonD =
 {
-	{ "New Game", function( self )
+	{ "Start Game", function( self )
 		self:getParent():remove()
 		game.changeState( "game" )
 	end },
-	{ "Load", function( self )
-		
+	{ "Options", function( self )
+		local prnt = self:getParent()
+		local w,h = prnt:getSize()
+		if not self.options then
+			self.options = gui.create( "options", prnt )
+			self.options:setPos( -w, 0 )
+		end 
+		prnt:moveTo( w, 0, 0.7, 0.5, 0.5 )
 	end },	
 	{ "Highscores", function( self )
 		local prnt = self:getParent()

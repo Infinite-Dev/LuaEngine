@@ -5,6 +5,10 @@ _E.__index = _E
 function _E:_initialize()
 	self:setPos( Vector( 0, 0 ) )
 	self:setAngle( 0 )
+	self:setHealth( 1 )
+	self:setMaxHealth( 1 )
+	self:setAlive( true )
+	self:setDraw( true )
 end 
 
 function _E:initialize()
@@ -62,6 +66,14 @@ function _E:setGroupIndex( group )
 	end
 end 
 
+function _E:getGroupIndex()
+	local f = self:getFixture()
+	if f then 
+		return f:getGroupIndex()
+	end 
+	return 0 
+end 
+
 function _E:setShape( shape )
 	self.__shape = shape 
 end 
@@ -115,10 +127,9 @@ function _E:drawImage()
 end
 
 function _E:draw()
-	self:DrawImage()
 end
 
-function _E:setNoDraw( bool )
+function _E:setDraw( bool )
 	self.__shouldDraw = bool 
 end 
 
@@ -211,7 +222,133 @@ end
 
 function _E:collisionPostSolve()
 
-end  
+end
+
+GROUPINDEX_PLAYER = -100
+GROUPINDEX_BULLET = -101
+GROUPINDEX_NPC  = -102 
+GROUPINDEX_WORLD  = -103
+GROUPINDEX_ENTITY = -104
+
+
+COLLISION_TYPE_PLAYER 	= 1 
+COLLISION_TYPE_BULLET 	= 2
+COLLISION_TYPE_NPC 		= 3
+COLLISION_TYPE_WORLD 	= 4
+COLLISION_TYPE_ENTITY 	= 5
+local collisionFuncs =
+{
+	[ COLLISION_TYPE_PLAYER ] = function( self )
+		local f = self:getFixture()
+		if f then 
+			f:setCategory( COLLISION_TYPE_PLAYER )
+			f:setGroupIndex( GROUPINDEX_PLAYER )
+		end 
+	end,
+
+	[ COLLISION_TYPE_BULLET ] = function( self )
+		local f = self:getFixture()
+		if f then 
+			f:setCategory( COLLISION_TYPE_BULLET )
+			f:setMask( COLLISION_TYPE_BULLET )
+		end 
+	end, 
+
+	[ COLLISION_TYPE_NPC ] = function( self )
+		local f = self:getFixture()
+		if f then 
+			f:setCategory( COLLISION_TYPE_NPC )
+			f:setGroupIndex( GROUPINDEX_NPC )
+		end 
+	end, 
+
+	[ COLLISION_TYPE_ENTITY ] = function( self )
+		local f = self:getFixture()
+		if f then 
+			f:setCategory( COLLISION_TYPE_ENTITY )
+			f:setGroupIndex( GROUPINDEX_ENTITY )
+		end 
+	end, 
+
+	[ COLLISION_TYPE_WORLD ] = function( self )
+		local f = self:getFixture()
+		if f then 
+			f:setCategory( COLLISION_TYPE_WORLD )
+			f:setGroupIndex( GROUPINDEX_WORLD )
+		end 
+	end, 
+}
+function _E:setCollisionType( n )
+	if collisionFuncs[ n ] then 
+		collisionFuncs[ n ]( self )
+	end 
+end   
+
+function _E:takeDamage( n )
+	local dmg = damageInfo()
+	dmg:setDamage( n )
+	dmg:setDamageForce( 0 )
+	self:takeDamageInfo( dmg )
+end 
+
+function _E:takeDamageInfo( dmgInfo )
+
+	print( 'BEFORE: '..dmgInfo:getDamage() )
+	self:onTakeDamage( dmgInfo )
+	print( 'AFTER: '..dmgInfo:getDamage() )
+
+	local dmg = dmgInfo:getDamage()
+	local force = dmgInfo:getDamageForce()
+	local dir = dmgInfo:getDamageDirection()
+	local type = dmgInfo:getDamageType()
+
+	local hp = self:getHealth() - dmg 
+
+	self:setHealth( hp ) 
+
+end 
+
+function _E:onTakeDamage( dmgInfo )
+end 
+
+function _E:setHealth( hp )
+	self.__health = hp
+	if hp <= 0 then 
+		self:setAlive( false )
+		self:onDeath()
+	end 
+end 
+
+function _E:onDeath()
+end 
+
+function _E:setMaxHealth( max )
+	self.__maxhealth = max 
+end 
+
+function _E:getHealth()
+	return self.__health 
+end 
+
+function _E:getMaxHealth()
+	return self.__maxhealth 
+end 
+
+function _E:getHealthPercentage()
+	return self:getHealth()/self:getMaxHealth()
+end
+
+function _E:isNPC()
+	return self._npc 
+end 
+
+function _E:isAlive()
+	return self.__alive
+end 
+
+function _E:setAlive( bool )
+	self.__alive = bool 
+end 
 
 function _E:remove()
 	local b = self:getBody()

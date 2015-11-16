@@ -21,8 +21,22 @@ function ENT:generate()
 	local fix = love.physics.newFixture( self:getBody(), self:getShape(), 1 )
 	fix:setRestitution( 1 )
 	fix:setFriction( 0 )
-	fix:setMask( 2 )
 	self:setFixture( fix )
+	self:setCollisionType( COLLISION_TYPE_ENTITY )
+end 
+
+function ENT:collisionPostSolve( ent, coll, norm1, tan1, norm2, tan2  )
+	if not isEntity( ent ) then return end 
+	if ent:getClass() == "ent_player" and ent:isAlive() then 
+
+		local b = self:getBody()
+		local d,e,f,g = b:getMassData()
+
+		local mult = norm1/11
+		local dmg = (f^2)*mult + (norm1^2)*mult + 3
+
+		ent:setHealth( self:getHealth() - dmg )
+	end 
 end 
 
 function ENT:setMinMax( min, max )

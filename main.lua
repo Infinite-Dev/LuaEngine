@@ -26,9 +26,6 @@ function love.load()
 	love.math.setRandomSeed( os.time() )
 
 	starImage = love.graphics.newImage( "materials/star.png" )
-
-	laserSound = love.audio.newSource("sound/laser.wav", "static" )
-	expSound = love.audio.newSource("sound/exp.wav", "static" )
 end 
 
 --[[----------------------------------------

@@ -265,12 +265,14 @@ function game.drawHUD()
 		lg.rectangle( "fill", x, h - y - barh, barw*p, barh )
 
 		local bosstbl = {}
-		for k,v in pairs (ents.getAll()) do 
-			if v.isBoss then 
-				bosstbl[ #bosstbl+1 ] = { v.name, v.desc, v.hp, v.maxhp }
+		for k,v in pairs (npc.getAll()) do 
+			if v:isBoss() then 
+				bosstbl[ #bosstbl+1 ] = { v:getName(), v:getDescription(), v:getHealth(), v:getMaxHealth() }
 			end 
 		end 
 
+		local bossw = w*0.6 
+		local bossh = 20
 		for i = 1,#bosstbl do 
 			local name = bosstbl[ i ][ 1 ]
 			local desc = bosstbl[ i ][ 2 ]
@@ -283,9 +285,16 @@ function game.drawHUD()
 			local y = nameH/2 + 60*(i-1)
 			lg.print( name, w/2 - nameW/2, y )
 
+			local y = y + nameH + 4
+			lg.setColor( 210, 50, 50, 255 )
+			lg.rectangle( "line", w/2 - bossw/2, y, bossw, bossh )
+			lg.rectangle( "fill", w/2 - bossw/2, y, bossw*p, bossh )
+
+			local y = y + bossh
+			lg.setColor( 255, 255, 255, 255 )
 			lg.setFont( bossFontSmall )
 			local descW,descH = bossFontSmall:getWidth( desc ),bossFontSmall:getHeight( desc )
-			lg.print( desc, w/2 - descW/2, y + nameH + 4)
+			lg.print( desc, w/2 - descW/2, y + 4)
 		end 
 	end
 end
@@ -374,4 +383,9 @@ function game.setNextSpawn( t )
 		t = WAVE.delay 
 	end 
 	game.__spawnTime = love.timer.getTime() + t 
+end 
+
+function game.createBullet( tbl )
+	local e = ents.create( "bullet_base" )
+	e:setBulletData( tbl )
 end 

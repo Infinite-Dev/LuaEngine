@@ -308,7 +308,7 @@ function PANEL:blurBackground( b, fadetime )
 
 		local scrw, scrh = lg.getDimensions()
 		p:setSize( scrw, scrh )
-		p:bringToFront()
+		p:sendToBack()
 		function p:paint( w, h )
 			local p = math.min( (love.timer.getTime()-startTime)/(time-startTime), 1 )
 			lg.setColor( 0, 0, 0, p*endAlpha )

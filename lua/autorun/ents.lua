@@ -3,6 +3,7 @@ ents = {}
 ents._index = {}
 ents._list = {}
 ents._createList = {}
+ents.cache = {}
 
 function Entity( id )
 	return ents.getIndex()[ i ]
@@ -16,9 +17,8 @@ function ents.create( ent_name )
 
 	if ent then 
 
-		local nEnt = table.copy( ent[ 1 ] )
-		setmetatable( nEnt, ent[ 2 ] )
-
+		local mTable = getmetatable( ent )
+		local nEnt = setmetatable( table.copy( ent ), mTable )
 		nEnt._index = #l+1
 		nEnt._isEntity = true 
 		nEnt._class = ent_name 
@@ -78,15 +78,67 @@ end
 
 function ents.draw()
 	for k,v in p( ents.getAll() ) do
-		--if v:shouldDraw() then
+		if v:shouldDraw() then
 			v:draw()
-		--end 
+		end 
 	end 
 end 
 
 function ents.registerEntity( name, tbl, base )
-	ents.getList()[ name ] = { tbl, (base or _E ) }
+
+	tbl._class = name 
+	local list = ents.getList()
+	if base then
+		if not list[ base ] then 
+			ents.cacheEnt( name, tbl, base )
+		else 
+			local baseEnt = list[ base ]
+			baseEnt.__index = baseEnt
+			local tbl = setmetatable( tbl, baseEnt )
+			list[ name ] = tbl 
+			ents.checkCache( name )
+		end 
+	else
+		tbl.__index = _E
+		list[ name ] = setmetatable( tbl, _E )
+		ents.checkCache( name )
+	end
+
+	for i = 1,#ents.cache do
+		if ents.cache[ i ][ 4 ] then 
+			ents.registerEntity( unpack( ents.cache[ i ] ) )
+			ents.cache[ i ] = nil 
+		end 
+	end 
+
 end 
+
+function ents.cacheEnt( name, tbl, base, bValidBase )
+	ents.cache[ #ents.cache +1 ] = { name, tbl, base, bValidBase }
+end 
+
+function ents.checkCache( name )
+	if #ents.cache > 0 then
+		for i = 1,#ents.cache do
+			if ents.cache[ i ][ 3 ] == name then 
+				ents.cache[ i ][ 4 ] = true 
+			end 
+		end 
+	end 
+end 
+
+function ents.loadCache()
+	for i = 1,#ents.cache do
+		if ents.cache[ i ][ 4 ] then
+			ents.register( unpack( ents.cache[ i ] ) )
+			ents.cache[ i ] = nil 
+		end 
+	end 
+	if #ents.cache > 0 then
+		ents.loadCache()
+	end 
+end 
+
 
 function ents.loadEntities( dir )
 	dir = dir or "lua/entities"
