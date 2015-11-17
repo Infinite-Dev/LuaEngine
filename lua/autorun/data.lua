@@ -1,7 +1,7 @@
 
 WAVE =
 {
-  [ 1 ]  = { {1, "npc_droneboss" } },
+  [ 1 ]  = { {1, "npc_droneboss" }, {1, "ent_asteroid"} },
   [ 2 ]  = { {2, "npc_drone" } },
   [ 3 ]  = { {2, "npc_drone" } },
   [ 4 ]  = { {2, "ent_asteroid" } },

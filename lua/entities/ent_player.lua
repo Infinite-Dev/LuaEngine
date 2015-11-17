@@ -210,7 +210,6 @@ function ENT:think()
 	if self.shouldGib then 
 
 		self:gib()
-
 		self:remove()
 
 	end 

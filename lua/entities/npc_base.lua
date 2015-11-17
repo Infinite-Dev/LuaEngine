@@ -13,6 +13,7 @@ function ENT:_initialize()
 	self:setDescription( self:getIndex() )
 	self:setAlive( true )
 	self:setDraw( true )
+	self:setValid( true )
 	self._npc = true 
 end 
 

@@ -4,6 +4,8 @@ ents._index = {}
 ents._list = {}
 ents._createList = {}
 ents.cache = {}
+ents.deathList = {}
+ents.removeList = {}
 
 function Entity( id )
 	return ents.getIndex()[ i ]
@@ -17,7 +19,7 @@ function ents.create( ent_name )
 
 	if ent then 
 
-		local mTable = getmetatable( ent )
+		local mTable = ent.__metaTable 
 		local nEnt = setmetatable( table.copy( ent ), mTable )
 		nEnt._index = #l+1
 		nEnt._isEntity = true 
@@ -70,10 +72,28 @@ function ents.getList()
 	return ents._list
 end
 
+function ents.addToDeathList( ent )
+	ents.deathList[ #ents.deathList+1 ] = ent   
+end 
+
+function ents.addToRemoveList( ent )
+	ents.removeList[ #ents.removeList+1 ] = ent   
+end 
+
 function ents.think()
 	for k,v in p( ents.getAll() ) do
-		v:think()
+		if v:isValid() then 
+			v:think()
+		end 
 	end 
+end 
+
+function ents.cleanUp()
+	local list = ents.removeList 
+	for i = 1,#list do 
+		list[ i ]:_delete()
+	end 
+	ents.removeList = {}
 end 
 
 function ents.draw()
@@ -95,11 +115,13 @@ function ents.registerEntity( name, tbl, base )
 			local baseEnt = list[ base ]
 			baseEnt.__index = baseEnt
 			local tbl = setmetatable( tbl, baseEnt )
+			tbl.__metaTable = baseEnt 
 			list[ name ] = tbl 
 			ents.checkCache( name )
 		end 
 	else
 		tbl.__index = _E
+		tbl.__metaTable = _E
 		list[ name ] = setmetatable( tbl, _E )
 		ents.checkCache( name )
 	end

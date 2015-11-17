@@ -47,6 +47,7 @@ end
 --]]----------------------------------------
 function love.update( dt )
 	game.think( dt )
+	ents.cleanUp()
 end 
 
 function love.mousepressed( x, y, button )

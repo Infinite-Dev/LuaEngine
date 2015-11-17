@@ -134,8 +134,8 @@ game.states.thinkFuncs =
 		gui.update()
 		timer.think()
 		if not game.isPaused() then 
-			ents.think()
 			game.logic()
+			ents.think()
 			game.getWorld():update( dt )
 		end 
 		hook.call( "think" )
@@ -255,7 +255,7 @@ function game.drawHUD()
 
 		local hp = game.player:getHealth()
 		local maxHP = asteroids.playerHealth
-		local p = hp/maxHP
+		local p = math.max( 0, hp/maxHP )
 		local c = { 30 + 225*(1-p), 30 + 225*p, 30, 255}
 
 		lg.setColor( unpack( c ) )

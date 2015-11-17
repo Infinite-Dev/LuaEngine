@@ -9,6 +9,7 @@ function _E:_initialize()
 	self:setMaxHealth( 1 )
 	self:setAlive( true )
 	self:setDraw( true )
+	self:setValid( true )
 end 
 
 function _E:initialize()
@@ -212,6 +213,14 @@ function _E:setVelocity( x, y )
 	end
 end
 
+function _E:getVelocity( asVector )
+	local b = self:getBody()
+	if b then 
+		local x,y = b:getLinearVelocity() 
+		return asVector and vector( x, y ) or x,y 
+	end 
+end 
+
 function _E:getBoundingBox()
 	local f = self:getFixture()
 	if f then 
@@ -293,9 +302,7 @@ end
 
 function _E:takeDamageInfo( dmgInfo )
 
-	print( 'BEFORE: '..dmgInfo:getDamage() )
 	self:onTakeDamage( dmgInfo )
-	print( 'AFTER: '..dmgInfo:getDamage() )
 
 	local dmg = dmgInfo:getDamage()
 	local force = dmgInfo:getDamageForce()
@@ -313,9 +320,11 @@ end
 
 function _E:setHealth( hp )
 	self.__health = hp
-	if hp <= 0 then 
-		self:setAlive( false )
-		self:onDeath()
+	if hp <= 0 then
+		if not self:isValid() then return end 
+		timer.simple( 0, function() 
+			self:onDeath()
+		end)
 	end 
 end 
 
@@ -350,20 +359,35 @@ function _E:setAlive( bool )
 	self.__alive = bool 
 end 
 
-function _E:remove()
-	local b = self:getBody()
-	local f = self:getFixture()
-	local s = self:getShape()
-
-	if f then 
-		f:destroy()
-	end 
-
-	if b then 
-		b:destroy()
-	end 
-
-	local e = ents.getIndex()
-	e[ self:getIndex() ] = nil 
-
+function _E:onRemove()
 end 
+
+function _E:isValid()
+	return self.__valid 
+end 
+
+function _E:setValid( b )
+	self.__valid = b 
+end 
+
+function _E:remove()
+	if not self:isValid() then return end 
+	self:setValid( false )
+	timer.simple( 0, function()
+		self:onRemove()
+		local b = self:getBody()
+		local f = self:getFixture()
+		local s = self:getShape()
+
+		if f then 
+			f:destroy()
+		end 
+
+		if b then 
+			b:destroy()
+		end 
+
+		local e = ents.getIndex()
+		e[ self:getIndex() ] = nil 
+	end )
+end

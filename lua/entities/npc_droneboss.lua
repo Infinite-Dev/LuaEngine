@@ -13,6 +13,7 @@ local bulletSpeed = 120
 local numBullets = 28
 local damage = 10
 local numDrones = 2 
+local laserSpeed = 200 
 local eTable =
 {
 	function( self )
@@ -53,7 +54,10 @@ local eTable =
 	end,
 	function( self )
 		self:doSpinAttack( 0.06, 2, 2, 10, 80 )
-	end 
+	end,
+	function( self )
+		self:doLaserAttack( 0.03, 1.5, 10, laserSpeed )
+	end  
 }	
 function ENT:initialize()
 	local circle = love.physics.newCircleShape( size )
@@ -164,8 +168,45 @@ function ENT:doSpinAttack( delay, loops, duration, bulletDamage, bulletSpeed )
 	end)
 end 
 
-function ENT:setEventThink( func )
-	self.eventThink = func 
+function ENT:doLaserAttack( delay, dur, damage, speed )
+	local t = love.timer.getTime()
+	self.laserTime = t + dur 
+	self.laserDelayAdd = delay 
+	self.laserDelay = 0 
+	self.laserAttack = true 
+	self.laserDamage = damage 
+	self.laserSpeed = speed 
+
+	self:setEventThink( function( self, t )
+		if not self.laserAttack then return end 
+		local x,y = self:getPos()
+		if t > self.laserDelay then 
+			local p = game.getPlayer()
+			if p and p:isAlive() then 
+				local px,py = p:getPos()
+				local vec = vector( x, y )
+				local vec2 = vector( px, py )
+				local pdir = p:getVelocity( true )
+				local vel = pdir:len()
+				local vec3 = vec2 + pdir*( vel/laserSpeed*0.8 ) 
+				local norm = (vec3-vec):normalized()
+				local bulletData = {}
+				bulletData.damage = self.laserDamage
+				bulletData.force = 50 
+				bulletData.startPos = vec 
+				bulletData.dir = norm 
+				bulletData.size = 2
+				bulletData.owner = self 
+				bulletData.speed = self.laserSpeed 
+				bulletData.color = { 0, 102, 255, 255 }
+				game.createBullet( bulletData )
+			end 
+			self.laserDelay = t + self.laserDelayAdd
+		end
+		if t > self.laserTime then 
+			self.laserAttack = false 
+		end 
+	end )
 end 
 
 function ENT:think()
@@ -177,7 +218,7 @@ function ENT:think()
 	local e = love.math.random( 1, #self:getEventTable() )
 	local n = love.math.random( 5, 8 )
 	if self:shouldDoEvent() then 
-		self:doEvent( e, n )
+		self:doEvent( 4, n )
 	end
 
 	if self.eventThink then 
