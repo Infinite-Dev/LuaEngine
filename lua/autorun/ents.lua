@@ -81,19 +81,18 @@ function ents.addToRemoveList( ent )
 end 
 
 function ents.think()
+	ents.cleanUp()
 	for k,v in p( ents.getAll() ) do
-		if v:isValid() then 
-			v:think()
-		end 
+		v:think()
 	end 
 end 
 
 function ents.cleanUp()
-	local list = ents.removeList 
+	local list = ents.deathList
 	for i = 1,#list do 
-		list[ i ]:_delete()
+		list[ i ]:onDeath()
 	end 
-	ents.removeList = {}
+	ents.deathList = {}
 end 
 
 function ents.draw()

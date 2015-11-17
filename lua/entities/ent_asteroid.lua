@@ -27,6 +27,7 @@ end
 
 function ENT:onDeath()
 	self:explode()
+	self:setValid( false )
 end 
 
 function ENT:collisionPostSolve( ent, coll, norm1, tan1, norm2, tan2  )
@@ -75,6 +76,7 @@ function ENT:destroy( hitx, hity )
 end 
 
 function ENT:explode()
+	if not self:isValid() then return end 
 	if (self.r) > 20 then 
 		local num = 2
 		local sz = self.r/1.5 - love.math.random( 2, 4 )

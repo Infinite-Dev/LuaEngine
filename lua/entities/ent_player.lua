@@ -100,6 +100,7 @@ function ENT:onDeath()
 	self:setRespawnTime( 2 )
 	self.moving = false 
 	self.shouldGib = true 
+	self:setValid( false )
 
 end 
 

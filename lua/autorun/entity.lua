@@ -322,9 +322,7 @@ function _E:setHealth( hp )
 	self.__health = hp
 	if hp <= 0 then
 		if not self:isValid() then return end 
-		timer.simple( 0, function() 
-			self:onDeath()
-		end)
+		ents.addToDeathList( self )
 	end 
 end 
 
@@ -371,23 +369,20 @@ function _E:setValid( b )
 end 
 
 function _E:remove()
-	if not self:isValid() then return end 
 	self:setValid( false )
-	timer.simple( 0, function()
-		self:onRemove()
-		local b = self:getBody()
-		local f = self:getFixture()
-		local s = self:getShape()
+	self:onRemove()
+	local b = self:getBody()
+	local f = self:getFixture()
+	local s = self:getShape()
 
-		if f then 
-			f:destroy()
-		end 
+	if f then 
+		f:destroy()
+	end 
 
-		if b then 
-			b:destroy()
-		end 
+	if b then 
+		b:destroy()
+	end 
 
-		local e = ents.getIndex()
-		e[ self:getIndex() ] = nil 
-	end )
+	local e = ents.getIndex()
+	e[ self:getIndex() ] = nil 
 end

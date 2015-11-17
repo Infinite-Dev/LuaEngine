@@ -182,7 +182,7 @@ function ENT:doLaserAttack( delay, dur, damage, speed )
 		local x,y = self:getPos()
 		if t > self.laserDelay then 
 			local p = game.getPlayer()
-			if p and p:isAlive() then 
+			if p:isValid() then 
 				local px,py = p:getPos()
 				local vec = vector( x, y )
 				local vec2 = vector( px, py )
@@ -241,7 +241,7 @@ function ENT:think()
 	end  
 
 	local p = game.getPlayer()
-	if not p:isAlive() then return end 
+	if not p:isValid() then return end 
 
 	local pVec = vector( p:getPos() )
 	local eVec = vector( self:getPos() )
