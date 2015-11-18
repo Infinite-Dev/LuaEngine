@@ -130,6 +130,14 @@ function ENT:isBoss()
 	return self.__isBoss 
 end 
 
+function ENT:setNextEvent( t )
+	self.eventTimer = love.timer.getTime() + t 
+end 
+
+function ENT:getNextEventTime()
+	return self.eventTimer or 0 
+end 
+
 function ENT:setEventTable( tbl )
 	self.eTable = tbl 
 end 

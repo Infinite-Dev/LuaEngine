@@ -117,9 +117,6 @@ function ENT:shouldDoEvent()
 	return love.timer.getTime() > self.eventTimer
 end 
 
-function ENT:setNextEvent( t )
-	self.eventTimer = love.timer.getTime() + t 
-end 
 
 function ENT:doSpinAttack( delay, loops, duration, bulletDamage, bulletSpeed )
 	self.spinAngle = 0
@@ -218,7 +215,7 @@ function ENT:think()
 	local e = love.math.random( 1, #self:getEventTable() )
 	local n = love.math.random( 5, 8 )
 	if self:shouldDoEvent() then 
-		self:doEvent( 4, n )
+		self:doEvent( e, n )
 	end
 
 	if self.eventThink then 
