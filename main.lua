@@ -21,11 +21,10 @@ function loadFiles( dir )
 end
 
 function love.load()
+	starImage = love.graphics.newImage( "materials/star.png" )
 	loadFiles( "lua/autorun" )
 	game.changeState( "menu" )
 	love.math.setRandomSeed( os.time() )
-
-	starImage = love.graphics.newImage( "materials/star.png" )
 end 
 
 --[[----------------------------------------
@@ -35,11 +34,12 @@ end
 
 
 function love.draw()
-	game.drawBackground()
-	ents.draw()
-	game.drawHUD()
-	hook.call( "paint" )
-	gui.draw()
+	local t = love.timer.getTime() 
+	game.drawBackground( t )
+	ents.draw( t )
+	game.drawHUD( t )
+	hook.call( "paint", t )
+	gui.draw( t )
 end
 
 --[[----------------------------------------

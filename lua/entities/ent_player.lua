@@ -99,8 +99,8 @@ function ENT:onDeath()
 
 	self:setRespawnTime( 2 )
 	self.moving = false 
-	self.shouldGib = true 
-	self:setValid( false )
+	self:gib()
+	self:remove()
 
 end 
 
@@ -208,13 +208,6 @@ function ENT:think()
 		self:setPos( x, h + compare )
 	end  
 
-	if self.shouldGib then 
-
-		self:gib()
-		self:remove()
-
-	end 
-
 end 
 
 function ENT:gib()
@@ -268,9 +261,10 @@ local sz = 10
 function ENT:draw()
 
 	local body = self:getBody()
-	lg.setColor( 255, 255, 255, 255 )
-
 	local points = {body:getWorldPoints( self:getShape():getPoints() )}
+	lg.setColor( 0, 0, 0, 255 )
+	lg.polygon( "fill", unpack( points ) )
+	lg.setColor( 255, 255, 255, 255 )
 	lg.polygon( "line", unpack( points ) )
 	
 	if self.moving then 

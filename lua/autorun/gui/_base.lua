@@ -86,10 +86,10 @@ end
 function PANEL:setSize( w, h )
 	self.__w = w
 	self.__h = h
-	self:onSizeChanged()
+	self:onSizeChanged( w, h )
 end
 
-function PANEL:onSizeChanged()
+function PANEL:onSizeChanged( w, h )
 end
 
 function PANEL:center()

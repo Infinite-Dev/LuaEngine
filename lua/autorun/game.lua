@@ -106,8 +106,7 @@ game.states.changeFuncs =
 
 		game.setUp()
 
-		game.setNextSpawn( 0 )
-		game.setWave( 1 )
+		wave.setWave( 1 )
 
 	end,
 	menu = function()
@@ -178,68 +177,18 @@ function game.restart()
 	hook.remove( "think", "playerDeathDelay" )
 end 
 
-
-local posFuncs =
-{
-	function( w, h )
-		local w,h = love.graphics.getDimensions()
-		local x = love.math.random( 0, w )
-		local y = -h*1.1
-		return x,y
-	end, 	
-	function( w, h )
-		local _,scrh = love.graphics.getDimensions()
-		local x = love.math.random( 0, w )
-		local y = scrh + h*1.1
-		return x,y
-	end, 	
-	function( w, h )
-		local scrw,_ = love.graphics.getDimensions()
-		local x = -w*1.1
-		local y = love.math.random( 0, h )
-		return x,y  
-	end, 	
-	function( w, h )
-		local scrw,_ = love.graphics.getDimensions()
-		local x = scrw + w*1.1
-		local y = love.math.random( 0, h )
-		return x,y 
-	end
-}
-function game.getSpawnPosition( ent )
-	local x1,y1,x2,y2 = ent:getBoundingBox()
-	local w,h = x2-x1,y2-y1
-	local p = love.math.random( 1, 4 )
-	local x,y = posFuncs[ p ]( w, h )
-	return x,y 
-end 
-
-function game.createEnemy( class )
-	if class == "ent_asteroid" then 
-		asteroids.createNewAsteroid()
-	else
-		local ent = ents.create( class )
-		local x,y = game.getSpawnPosition( ent )
-		ent:setPos( x, y )
-		ent:spawn()
- 	end 
-end 
-
 function game.logic()
-	if game.shouldSpawn() then 
 
-		local data = game.getWaveData()
-		for i = 1,#data do 
-			local enemyData = data[ i ]
-			for i2 = 1,enemyData[ 1 ] do 
-				game.createEnemy( enemyData[ 2 ] )
-			end 
-		end 
+	local data = wave.getWave()
+	if not data:inProgress() then
+		wave.start()
+	elseif data:canEnd() then 
+		wave.stop()
+		wave.setWave( wave.getIndex() + 1 )
+		return 
+	end  
+	wave.think()
 
-		game.nextWave()
-		game.setNextSpawn()
-
-	end
 end 
 
 local lg = love.graphics 
@@ -249,53 +198,64 @@ local barw = 150
 local barh = 13
 local x = 25
 local y = 15
+
+function game.drawHP( w, h )
+	local hp = game.player:getHealth()
+	local maxHP = asteroids.playerHealth
+	local p = math.max( 0, hp/maxHP )
+	local c = { 30 + 225*(1-p), 30 + 225*p, 30, 255}
+
+	lg.setColor( unpack( c ) )
+	lg.rectangle( "line", x, h - y - barh , barw, barh )
+
+	lg.setColor( unpack( c ) )
+	lg.rectangle( "fill", x, h - y - barh, barw*p, barh )
+end 
+
+function game.drawBossHealth( w, h )
+
+	local bosstbl = {}
+	for k,v in pairs (npc.getAll()) do 
+		if v:isBoss() then 
+			bosstbl[ #bosstbl+1 ] = { v:getName(), v:getDescription(), v:getHealth(), v:getMaxHealth() }
+		end 
+	end 
+
+	local bossw = w*0.6 
+	local bossh = 20
+	for i = 1,#bosstbl do 
+		local name = bosstbl[ i ][ 1 ]
+		local desc = bosstbl[ i ][ 2 ]
+		local hp = bosstbl[ i ][ 3 ]
+		local maxhp = bosstbl[ i ][ 4 ]
+		local p = hp/maxhp 
+		lg.setColor( 255, 255, 255, 255 )
+		lg.setFont( bossFont )
+		local nameW,nameH = bossFont:getWidth( name ),bossFont:getHeight( name )
+		local y = nameH/2 + 60*(i-1)
+		lg.print( name, w/2 - nameW/2, y )
+
+		local y = y + nameH + 4
+		lg.setColor( 210, 50, 50, 255 )
+		lg.rectangle( "line", w/2 - bossw/2, y, bossw, bossh )
+		lg.rectangle( "fill", w/2 - bossw/2, y, bossw*p, bossh )
+
+		local y = y + bossh
+		lg.setColor( 255, 255, 255, 255 )
+		lg.setFont( bossFontSmall )
+		local descW,descH = bossFontSmall:getWidth( desc ),bossFontSmall:getHeight( desc )
+		lg.print( desc, w/2 - descW/2, y + 4)
+	end 
+
+end 
+
 function game.drawHUD()
 	if game.player and game.getState() == "game" then 
 		local w,h = love.graphics.getDimensions()
 
-		local hp = game.player:getHealth()
-		local maxHP = asteroids.playerHealth
-		local p = math.max( 0, hp/maxHP )
-		local c = { 30 + 225*(1-p), 30 + 225*p, 30, 255}
+		game.drawHP( w, h )
+		game.drawBossHealth( w, h )
 
-		lg.setColor( unpack( c ) )
-		lg.rectangle( "line", x, h - y - barh , barw, barh )
-
-		lg.setColor( unpack( c ) )
-		lg.rectangle( "fill", x, h - y - barh, barw*p, barh )
-
-		local bosstbl = {}
-		for k,v in pairs (npc.getAll()) do 
-			if v:isBoss() then 
-				bosstbl[ #bosstbl+1 ] = { v:getName(), v:getDescription(), v:getHealth(), v:getMaxHealth() }
-			end 
-		end 
-
-		local bossw = w*0.6 
-		local bossh = 20
-		for i = 1,#bosstbl do 
-			local name = bosstbl[ i ][ 1 ]
-			local desc = bosstbl[ i ][ 2 ]
-			local hp = bosstbl[ i ][ 3 ]
-			local maxhp = bosstbl[ i ][ 4 ]
-			local p = hp/maxhp 
-			lg.setColor( 255, 255, 255, 255 )
-			lg.setFont( bossFont )
-			local nameW,nameH = bossFont:getWidth( name ),bossFont:getHeight( name )
-			local y = nameH/2 + 60*(i-1)
-			lg.print( name, w/2 - nameW/2, y )
-
-			local y = y + nameH + 4
-			lg.setColor( 210, 50, 50, 255 )
-			lg.rectangle( "line", w/2 - bossw/2, y, bossw, bossh )
-			lg.rectangle( "fill", w/2 - bossw/2, y, bossw*p, bossh )
-
-			local y = y + bossh
-			lg.setColor( 255, 255, 255, 255 )
-			lg.setFont( bossFontSmall )
-			local descW,descH = bossFontSmall:getWidth( desc ),bossFontSmall:getHeight( desc )
-			lg.print( desc, w/2 - descW/2, y + 4)
-		end 
 	end
 end
 
@@ -305,6 +265,7 @@ local starMin = 2
 local starMax = 4
 local starTable = {}
 function game.generateBackground()
+	
 	local w,h = love.graphics.getDimensions()
 	local r = math.ceil( math.sqrt( targStars ) )
 	local c = math.floor( math.sqrt( targStars ) )
@@ -317,16 +278,23 @@ function game.generateBackground()
 		local y = math.floor( (i-1)/c )*gh + love.math.random( border, gh - border )
 		starTable[ i ] = {x, y, love.math.random( 10, 20 )/100 }
 		j = math.loop( j, 1, c )
-	end 
+	end
+
+	game.backGroundCanvas = love.graphics.newCanvas()
+	love.graphics.setCanvas( game.backGroundCanvas )
+	for i = 1,#starTable do 
+		local t = starTable[ i ]
+		love.graphics.setColor( 255, 255, 255, 255 )
+		love.graphics.draw(starImage, t[ 1 ], t[ 2 ], 0, t[ 3 ], t[ 3 ] )
+	end
+	love.graphics.setCanvas()
+
 end 
 
 function game.drawBackground()
 	if game.getState() == "game" then 
-		for i = 1,#starTable do 
-			local t = starTable[ i ]
-			love.graphics.setColor( 255, 255, 255, 255 )
-			love.graphics.draw(starImage, t[ 1 ], t[ 2 ], 0, t[ 3 ], t[ 3 ] )
-		end
+		love.graphics.setColor( 255, 255, 255, 255 )
+		love.graphics.draw( game.backGroundCanvas )
 	end 
 end 
 
@@ -354,38 +322,12 @@ function game.playerDeath()
 	game.endGame:createButton()
 end 
 
-function game.setWave( n )
-	game.__wave = n 
-end
-
-function game.getWaveNumber()
-	return game.__wave 
-end 
-
-function game.getWaveData()
-	return WAVE[ game.getWaveNumber() ]
-end 
-
-function game.nextWave()
-	game.setWave( math.min( game.getWaveNumber() + 1, game.getMaxWave() ) )
-end 
-
-function game.getMaxWave()
-	return #WAVE - 1
-end
-
-function game.shouldSpawn()
-	return game.__spawnTime <= love.timer.getTime()
-end 
-
-function game.setNextSpawn( t )
-	if not t then 
-		t = WAVE.delay 
-	end 
-	game.__spawnTime = love.timer.getTime() + t 
-end 
 
 function game.createBullet( tbl )
 	local e = ents.create( "bullet_base" )
 	e:setBulletData( tbl )
+end 
+
+function game.entityDeath( ent )
+	wave.entityDeath( ent )
 end 

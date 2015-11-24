@@ -90,15 +90,17 @@ end
 function ents.cleanUp()
 	local list = ents.deathList
 	for i = 1,#list do 
-		list[ i ]:onDeath()
+		local ent = list[ i ]
+		game.entityDeath( ent )
+		ent:onDeath()
 	end 
 	ents.deathList = {}
 end 
 
-function ents.draw()
+function ents.draw( t )
 	for k,v in p( ents.getAll() ) do
 		if v:shouldDraw() then
-			v:draw()
+			v:draw( t )
 		end 
 	end 
 end 

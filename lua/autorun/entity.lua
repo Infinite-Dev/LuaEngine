@@ -301,7 +301,7 @@ function _E:takeDamage( n )
 end 
 
 function _E:takeDamageInfo( dmgInfo )
-
+	if not self:isValid() then return end 
 	self:onTakeDamage( dmgInfo )
 
 	local dmg = dmgInfo:getDamage()
@@ -321,9 +321,13 @@ end
 function _E:setHealth( hp )
 	self.__health = hp
 	if hp <= 0 then
-		if not self:isValid() then return end 
-		ents.addToDeathList( self )
+		self:doDeath()
 	end 
+end 
+
+function _E:doDeath()
+	if not self:isValid() then return end 
+	ents.addToDeathList( self )
 end 
 
 function _E:onDeath()
@@ -368,8 +372,45 @@ function _E:setValid( b )
 	self.__valid = b 
 end 
 
+local posFuncs =
+{
+	function( r )
+		local w,h = love.graphics.getDimensions()
+		local x = love.math.random( 0, w )
+		local y = r*1.1
+		return x,y
+	end, 	
+	function( r )
+		local w,h = love.graphics.getDimensions()
+		local x = love.math.random( 0, w )
+		local y = h - r*1.1
+		return x,y
+	end, 	
+	function( r )
+		local w,h = love.graphics.getDimensions()
+		local x = r*1.1
+		local y = love.math.random( 0, h )
+		return x,y  
+	end, 	
+	function( r )
+		local w,h = love.graphics.getDimensions()
+		local x = w - r*1.1
+		local y = love.math.random( 0, h )
+		return x,y 
+	end
+}
+function _E:getSpawnPosition()
+	local w,h = self:getBoundingBox()
+	local p = love.math.random( 1, 4 )
+	local x, y = posFuncs[ p ]( p > 2 and w or h )
+	return x,y 
+end 
+
+function _E:onSpawn()
+end 
+
 function _E:remove()
-	self:setValid( false )
+	if not self:isValid() then return end
 	self:onRemove()
 	local b = self:getBody()
 	local f = self:getFixture()
@@ -384,5 +425,6 @@ function _E:remove()
 	end 
 
 	local e = ents.getIndex()
-	e[ self:getIndex() ] = nil 
+	e[ self:getIndex() ] = nil
+	self:setValid( false ) 
 end

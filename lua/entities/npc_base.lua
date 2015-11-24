@@ -116,10 +116,7 @@ function ENT:takeDamageInfo( dmgInfo )
 	local hp, armor = self:getArmorTable()[ self:getArmorType() ]( hp, armor, dmg, r )
 	self:setHealth( hp ) 
 	self:setArmor( armor ) 
-	if self:getHealth() <= 0 then 
-		self:doDeath()
-	end 
-
+	
 end 
 
 function ENT:setBoss( b )
@@ -155,12 +152,8 @@ function ENT:setEventThink( func )
 	self.eventThink = func 
 end 
 
-function ENT:doDeath()
-	self:remove()
-	self:onDeath()
-end 
-
 function ENT:onDeath()
-end
+	self:remove()
+end 
 
 ents.registerEntity( "npc_base", ENT )

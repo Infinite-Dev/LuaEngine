@@ -8,6 +8,17 @@ function ENT:initialize()
 	self.alive = true 
 end 
 
+function ENT:onSpawn()
+	self:generate()
+	local w,h = love.graphics.getDimensions()
+	local midx, midy = w/2, h/2 
+	local x,y = self:getPos()
+	local vec1 = vector( midx, midy )
+	local vec2 = vector( x, y )
+	local norm = (vec1-vec2):normalized()
+	self:setVelocity( norm*50 )
+end
+
 function ENT:generate()
 	local circle = love.physics.newCircleShape( self.r or love.math.random( self.min, self.max ) )
 	self:setShape( circle )

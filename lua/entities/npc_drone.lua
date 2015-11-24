@@ -31,11 +31,11 @@ function ENT:collisionPostSolve( ent, coll, norm1, tan1, norm2, tan2  )
 	if not isEntity( ent ) then return end 
 	if ent:getClass() == "ent_player" and ent:isAlive() then 
 		ent:takeDamage( self.damage )
-		self:remove()
+		self:takeDamage( 1 )
 	end 
 end 
 
-function ENT:spawn()
+function ENT:onSpawn()
 	local w,h = love.graphics.getDimensions()
 	local midx, midy = w/2, h/2 
 	local x,y = self:getPos()
@@ -66,7 +66,7 @@ function ENT:think()
 	end  
 
 	local p = game.getPlayer()
-	if not p:isAlive() then return end 
+	if not p:isValid() then return end 
 	local pVec = vector( p:getPos() )
 	local eVec = vector( self:getPos() )
 	if pVec:distance( eVec ) <= range then 

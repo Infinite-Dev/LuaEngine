@@ -255,6 +255,11 @@ function ENT:think()
 	end 
 end 
 
+function ENT:getSpawnPosition()
+	local w,h = love.graphics.getDimensions()
+	return w/2 - size/2, -h - size
+end
+
 local lg = love.graphics
 function ENT:draw()
 	local x,y = self:getPos()
