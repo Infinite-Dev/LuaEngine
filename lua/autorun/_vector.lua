@@ -88,6 +88,11 @@ function Vector:normalize()
   return self
 end
 
+function Vector:toAngle()
+  local norm = self:normalized()
+  return math.atan2( norm.y, norm.x )
+end 
+
 function Vector:normalized()
   return self / self:len()
 end

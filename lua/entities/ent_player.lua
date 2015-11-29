@@ -139,7 +139,7 @@ function ENT:think()
 			bulletData.startPos = self:getShootPos()
 			bulletData.dir = self:getAimDir()
 			bulletData.angle = self:getAngle() 
-			bulletData.size = 2
+			bulletData.size = 3
 			bulletData.owner = self 
 			bulletData.speed = 400
 			bulletData.color = { 255, 125, 30, 255 }

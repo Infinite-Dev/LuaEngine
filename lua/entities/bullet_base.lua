@@ -31,14 +31,14 @@ function ENT:setSize( n )
 
 	local x,y = self:getPos()
 	local body = love.physics.newBody( game.getWorld(), x, y, "dynamic" )
-	body:setMass( self.r )
+	body:setMass( 1 )
 	body:setLinearDamping( 0 )
 	body:setBullet( true )
 	self:setBody( body )
 
 	local d = 5 
 	local fix = love.physics.newFixture( self:getBody(), self:getShape(), 1 )
-	fix:setRestitution( 1 )
+	fix:setRestitution( 0 )
 	fix:setFriction( 0 )
 	fix:setDensity( 1 )
 	self:setFixture( fix )
@@ -62,7 +62,7 @@ function ENT:setBulletData( bulletData )
 	local speed = bulletData.speed 
 	local damage = bulletData.damage
 	local force = bulletData.force 
-	local angle = bulletData.angle or 0 
+	local angle = bulletData.angle or 0
 	local size = bulletData.size 
 	local callBack = bulletData.callBack
 	local thinkFunc = bulletData.thinkFunc
@@ -132,18 +132,21 @@ function ENT:think()
 	local x,y = self:getPos()
 	local w,h = love.graphics.getDimensions()
 
+	local compW = w*1.4
+	local compH = h*1.4
+
 	local mult = 1.2
 	local compare = self.r*mult
 	local x2,y2 = x + compare, y + compare
 	local x3,y3 = x - compare, y - compare
 
-	if x3 > w + compare/2 then 
+	if x3 > compW + compare/2 then 
 		self:remove()
-	elseif y3 > h + compare/2 then
+	elseif y3 > compH + compare/2 then
 		self:remove()
-	elseif x2 < -compare/2 then 
+	elseif x2 < -compare/2 - (compW-w) then 
 		self:remove()
-	elseif y2 < -compare/2 then 
+	elseif y2 < -compare/2 - (compH-h) then 
 		self:remove()
 	end 
 
@@ -151,7 +154,7 @@ function ENT:think()
 		self:thinkFunc()
 	end 
 
-end 
+end  
 
 local math = math 
 local lg = love.graphics 

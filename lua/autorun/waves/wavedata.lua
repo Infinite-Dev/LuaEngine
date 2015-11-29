@@ -5,7 +5,7 @@ waveData.score       = 100
 waveData.waveDelay   = 2  
 waveData.spawns =
 {
-    [ "npc_ufo" ] = 3
+    [ "npc_ufoboss" ] = 1
 }
 WAVE.__waveData = waveData 
 

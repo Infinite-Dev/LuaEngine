@@ -152,6 +152,10 @@ function ENT:setEventThink( func )
 	self.eventThink = func 
 end 
 
+function ENT:shouldDoEvent()
+	return love.timer.getTime() > self.eventTimer
+end 
+
 function ENT:onDeath()
 	self:remove()
 end 

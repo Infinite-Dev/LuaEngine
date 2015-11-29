@@ -113,11 +113,6 @@ function ENT:spawn()
 	self:setVelocity( norm*200 )
 end 
 
-function ENT:shouldDoEvent()
-	return love.timer.getTime() > self.eventTimer
-end 
-
-
 function ENT:doSpinAttack( delay, loops, duration, bulletDamage, bulletSpeed )
 	self.spinAngle = 0
 	self.spinDamage = bulletDamage
@@ -257,7 +252,7 @@ end
 
 function ENT:getSpawnPosition()
 	local w,h = love.graphics.getDimensions()
-	return w/2 - size/2, -h - size
+	return w/2 - size/2, -size
 end
 
 local lg = love.graphics

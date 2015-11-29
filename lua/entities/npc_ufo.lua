@@ -28,9 +28,11 @@ function ENT:initialize()
 	self.nextTargTime = 0 
 	self.targChangeDelay = 1.5
 	self.targPos = vector( 0, 0 )
-	self.fireDelay = 1.5
+	self.fireDelay = 2
 	self.nextFireTime = love.timer.getTime() + self.fireDelay 
-	self.bulletSpeed = 200 
+	self.bulletSpeed = 250
+	self:setHealth( 2 )
+	self:setMaxHealth( 2 )
 end 
 
 function ENT:collisionPostSolve( ent, coll, norm1, tan1, norm2, tan2  )
@@ -134,7 +136,7 @@ function ENT:fireBullet( norm )
 	bulletData.speed = self.bulletSpeed 
 	bulletData.color = { 0, 255, 0, 255 }
 	bulletData.drawMode = BULLET_DRAWMODE_LINE
-	bulletData.angle = math.atan( norm.y/norm.x ) + radian/4
+	bulletData.angle = norm:toAngle() + radian/4
 	game.createBullet( bulletData )
 end 
 
