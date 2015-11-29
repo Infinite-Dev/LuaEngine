@@ -132,7 +132,7 @@ function ENT:fireBullet( norm )
 	local vec = vector( x, y )
 	local bulletData = {}
 	bulletData.damage = self.laserDamage
-	bulletData.force = 50 
+	bulletData.force = 100 
 	bulletData.startPos = vec
 	bulletData.dir = norm 
 	bulletData.size = 14
@@ -154,20 +154,21 @@ function ENT:getSpawnPosition()
 end
 
 local lg = love.graphics
-local numCircles = 8
-local circleSize = size*0.11
+local numCircles = 14
+local circleSize = size*0.08
 local radians = math.pi*2 
 local circleOrbit = size - circleSize*1.5
-local blur = 15
+local blur = 40
 function ENT:draw( t )
 	local x,y = self:getPos()
 
+	local t = t*0.5
 	for i = 1,numCircles do 
 		local p = (i/numCircles)*radians
-		local angle = t + p + radians/2 
+		local angle = t + p 
 		for i = 1,blur do 
-			lg.setColor( 31, 255, 31, 20*(1 - (i/blur) ) )
-			lg.arc( "fill", x, y, size*(1+(i/250)), -angle, -angle + math.pi/(numCircles), 20 )
+			lg.setColor( 31, 255, 31, 5*(1 - (i/blur) ) )
+			lg.arc( "fill", x, y, size*(1+(i/250)), -angle, -angle + math.pi/(numCircles), 10 )
 		end 
 	end
 
@@ -181,7 +182,7 @@ function ENT:draw( t )
 	lg.circle( "fill", x, y, size*0.65 )
 	for i = 1,numCircles do 
 		local p = (i/numCircles)*radians
-		local angle = t + p 
+		local angle = t + p - (math.pi/(numCircles)/2)
 		local cx = math.cos( -angle )*circleOrbit
 		local cy = math.sin( -angle )*circleOrbit
 		lg.circle( "fill", x + cx, y + cy, circleSize )

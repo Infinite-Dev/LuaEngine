@@ -43,6 +43,8 @@ function game.getWorld()
 	return game.__world 
 end 
 
+
+local p = pairs 
 function game.beginContact( a, b, coll )
 	hook.call( "beginContact", a, b, coll )
 end 
@@ -52,30 +54,49 @@ function game.endContact( a, b, coll )
 end 
 
 function game.preSolve( a, b, coll )
-	hook.call( "preSolve", a, b, coll )
-end 
-
-local p = pairs 
-function game.postSolve( a, b, coll, normalimpulse1, tangentimpulse1, normalimpulse2, tangentimpulse2 )
 	local ent1
 	local ent2 
-	for k,v in p( ents.getAll() ) do
-		local f = v:getFixture()
-		if f then 
-			if f == a then 
-				ent1 = v
-			elseif f == b then 
-				ent2 = v
-			end 
+	local data1 = a:getUserData()
+	if data1 then 
+		if data1.isEntity then 
+			ent1 = entity( data1.index )
 		end 
 	end 
 
-	if ent1 then 
-		ent1:collisionPostSolve( ent2 or b, coll, normalimpulse1, tangentimpulse1, normalimpulse2, tangentimpulse2 )
+	local data2 = b:getUserData()
+	if data2 then 
+		if data2.isEntity then 
+			ent2 = entity( data2.index )
+		end 
 	end 
 
-	if ent2 then 
-		ent2:collisionPostSolve( ent1 or a, coll, normalimpulse1, tangentimpulse1, normalimpulse2, tangentimpulse2 )
+	if ent1 and ent2 then 
+		ent1:collisionPreSolve( ent2, coll )
+		ent2:collisionPreSolve( ent1, coll )
+	end 
+	hook.call( "preSolve", a, b, coll )
+end 
+
+function game.postSolve( a, b, coll, normalimpulse1, tangentimpulse1, normalimpulse2, tangentimpulse2 )
+	local ent1
+	local ent2 
+	local data1 = a:getUserData()
+	if data1 then 
+		if data1.isEntity then 
+			ent1 = entity( data1.index )
+		end 
+	end 
+
+	local data2 = b:getUserData()
+	if data2 then 
+		if data2.isEntity then 
+			ent2 = entity( data2.index )
+		end 
+	end 
+
+	if ent1 and ent2 then 
+		ent1:collisionPostSolve( ent2, coll, normalimpulse1, tangentimpulse1, normalimpulse2, tangentimpulse2 )
+		ent2:collisionPostSolve( ent1, coll, normalimpulse1, tangentimpulse1, normalimpulse2, tangentimpulse2 )
 	end 
 	hook.call( "postSolve", a, b, coll, normalimpulse1, tangentimpulse1, normalimpulse2, tangentimpulse2 )
 end 

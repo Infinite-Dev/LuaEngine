@@ -7,8 +7,8 @@ ents.cache = {}
 ents.deathList = {}
 ents.removeList = {}
 
-function Entity( id )
-	return ents.getIndex()[ i ]
+function entity( id )
+	return ents.getIndex()[ id ]
 end 
 
 function ents.create( ent_name )

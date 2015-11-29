@@ -38,9 +38,6 @@ function ENT:setSize( n )
 
 	local d = 5 
 	local fix = love.physics.newFixture( self:getBody(), self:getShape(), 1 )
-	fix:setRestitution( 0 )
-	fix:setFriction( 0 )
-	fix:setDensity( 1 )
 	self:setFixture( fix )
 
 	self.drawx = x 
@@ -106,6 +103,7 @@ function ENT:setBulletData( bulletData )
 	local dmgInfo = damageInfo()
 	dmgInfo:setDamage( damage )
 	dmgInfo:setDamageForce( force )
+	dmgInfo:setDamageDirection( dir )
 	dmgInfo:setDamageType( DMG_BULLET )
 	self:setDamageInfo( dmgInfo )
 
@@ -118,13 +116,13 @@ function ENT:setBulletData( bulletData )
 
 end 
 
-function ENT:collisionPostSolve( ent, coll, norm1, tan1, norm2, tan2  )
-	if not isEntity( ent ) then return end 
+function ENT:collisionPreSolve( ent, coll )
 	if self.callBack then 
 		self:callBack( ent )
 	end 
 	ent:takeDamageInfo( self:getDamageInfo() )
 	self:remove()
+	coll:setEnabled( false )
 end 
 
 function ENT:think()

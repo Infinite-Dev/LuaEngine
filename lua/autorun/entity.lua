@@ -58,6 +58,7 @@ function _E:getFixture()
 end 
 
 function _E:setFixture( fix )
+	fix:setUserData( { isEntity = true, index = self:getIndex() } )
 	self.__fixture = fix 
 end 
 
@@ -87,28 +88,15 @@ function _E:setHull( width, height )
 	self:newRectangleShape( width, height )
 end 
 
-function _E:getColor()
-	return self.__Color
-end 
-
-function _E:setColor( clr )
-	self.__Color = clr 
-end
-
-function _E:setAlpha( a )
-
-end  
-
-function _E:physicsinit()
-
-end 
-
 function _E:physWake()
-
+	local b = self:getBody()
+	b:setAwake( true )
+	b:setActive( true )
 end 
 
 function _E:physSleep()
-
+	local b = self:getBody()
+	b:setAwake( false )
 end
 
 function _E:setImage( img )
@@ -226,11 +214,20 @@ function _E:getBoundingBox()
 	if f then 
 		return f:getBoundingBox()
 	end 
-	return 1,1
+	return 1,1,1,1
+end 
+
+function _E:getBoundingBoxDimensions()
+	local topLeftX, topLeftY, bottomRightX, bottomRightY = self:getBoundingBox()
+	local w = bottomRightX - topLeftX
+	local h = bottomRightY - topLeftY
+	return w, h 
 end 
 
 function _E:collisionPostSolve()
+end
 
+function _E:collisionPreSolve()
 end
 
 GROUPINDEX_PLAYER = -100
@@ -301,6 +298,7 @@ function _E:takeDamage( n )
 end 
 
 function _E:takeDamageInfo( dmgInfo )
+
 	if not self:isValid() then return end 
 	self:onTakeDamage( dmgInfo )
 
@@ -311,7 +309,11 @@ function _E:takeDamageInfo( dmgInfo )
 
 	local hp = self:getHealth() - dmg 
 
-	self:setHealth( hp ) 
+	local dForce = dir*force 
+	self:applyForce( dForce )
+
+	self:setHealth( hp )
+
 
 end 
 
@@ -326,8 +328,9 @@ function _E:setHealth( hp )
 end 
 
 function _E:doDeath()
-	if not self:isValid() then return end 
+	if not self:isAlive() then return end 
 	ents.addToDeathList( self )
+	self:setAlive( false )
 end 
 
 function _E:onDeath()
@@ -377,30 +380,30 @@ local posFuncs =
 	function( r )
 		local w,h = love.graphics.getDimensions()
 		local x = love.math.random( 0, w )
-		local y = r*1.1
+		local y = -r*1.1
 		return x,y
 	end, 	
 	function( r )
 		local w,h = love.graphics.getDimensions()
 		local x = love.math.random( 0, w )
-		local y = h - r*1.1
+		local y = h + r*1.1
 		return x,y
 	end, 	
 	function( r )
 		local w,h = love.graphics.getDimensions()
-		local x = r*1.1
+		local x = -r*1.1
 		local y = love.math.random( 0, h )
 		return x,y  
 	end, 	
 	function( r )
 		local w,h = love.graphics.getDimensions()
-		local x = w - r*1.1
+		local x = w + r*1.1
 		local y = love.math.random( 0, h )
 		return x,y 
 	end
 }
 function _E:getSpawnPosition()
-	local w,h = self:getBoundingBox()
+	local w,h = self:getBoundingBoxDimensions()
 	local p = love.math.random( 1, 4 )
 	local x, y = posFuncs[ p ]( p > 2 and w or h )
 	return x,y 

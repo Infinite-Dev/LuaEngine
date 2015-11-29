@@ -42,6 +42,7 @@ function ENT:initialize()
 	self.shouldGib = false
 	self.gibDelay = 0 
 
+	self:physWake()
 	self.moving = false 
 
 end 
@@ -97,8 +98,6 @@ end
 
 function ENT:onDeath()
 
-	self:setRespawnTime( 2 )
-	self.moving = false 
 	self:gib()
 	self:remove()
 

@@ -129,6 +129,41 @@ function ENT:think()
 
 end 
 
+
+local posFuncs =
+{
+	function( r )
+		local w,h = love.graphics.getDimensions()
+		local x = love.math.random( 0, w )
+		local y = -r*1.1
+		return x,y
+	end, 	
+	function( r )
+		local w,h = love.graphics.getDimensions()
+		local x = love.math.random( 0, w )
+		local y = h + r*1.1
+		return x,y
+	end, 	
+	function( r )
+		local w,h = love.graphics.getDimensions()
+		local x = -r*1.1
+		local y = love.math.random( 0, h )
+		return x,y  
+	end, 	
+	function( r )
+		local w,h = love.graphics.getDimensions()
+		local x = w + r*1.1
+		local y = love.math.random( 0, h )
+		return x,y 
+	end
+}
+function ENT:getSpawnPosition()
+	local w,h = self:getBoundingBoxDimensions()
+	local p = love.math.random( 1, 4 )
+	local x, y = posFuncs[ p ]( self.r )
+	return x,y 
+end
+
 local lg = love.graphics
 function ENT:draw()
 	local x,y = self:getPos()

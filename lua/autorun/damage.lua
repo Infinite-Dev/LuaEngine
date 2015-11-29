@@ -35,7 +35,7 @@ function damageInfo.getDamageForce( self )
     return self.damageForce 
 end 
 
-function damageInfo.setDamageDirecton( self, vec )
+function damageInfo.setDamageDirection( self, vec )
     self.damageDir = vec 
 end 
 
@@ -66,7 +66,7 @@ local emptyTable =
     damageDir = vector( 0, 0 )
 }
 function damageInfo.new(x, y)
-  return setmetatable({emptyTable}, damageInfo)
+  return setmetatable(emptyTable, damageInfo)
 end
 
 setmetatable(damageInfo, { __call = function(_, ...) return damageInfo.new(...) end })

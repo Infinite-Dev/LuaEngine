@@ -110,12 +110,15 @@ function ENT:takeDamageInfo( dmgInfo )
 	local type = dmgInfo:getDamageType()
 
 
+	local dForce = dir*force 
+	self:applyForce( dForce )
+
 	local hp = self:getHealth()
 	local armor = self:getArmor()
 	local r = self:getArmorRatio()
 	local hp, armor = self:getArmorTable()[ self:getArmorType() ]( hp, armor, dmg, r )
 	self:setHealth( hp ) 
-	self:setArmor( armor ) 
+	self:setArmor( armor )
 	
 end 
 
