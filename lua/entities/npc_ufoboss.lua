@@ -158,7 +158,7 @@ local numCircles = 14
 local circleSize = size*0.08
 local radians = math.pi*2 
 local circleOrbit = size - circleSize*1.5
-local blur = 40
+local blur = 20
 function ENT:draw( t )
 	local x,y = self:getPos()
 
@@ -167,7 +167,7 @@ function ENT:draw( t )
 		local p = (i/numCircles)*radians
 		local angle = t + p 
 		for i = 1,blur do 
-			lg.setColor( 31, 255, 31, 5*(1 - (i/blur) ) )
+			lg.setColor( 31, 255, 31, 15*(1 - (i/blur) ) )
 			lg.arc( "fill", x, y, size*(1+(i/250)), -angle, -angle + math.pi/(numCircles), 10 )
 		end 
 	end

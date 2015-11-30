@@ -23,6 +23,7 @@ function ENT:initialize()
 	body:setMass( 35 )
 	body:setAngularDamping( 100 )
 	body:setLinearDamping( 1.5 )
+	body:setSleepingAllowed( false )
 	self:setBody( body )
 
 	local d = 5 
@@ -42,7 +43,6 @@ function ENT:initialize()
 	self.shouldGib = false
 	self.gibDelay = 0 
 
-	self:physWake()
 	self.moving = false 
 
 end 
@@ -108,7 +108,7 @@ function ENT:getShootPos()
 	local points = {body:getWorldPoints( self:getShape():getPoints() )}
 	local x = points[ 3 ]
 	local y = points[ 4 ]
-	return vector( x, y ) 
+	return vector( x, y )
 end 
 
 function ENT:getAimDir()

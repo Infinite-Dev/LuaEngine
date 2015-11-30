@@ -66,7 +66,7 @@ local emptyTable =
     damageDir = vector( 0, 0 )
 }
 function damageInfo.new(x, y)
-  return setmetatable(emptyTable, damageInfo)
+    return setmetatable( table.copy( emptyTable ), damageInfo)
 end
 
 setmetatable(damageInfo, { __call = function(_, ...) return damageInfo.new(...) end })

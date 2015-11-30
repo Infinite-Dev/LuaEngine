@@ -128,7 +128,7 @@ function ENT:fireBullet( norm )
 	local vec = vector( x, y )
 	local bulletData = {}
 	bulletData.damage = self.damage
-	bulletData.force = 0 
+	bulletData.force = 0.5
 	bulletData.startPos = vec
 	bulletData.dir = norm 
 	bulletData.size = 4

@@ -190,6 +190,17 @@ function _E:applyForce( x, y )
 	end  
 end
 
+function _E:applyImpulse( x, y )
+	local b = self:getBody()
+	if b then 
+		if type( x ) == "table" then 
+			b:applyLinearImpulse( x.x, x.y )
+		else 
+			b:applyLinearImpulse( x, y )
+		end 
+	end 
+end 
+
 function _E:setVelocity( x, y )
 	local b = self:getBody()
 	if b then 
@@ -309,8 +320,8 @@ function _E:takeDamageInfo( dmgInfo )
 
 	local hp = self:getHealth() - dmg 
 
-	local dForce = dir*force 
-	self:applyForce( dForce )
+	local dForce = dir*force
+	self:applyImpulse( dForce )
 
 	self:setHealth( hp )
 

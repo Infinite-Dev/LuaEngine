@@ -8,7 +8,7 @@ local speed = 50
 local mass = 100
 local damage = 100
 local colDamage = 20 
-local hp = 100
+local hp = 150
 local bulletSpeed = 120
 local numBullets = 28
 local damage = 10
@@ -25,7 +25,7 @@ local eTable =
 			local norm = ( vector( x, y ) - vector( x2, y2 ) ):normalized()
 			local drone = ents.create( "npc_drone" )
 			drone:setPos( x + x2 , y + y2 )
-			drone:applyForce( norm*120 )
+			drone:applyForce( norm*250 )
 		end 
 	end,
 	function( self )
@@ -41,7 +41,7 @@ local eTable =
 			
 			local bulletData = {}
 			bulletData.damage = damage 
-			bulletData.force = 50 
+			bulletData.force = 1
 			bulletData.startPos = vec 
 			bulletData.dir = norm 
 			bulletData.size = 2
@@ -140,7 +140,7 @@ function ENT:doSpinAttack( delay, loops, duration, bulletDamage, bulletSpeed )
 
 					local bulletData = {}
 					bulletData.damage = self.spinDamage 
-					bulletData.force = 50 
+					bulletData.force = 1
 					bulletData.startPos = vec 
 					bulletData.dir = norm 
 					bulletData.size = 2
@@ -184,7 +184,7 @@ function ENT:doLaserAttack( delay, dur, damage, speed )
 				local norm = (vec3-vec):normalized()
 				local bulletData = {}
 				bulletData.damage = self.laserDamage
-				bulletData.force = 50 
+				bulletData.force = 1 
 				bulletData.startPos = vec 
 				bulletData.dir = norm 
 				bulletData.size = 2
