@@ -2,7 +2,7 @@
 	LoadFiles( directory )
 	Loads files from the specified directory.
 --]]----------------------------------------
-
+debugFont = love.graphics.newFont( 15 )
 function loadFiles( dir )
 	local objects = love.filesystem.getDirectoryItems( dir )
 	local tbl = {}
@@ -40,6 +40,11 @@ function love.draw()
 	game.drawHUD( t )
 	hook.call( "paint", t )
 	gui.draw( t )
+	local fps = love.timer.getFPS()
+	local p = fps/60 
+	love.graphics.setColor( 255*(1-p), 255*p, 0, 255 )
+	love.graphics.setFont( debugFont )
+	love.graphics.print("FPS: "..tostring( fps ), 10, 10)
 end
 
 --[[----------------------------------------

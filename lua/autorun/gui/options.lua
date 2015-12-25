@@ -78,7 +78,7 @@ function PANEL:setUpOptions( w, h )
 		"1920x1080",
 
 		function()
-			love.window.setMode( 1920, 1080 )
+			gui.changeResolution( 1920, 1080 )
 		end 
 	)
 	res:addOption( 
@@ -86,7 +86,7 @@ function PANEL:setUpOptions( w, h )
 		"1366x768",
 		
 		function()
-			love.window.setMode( 1336, 768 )
+			gui.changeResolution( 1336, 768 )
 		end 
 	)	
 	res:addOption( 
@@ -94,7 +94,7 @@ function PANEL:setUpOptions( w, h )
 		"1024x768",
 		
 		function()
-			love.window.setMode( 1024, 768 )
+			gui.changeResolution( 1024, 768 )
 		end 
 	)	
 	res:addOption( 
@@ -102,7 +102,7 @@ function PANEL:setUpOptions( w, h )
 		"800x600",
 		
 		function()
-			love.window.setMode( 800, 600 )
+			gui.changeResolution( 800, 600 )
 		end 
 	)
 	res:addOption( 
@@ -110,7 +110,7 @@ function PANEL:setUpOptions( w, h )
 		"600x400",
 		
 		function()
-			love.window.setMode( 600, 400 )
+			gui.changeResolution( 600, 400 )
 		end 
 	)
 

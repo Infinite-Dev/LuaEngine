@@ -40,17 +40,27 @@ function PANEL:getDefaultText()
 	return self.__defaultText
 end 
 
+function PANEL:setDropMenuHeight( h )
+	self.__dropMenuHeight = h 
+end 
+
+function PANEL:getDropMenuHeight()
+	return self.__dropMenuHeight or (#self:getOptionTable()-1)*self:getHeight()
+end 
+
 function PANEL:doClick()
 	local master = self 
-	if not self.panel then 
+	if not self.dropPanel then 
 
 		local tbl = self:getOptionTable()
-		self.panel = gui.create( "panel", self )
+		self.dropPanel = gui.create( "panel", self )
 
 		local w,h = self:getSize()
-		local panel = self.panel
+		local panel = self.dropPanel
+
+		local dropHeight = self:getDropMenuHeight()
 		panel:setPos( 0, h + 1 )
-		panel:setSize( w, (h*.75)*(#tbl) )
+		panel:setSize( w, dropHeight )
 		local b = 1 
 		function panel:paint( w, h ) 
 			lg.setColor( 0, 102, 255, 255 )
@@ -61,8 +71,9 @@ function PANEL:doClick()
 		end
 		
 		for i = 1,#tbl do 
+			local optionH = dropHeight/(#tbl-1) 
 			local button = gui.create( "button", panel )
-			button:setPos( 0, (i-1)*(h*.75) + i )
+			button:setPos( 0, (i-1)*(optionH*.75) + i )
 			button:setSize( w, h )
 			button:setText( tbl[ i ].text )
 			button:setTextColor( 100, 100, 100, 255 )
@@ -71,8 +82,8 @@ function PANEL:doClick()
 			end 
 			function button:doClick()
 				master:setText( tbl[ i ].text )
-				master:closeDropMenu()
 				tbl[ i ].func( master, self )
+				master:closeDropMenu()
 			end 
 		end 
 
@@ -82,13 +93,13 @@ function PANEL:doClick()
 end 
 
 function PANEL:closeDropMenu()
-	self.panel:remove()
-	self.panel = false 
+	self.dropPanel:remove()
+	self.dropPanel = false 
 end 
 
 
 local down = "v"
-local font = lg.newFont( 20 )
+local font = lg.newFont( 22 )
 function PANEL:paint( w, h )
 
 	local font = self:getFont()

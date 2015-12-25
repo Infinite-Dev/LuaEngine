@@ -124,18 +124,10 @@ function PANEL:getWidth()
 	return self.__w
 end
 
-function PANEL:setPos( x, y, floor )
-	floor = floor or false
+function PANEL:setPos( x, y )
 	if type( x ) == "table" then 
 		y = x.y
 		x = x.x  
-		if type( y ) == "bool" then
-			floor = y 
-		end
-	end 
-	if floor then 
-		x = math.floor( x )
-		y = math.floor( y )
 	end 
 	local oldX,oldY = self:getPos()
 	if self:isChild() then
@@ -163,6 +155,15 @@ end
 function PANEL:getPos()
 	return self.__x,self.__y
 end
+
+function PANEL:getLocalPos()
+	if self:isChild() then 
+		local x,y = self:getParent():getPos()
+		return self.__x - x,self.__y - y 
+	else 
+		return self.__x,self.__y
+	end 
+end 
 
 function PANEL:getX()
 	return self.__x
@@ -230,9 +231,7 @@ function PANEL:setZ( num, b )
 			c[ i ]:setZ( num + 1 )
 		end 
 	end 
-	if b then 
-		gui.generateDrawOrder()
-	end 
+	gui.generateDrawOrder()
 end 
 
 function PANEL:getZ()
@@ -292,6 +291,7 @@ function PANEL:doModal( b )
 	elseif gui.getModal == self then 
 	    gui.setModal()
 	end
+	gui.generateDrawOrder()
 end
 
 function PANEL:isModal()
@@ -321,6 +321,7 @@ function PANEL:blurBackground( b, fadetime )
 		end 
 		self.__backblur = false 
 	end 
+	gui.generateDrawOrder()
 end 
 
 function PANEL:remove()

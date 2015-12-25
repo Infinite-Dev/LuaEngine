@@ -156,6 +156,7 @@ end
 
 --Internal.
 function gui.draw()
+	gui.generateDrawOrder()
 	local tbl = gui.getDrawOrder()
 	for k,panel in orderedPairs( tbl ) do 
 		local w,h = panel:getSize()
@@ -173,6 +174,8 @@ function gui.draw()
 end
 
 --Internal.
+gui.__updateTimer = 0 
+gui.__updateDelay = 0.05
 function gui.update()
 	for k, panel in pairs( gui.objects ) do
 		panel:think()
@@ -215,6 +218,8 @@ function gui.buttonCheck( x, y, button )
 			end 
 			if not targ:isChild() then 
 				targ:bringToFront()
+			else 
+				targ:getParent():bringToFont()
 			end 
 		end
 		return 
@@ -244,9 +249,26 @@ function gui.buttonCheck( x, y, button )
 		end 
 		if not p:isChild() then 
 			p:bringToFront()
+		else 
+			p:getParent():bringToFront()
 		end 
 	end
 
 end
 
+function gui.changeResolution( w, h )
+	local oldw,oldh = love.graphics.getDimensions()
+	local widthScale, heightScale = w/oldw, h/oldh 
+	love.window.setMode( w, h )
+	gui.scale( widthScale, heightScale )
+end 
 
+function gui.scale( widthScale, heightScale )
+	for k,panel in pairs( gui.getObjects() ) do 
+		local w,h = panel:getSize()
+		panel:setSize( w*widthScale, h*heightScale )
+		local x,y = panel:getLocalPos()
+		panel:setPos( x*widthScale, y*heightScale )
+	end 
+	gui.generateDrawOrder()
+end 
