@@ -213,5 +213,9 @@ function WAVE:reset()
 
 end 
 
+function WAVE:getBossHealthPos()
+    
+end 
+
 wave.add( WAVE, "wave_base" )
 

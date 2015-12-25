@@ -3,12 +3,45 @@
 	table.copy( table )
 	Used to create a new instance of a table.
 --]]----------------------------------------
-table.copy = function( tbl )
-	local c_tbl = {}
-	for k,v in pairs( tbl ) do
-		c_tbl[ k ] = v
-	end
-return c_tbl
+
+local function istable( t )
+    return type( t ) == "table"
+end 
+function table.copy( t, lookup_table )
+    if ( t == nil ) then return nil end
+
+    local copy = {}
+    setmetatable( copy, debug.getmetatable( t ) )
+    for i, v in pairs( t ) do
+        if ( not istable( v ) ) then
+            copy[ i ] = v
+        else
+            lookup_table = lookup_table or {}
+            lookup_table[ t ] = copy
+            if ( lookup_table[ v ] ) then
+                copy[ i ] = lookup_table[ v ] -- we already copied this table. reuse the copy.
+            else
+                copy[ i ] = table.copy( v, lookup_table ) -- not yet copied. copy it.
+            end
+        end
+    end
+    return copy
+end 
+
+function table.merge( dest, source )
+
+    for k, v in pairs( source ) do
+        if ( type( v ) == "table" and type( dest[ k ] ) == "table" ) then
+            -- don't overwrite one table with another
+            -- instead merge them recurisvely
+            table.merge( dest[ k ], v )
+        else
+            dest[ k ] = v
+        end
+    end
+
+    return dest
+
 end
 
 

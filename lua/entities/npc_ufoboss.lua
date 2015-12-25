@@ -9,7 +9,7 @@ local mass = 100
 local damage = 25 
 local hp = 200
 
-local laserSpeed = 500
+local laserSpeed = 800
 local events =
 {
 	function( self )
@@ -52,7 +52,7 @@ function ENT:initialize()
 	self:setDescription( "...we have a problem.")
 
 	self:setEventTable( events )
-	self.eventTimer = love.timer.getTime() + love.math.random( 5, 12 )
+	self.eventTimer = love.timer.getTime() + love.math.random( 4, 5 )
 
 end 
 
@@ -82,7 +82,7 @@ function ENT:logic( x, y, w, h, p )
 
 	local t = love.timer.getTime()
 	local e = love.math.random( 1, #self:getEventTable() )
-	local n = love.math.random( 10, 14 )
+	local n = love.math.random( 4,5 )
 	if self:shouldDoEvent() then 
 		self:doEvent( e, n )
 	end
@@ -110,13 +110,7 @@ function ENT:doLaserAttack( delay, dur, damage, speed )
 		if t > self.laserDelay then 
 			local p = game.getPlayer()
 			if p:isValid() then 
-				local px,py = p:getPos()
-				local vec = vector( x, y )
-				local vec2 = vector( px, py )
-				local pdir = p:getVelocity( true )
-				local vel = pdir:len()
-				local vec3 = vec2 + pdir*( vel/laserSpeed*0.8 ) 
-				local norm = (vec2-vec):normalized()
+				local norm = self:getPredictedPlayerPos( p )
 				self:fireBullet( norm )
 			end 
 			self.laserDelay = t + self.laserDelayAdd
@@ -127,12 +121,28 @@ function ENT:doLaserAttack( delay, dur, damage, speed )
 	end )
 end
 
+function ENT:getPredictedPlayerPos( p )
+	local x,y = self:getPos()
+	local px,py = p:getPos()
+	local vec = vector( x, y )
+	local vec2 = vector( px, py )
+	local pdir = p:getVelocity( true )
+	local vel = pdir:len()
+
+	local d = vec:distance( vec2 )
+	local t = d/self.laserSpeed
+	local pDist = (t/220)*vel 
+	local vec3 = vec2 + (pdir*pDist)
+	local norm = ( vec3 - vec ):normalized()
+	return norm 
+end 
+
 function ENT:fireBullet( norm )
 	local x,y = self:getPos()
 	local vec = vector( x, y )
 	local bulletData = {}
 	bulletData.damage = self.laserDamage
-	bulletData.force = 100 
+	bulletData.force = 0.6
 	bulletData.startPos = vec
 	bulletData.dir = norm 
 	bulletData.size = 14
@@ -145,7 +155,6 @@ function ENT:fireBullet( norm )
 end 
 
 function ENT:onSpawn()
-
 end 
 
 function ENT:getSpawnPosition()

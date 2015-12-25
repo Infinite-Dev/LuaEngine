@@ -57,13 +57,15 @@ end
 local keyFuncs = 
 {
 	[ "escape" ] = function()
-		if game.isPaused() then 
-			game.unpause()
-			if game.pauseMenu then
-				game.pauseMenu:remove()
-			end 
-		else 
-			game.pause()
+		if game.getState() == "game" then 
+			if game.isPaused() then 
+				game.unpause()
+				if game.pauseMenu then
+					game.pauseMenu:remove()
+				end 
+			else 
+				game.pause()
+			end
 		end 
 	end,
 	[ "r" ] = function()

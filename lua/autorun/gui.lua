@@ -48,6 +48,7 @@ function gui.create( base, parent )
 	panel:setZ( gui.getMaxZ() + 1 )
 	panel:_initialize()
 	panel:init()
+	gui.generateDrawOrder()
 	return panel 
 end
 
@@ -58,11 +59,8 @@ end
 --]]----------------------------------------
 function gui.mergeGUIs( panel, base )
 	local new_panel = {}
-	new_panel = table.copy( gui.panels[ base ] )
-	for k,v in pairs( panel ) do
-		new_panel[ k ] = v
-	end
-return new_panel
+	new_panel = table.merge( table.copy( gui.panels[ base ] ), panel )
+	return new_panel
 end
 
 function gui.cacheUI( name, panel, base, bValidBase )
@@ -162,9 +160,10 @@ function gui.draw()
 	for k,panel in orderedPairs( tbl ) do 
 		local w,h = panel:getSize()
 		local x,y = panel:getPos()
-		lg.translate( x, y )
+
+		lg.translate( x+1, y+1 )
 			if panel.__clampDrawing then 
-				lg.setScissor( x, y, w, h )
+				lg.setScissor( x, y, w+2, h+4 )
 			end
 			panel:paint( w, h )
 			panel:paintOver( w, h )

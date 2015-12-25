@@ -46,12 +46,74 @@ function PANEL:init()
 	panel:setSize( w - border*2, h - fh - textBorder - border*2 )
 	panel:setPos( border, fh + textBorder + border )
 	function panel:paint( w, h )
-		lg.setColor( 22, 22, 22, 255 )
+		lg.setColor( 44, 44, 44, 255 )
 		lg.rectangle( "fill", 0, 0, w, h )
-
-		lg.setColor( 3, 3, 3, 255 )
-		lg.rectangle( "fill", b, b, w - b*2, h - b*2 )
 	end 
+
+	local pw,ph = panel:getSize()
+	local px,py = panel:getPos()
+	self.panel = gui.create( "panel", panel )
+	self.panel:setSize( pw - b*2, ph - b*2 )
+	self.panel:setPos( b, b )
+	self.panel.paint = function( pnl, w, h  )
+		lg.setColor( 11, 11, 11, 255 )
+		lg.rectangle( "fill", 0, 0, w, h )
+	end
+	self:setUpOptions( self.panel:getSize() )
+end 
+
+local border = 4
+function PANEL:setUpOptions( w, h )
+
+	local panel = self.panel 
+
+	local opW = w/5
+	local opH = h/12
+	local res = gui.create( "dropDownMenu", panel )
+	res:setSize( opW, opH )
+	res:setPos( border, border )
+	res:setDefaultText( "800x600" )
+	res:addOption( 
+
+		"1920x1080",
+
+		function()
+			love.window.setMode( 1920, 1080 )
+		end 
+	)
+	res:addOption( 
+
+		"1366x768",
+		
+		function()
+			love.window.setMode( 1336, 768 )
+		end 
+	)	
+	res:addOption( 
+
+		"1024x768",
+		
+		function()
+			love.window.setMode( 1024, 768 )
+		end 
+	)	
+	res:addOption( 
+
+		"800x600",
+		
+		function()
+			love.window.setMode( 800, 600 )
+		end 
+	)
+	res:addOption( 
+
+		"600x400",
+		
+		function()
+			love.window.setMode( 600, 400 )
+		end 
+	)
+
 end 
 
 function PANEL:paint( w, h )

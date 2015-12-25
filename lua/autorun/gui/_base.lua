@@ -18,6 +18,7 @@ local lm = love.mouse
 local PANEL = {}
 
 function PANEL:_initialize()
+
 end
 
 function PANEL:init()
@@ -124,7 +125,7 @@ function PANEL:getWidth()
 end
 
 function PANEL:setPos( x, y, floor )
-	floor = floor or true 
+	floor = floor or false
 	if type( x ) == "table" then 
 		y = x.y
 		x = x.x  
@@ -269,7 +270,7 @@ function PANEL:moveTo( x, y, time, easein, easeout, callback, ... )
 			if t2 > thinkTime then  
 				local p = (t2-t)/(time)
 				local drawP = math.easeInOut( p, easein, easeout )
-				self:setPos( (vec2 + add*drawP), false ) 
+				self:setPos( (vec2 + add*drawP) ) 
 				if p >= 1 then 
 					self:setPos( x, y )
 					hook.remove( "think", hname )

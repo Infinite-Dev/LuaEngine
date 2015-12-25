@@ -242,8 +242,10 @@ function game.drawBossHealth( w, h )
 		end 
 	end 
 
+	local wave = wave.getWave()
 	local bossw = w*0.6 
 	local bossh = 20
+	local bx,by = wave:getBossHealthPos()
 	for i = 1,#bosstbl do 
 		local name = bosstbl[ i ][ 1 ]
 		local desc = bosstbl[ i ][ 2 ]
