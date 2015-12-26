@@ -43,7 +43,9 @@ function PANEL:init()
 	local b = 6
 	local fw,fh = titleFont:getWidth( hText ),titleFont:getHeight( hText )
 	local panel = gui.create( "panel", self )
-	panel:setSize( w - border*2, h - fh - textBorder - border*2 )
+
+	self.pnlh =  h - fh - textBorder - border*2 
+	panel:setSize( w - border*2, self.pnlh )
 	panel:setPos( border, fh + textBorder + border )
 	function panel:paint( w, h )
 		lg.setColor( 44, 44, 44, 255 )
@@ -118,13 +120,21 @@ end
 
 function PANEL:paint( w, h )
 
+	local dw,dh = love.graphics.getDimensions()
+	local pw,ph = self:getSize() 
+
 	lg.setColor( 11, 11, 11, 120 )
 	lg.rectangle( "fill", 0, 0, w, h )
 
 	lg.setColor( 255, 255, 255, 230 )
 	lg.setFont( titleFont )
 	local fW,fH = titleFont:getWidth( hText ),titleFont:getHeight( hText )
-	lg.print( hText, w/2 - fW/2 , textBorder )
+
+	local pnlh =  dh - fH - textBorder - border*2 
+	local y = (dh - pnlh - border - fH)/2
+	lg.print( hText, w/2 - fW/2 ,  y )
+
+	print( y )
 
 end
 gui.register( "options", PANEL, "base" )

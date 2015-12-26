@@ -156,7 +156,7 @@ end
 
 --Internal.
 function gui.draw()
-	gui.generateDrawOrder()
+	--gui.generateDrawOrder()
 	local tbl = gui.getDrawOrder()
 	for k,panel in orderedPairs( tbl ) do 
 		local w,h = panel:getSize()
