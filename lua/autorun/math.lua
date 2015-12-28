@@ -60,3 +60,8 @@ function math.loop( num, min, max, incr )
 	end 
 	return num 
 end 
+
+function math.round(num, idp)
+  local mult = 10^(idp or 0)
+  return math.floor(num * mult + 0.5) / mult
+end

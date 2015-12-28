@@ -51,7 +51,7 @@ function PANEL:isChild()
 	if type( self:getParent() ) == "table" then
 		return true
 	end
-return false
+	return false
 end
 
 function PANEL:isParent()
@@ -85,12 +85,13 @@ function PANEL:isParentOf( pnl )
 end 
 
 function PANEL:setSize( w, h )
+	local oldw, oldh = self:getSize()
 	self.__w = w
 	self.__h = h
-	self:onSizeChanged( w, h )
+	self:onSizeChanged( oldw, oldh, w, h )
 end
 
-function PANEL:onSizeChanged( w, h )
+function PANEL:onSizeChanged( oldw, oldh, w, h )
 end
 
 function PANEL:center()
@@ -194,12 +195,15 @@ end
 function PANEL:onCursorExited()
 end
 
+function PANEL:setCanClick( b )
+	self.__canClick = b 
+end 
+
 function PANEL:canClick()
 	return self.__canClick
 end
 
 function PANEL:__click()
-
 end
 
 local in_area = util.isInArea
@@ -211,7 +215,7 @@ function PANEL:__mouseThink()
 	elseif self.__hovered == true and not in_area( x, y, self.__x, self.__y, self:getSize() ) then
 		self.__hovered = false
 		self:onCursorExited()
-	end
+	end 
 end
 
 function PANEL:getID()
@@ -239,7 +243,7 @@ function PANEL:getZ()
 end 
 
 function PANEL:bringToFront()
-	local z =gui.getMaxZ()+1
+	local z = gui.getMaxZ()+1
 	self:setZ( z )
 end 
 
@@ -324,8 +328,12 @@ function PANEL:blurBackground( b, fadetime )
 	gui.generateDrawOrder()
 end 
 
+function PANEL:onScale( n )
+end 
+
 function PANEL:remove()
 
+	gui.assertPositions()
 	local parent = self:getParent()
 	if parent then
 		local new_children = {}
@@ -348,7 +356,7 @@ function PANEL:remove()
 	if self:isModal() then 
 		gui.setModal( nil )
 	end 
-	gui.objects[ self.__id ] = nil
+	gui.remove( self )
 	gui.generateDrawOrder()
 
 end

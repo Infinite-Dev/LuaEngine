@@ -23,12 +23,16 @@ function PANEL:_initialize()
 	self.__down_time = 0
 	self.__alpha = 240
 	self.__color = { 230, 230, 230, 240 }
-	self.__textcolor = { 60, 60, 60, 255 }
-	self.__gradient = 2
-	self.__text = "Click me!"
-	self.__canClick = true
-	self.__font = defaultFont 
+	self:setTextColor( 60, 60, 60, 255 )
+	self:setGradient( 2 )
+	self:setText( "Click me!" )
+	self:setCanClick( true )
+	self:setFont( defaultFont )
+	self:setTextOffest( 0, 0 )
 end
+
+function PANEL:onSizeChanged()
+end 
 
 function PANEL:setGradient( grad )
 	self.__gradient = grad
@@ -45,6 +49,14 @@ end
 function PANEL:getText( text )
 	return self.__text
 end
+
+function PANEL:setTextOffest( x, y )
+	self.__textOffset = { x = x, y = y }
+end
+
+function PANEL:getTextOffset()
+	return self.__textOffset 
+end  
 
 function PANEL:setEnabled( bool )
 	self.__enabled = bool 
@@ -75,21 +87,19 @@ function PANEL:getFont()
 end 
 
 function PANEL:doClick()
-
 end
 
 function PANEL:doRightClick()
-
 end
 
 local key_funcs = 
 {
-	[ "l" ] = function( pnl )
+	[ 1 ] = function( pnl )
 		if pnl.doClick then
 			pnl:doClick()
 		end
 	end,
-	[ "r" ] = function( pnl )
+	[ 2 ] = function( pnl )
 		if pnl.doRightClick then
 			pnl:doRightClick()
 		end
@@ -122,7 +132,11 @@ function PANEL:paintOver( w, h )
 
 	local w2,h2 = font:getWidth( text ),font:getHeight( text )
 	lg.setColor( unpack( self:getTextColor() ) )
-	lg.print( text, w/2 - w2/2, h/2 - h2/2 )
+
+	local offset = self:getTextOffset()
+	local x = ( w - w2 )/2 - offset.x
+	local y = (h - h2)/2 - offset.y 
+	lg.print( text, x, y )
 
 end
 

@@ -5,20 +5,19 @@ local lm = love.mouse
 
 gui = {}
 gui.objects = {} -- Objects that have been created.
-gui.panels = {} -- Panels that have been registered.
-gui.cache = {}
-gui._maxz = 0
-gui._minz = 0
-gui.pos = 0
-
+gui.panels 	= {} -- Panels that have been registered.
+gui.cache 	= {}
+gui._maxz 	= 0
+gui._minz 	= 0
+gui.pos 	= 0
 
 --[[----------------------------------------
 	gui.create( base, parent )
 	Used to create GUI panels.
 --]]----------------------------------------
-function gui.create( base, parent )
+function gui.create( class, parent )
 	local panel = {}
-	local bPanel = gui.panels[ base ]
+	local bPanel = gui.panels[ class ]
 	if bPanel then 
 		panel = table.copy( bPanel )
 	else 
@@ -38,12 +37,12 @@ function gui.create( base, parent )
 	panel.__y = 0
 	panel.__w = 15
 	panel.__h = 5
-	panel.__class = base 
+	panel.__class = class
 	
 	gui.pos = gui.pos + 1
 	local pos = gui.pos 
 	panel.__id = pos
-	gui.objects[ pos ] = panel
+	table.insert( gui.objects, panel )
 
 	panel:setZ( gui.getMaxZ() + 1 )
 	panel:_initialize()
@@ -60,6 +59,7 @@ end
 function gui.mergeGUIs( panel, base )
 	local new_panel = {}
 	new_panel = table.merge( table.copy( gui.panels[ base ] ), panel )
+	new_panel.baseClass = table.copy( gui.panels[ base ] )
 	return new_panel
 end
 
@@ -143,39 +143,38 @@ function gui.getObjects()
 end 
 
 function gui.generateDrawOrder()
-	local list = table.copy( gui.getObjects() )
+	local list = gui.getObjects()
 	table.sort( list, function( t, t2 ) 
-		return ( t and t2 and t:getZ() < t2:getZ() or false )
+		return ( t:getZ() < t2:getZ() or false )
 	end )
-	gui.__drawOrder = list 
-end 
-
-function gui.getDrawOrder()
-	return gui.__drawOrder or {}
 end 
 
 --Internal.
 function gui.draw()
-	--gui.generateDrawOrder()
-	local tbl = gui.getDrawOrder()
-	for k,panel in orderedPairs( tbl ) do 
+	local tbl = gui.getObjects()
+	for i = 1,#tbl do 
+		local panel = tbl[ i ]
 		local w,h = panel:getSize()
 		local x,y = panel:getPos()
 
-		lg.translate( x+1, y+1 )
+		local transx, transy = x, y
+		local clipx, clipy = x, y 
+		local clipw, cliph = w, h 
+
+		local paintw,painth = w-2,h-2
+
+		lg.translate( transx, transy )
 			if panel.__clampDrawing then 
-				lg.setScissor( x, y, w+2, h+4 )
+				lg.setScissor( clipx, clipy, clipw, cliph )
 			end
-			panel:paint( w, h )
-			panel:paintOver( w, h )
+			panel:paint( paintw, painth )
+			panel:paintOver( paintw, painth )
 			lg.setScissor()
 		lg.origin()
 	end 
 end
 
 --Internal.
-gui.__updateTimer = 0 
-gui.__updateDelay = 0.05
 function gui.update()
 	for k, panel in pairs( gui.objects ) do
 		panel:think()
@@ -187,8 +186,7 @@ end
 	Check to see if we clicked on a gui panel.
 --]]----------------------------------------
 
-function gui.buttonCheck( x, y, button )
-
+function gui.buttonCheck( x, y, button, istouch )
 	local in_area = util.isInArea
 	local p = gui.getModal()
 	if p then 
@@ -218,8 +216,6 @@ function gui.buttonCheck( x, y, button )
 			end 
 			if not targ:isChild() then 
 				targ:bringToFront()
-			else 
-				targ:getParent():bringToFont()
 			end 
 		end
 		return 
@@ -249,8 +245,6 @@ function gui.buttonCheck( x, y, button )
 		end 
 		if not p:isChild() then 
 			p:bringToFront()
-		else 
-			p:getParent():bringToFront()
 		end 
 	end
 
@@ -271,4 +265,15 @@ function gui.scale( widthScale, heightScale )
 		panel:setPos( x*widthScale, y*heightScale )
 	end 
 	gui.generateDrawOrder()
+end 
+
+function gui.remove( pnl )
+	table.remove( gui.objects, pnl.__tablepos )
+	gui.assertPositions()
+end 
+
+function gui.assertPositions()
+	for i = 1,#gui.objects do 
+		gui.objects[ i ].__tablepos = i 
+	end 
 end 

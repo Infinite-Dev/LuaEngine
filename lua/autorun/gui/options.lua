@@ -52,6 +52,8 @@ function PANEL:init()
 		lg.rectangle( "fill", 0, 0, w, h )
 	end 
 
+	self.container = panel 
+
 	local pw,ph = panel:getSize()
 	local px,py = panel:getPos()
 	self.panel = gui.create( "panel", panel )
@@ -69,8 +71,8 @@ function PANEL:setUpOptions( w, h )
 
 	local panel = self.panel 
 
-	local opW = w/5
-	local opH = h/12
+	local opW = w/8
+	local opH = h/15
 	local res = gui.create( "dropDownMenu", panel )
 	res:setSize( opW, opH )
 	res:setPos( border, border )
@@ -116,6 +118,14 @@ function PANEL:setUpOptions( w, h )
 		end 
 	)
 
+	function res:onSizeChanged( oldw, oldh, w, h )
+		local wscale = w/100
+		local hscale = h/40
+		local median = (wscale+hscale)/2
+		print( median )
+		self:setFont( love.graphics.newFont( math.round( median*16 ) ) )
+	end
+
 end 
 
 function PANEL:paint( w, h )
@@ -130,11 +140,12 @@ function PANEL:paint( w, h )
 	lg.setFont( titleFont )
 	local fW,fH = titleFont:getWidth( hText ),titleFont:getHeight( hText )
 
-	local pnlh =  dh - fH - textBorder - border*2 
-	local y = (dh - pnlh - border - fH)/2
-	lg.print( hText, w/2 - fW/2 ,  y )
+	local con = self.container 
+	local conHeight = con:getHeight()
+	local cony = con:getY()
 
-	print( y )
+	local y = cony - (dh - self.container:getHeight() + border )/2 - fH/2
+	lg.print( hText, w/2 - fW/2 ,  y )
 
 end
 gui.register( "options", PANEL, "base" )
