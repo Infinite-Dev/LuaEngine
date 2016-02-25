@@ -161,7 +161,7 @@ function gui.draw()
 		local clipx, clipy = x, y 
 		local clipw, cliph = w, h 
 
-		local paintw,painth = w-2,h-2
+		local paintw,painth = w,h
 
 		lg.translate( transx, transy )
 			if panel.__clampDrawing then 
@@ -184,6 +184,7 @@ end
 
 --[[----------------------------------------
 	Check to see if we clicked on a gui panel.
+	Should probably make this less shit.
 --]]----------------------------------------
 
 function gui.buttonCheck( x, y, button, istouch )
@@ -276,4 +277,5 @@ function gui.assertPositions()
 	for i = 1,#gui.objects do 
 		gui.objects[ i ].__tablepos = i 
 	end 
+	gui.pos = #gui.objects -- Confirmed for not fucking shit up.
 end 

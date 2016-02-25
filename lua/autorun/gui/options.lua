@@ -122,7 +122,6 @@ function PANEL:setUpOptions( w, h )
 		local wscale = w/100
 		local hscale = h/40
 		local median = (wscale+hscale)/2
-		print( median )
 		self:setFont( love.graphics.newFont( math.round( median*16 ) ) )
 	end
 

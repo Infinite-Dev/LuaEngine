@@ -43,6 +43,10 @@ function ENT:collisionPostSolve( ent, coll, norm1, tan1, norm2, tan2  )
 	end 
 end 
 
+function ENT:getSpawnPos()
+	return vector( 300, 300 )
+end 
+
 function ENT:onSpawn()
 	local w,h = love.graphics.getDimensions()
 	local midx, midy = w/2, h/2 

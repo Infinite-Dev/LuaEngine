@@ -68,9 +68,9 @@ function PANEL:doClick()
 		end
 		
 		for i = 1,#tbl do 
-			local optionH = self:getHeight()
+			local optionH = math.floor( self:getHeight() )
 			local button = gui.create( "button", panel )
-			button:setPos( 0, (i-1)*(optionH) )
+			button:setPos( 0, (i-1)*(optionH) + i)
 			button:setSize( w, optionH )
 			button:setText( tbl[ i ].text )
 			button:setTextColor( 255, 255, 255, 255 )

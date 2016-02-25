@@ -122,12 +122,13 @@ game.states.changeFuncs =
 
 		game.unpause()
 
-		love.physics.setMeter(64)
+		love.physics.setMeter( 64 )
 		game.setWorld( love.physics.newWorld( 0, 0, true ) )
 
 		game.setUp()
 
-		wave.setWave( 1 )
+		game.setCurrentWave( 1 )
+		game.getCurrentWave():start()
 
 	end,
 	menu = function()
@@ -199,17 +200,7 @@ function game.restart()
 end 
 
 function game.logic()
-
-	local data = wave.getWave()
-	if not data:inProgress() then
-		wave.start()
-	elseif data:canEnd() then 
-		wave.stop()
-		wave.setWave( wave.getIndex() + 1 )
-		return 
-	end  
-	wave.think()
-
+	game.waveThink()
 end 
 
 local lg = love.graphics 
@@ -233,42 +224,7 @@ function game.drawHP( w, h )
 	lg.rectangle( "fill", x, h - y - barh, barw*p, barh )
 end 
 
-function game.drawBossHealth( w, h )
-
-	local bosstbl = {}
-	for k,v in pairs (npc.getAll()) do 
-		if v:isBoss() then 
-			bosstbl[ #bosstbl+1 ] = { v:getName(), v:getDescription(), v:getHealth(), v:getMaxHealth() }
-		end 
-	end 
-
-	local wave = wave.getWave()
-	local bossw = w*0.6 
-	local bossh = 20
-	local bx,by = wave:getBossHealthPos()
-	for i = 1,#bosstbl do 
-		local name = bosstbl[ i ][ 1 ]
-		local desc = bosstbl[ i ][ 2 ]
-		local hp = bosstbl[ i ][ 3 ]
-		local maxhp = bosstbl[ i ][ 4 ]
-		local p = hp/maxhp 
-		lg.setColor( 255, 255, 255, 255 )
-		lg.setFont( bossFont )
-		local nameW,nameH = bossFont:getWidth( name ),bossFont:getHeight( name )
-		local y = nameH/2 + 60*(i-1)
-		lg.print( name, w/2 - nameW/2, y )
-
-		local y = y + nameH + 4
-		lg.setColor( 210, 50, 50, 255 )
-		lg.rectangle( "line", w/2 - bossw/2, y, bossw, bossh )
-		lg.rectangle( "fill", w/2 - bossw/2, y, bossw*p, bossh )
-
-		local y = y + bossh
-		lg.setColor( 255, 255, 255, 255 )
-		lg.setFont( bossFontSmall )
-		local descW,descH = bossFontSmall:getWidth( desc ),bossFontSmall:getHeight( desc )
-		lg.print( desc, w/2 - descW/2, y + 4)
-	end 
+function game.drawBossHealth( w, h ) 
 
 end 
 
@@ -352,5 +308,5 @@ function game.createBullet( tbl )
 end 
 
 function game.entityDeath( ent )
-	wave.entityDeath( ent )
+	game.waveEntityDeath( ent )
 end 

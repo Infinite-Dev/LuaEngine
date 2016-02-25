@@ -34,7 +34,6 @@ function ENT:getDescription()
 end 
 
 function ENT:spawn()
-
 end 
 
 function ENT:setArmor( n )
