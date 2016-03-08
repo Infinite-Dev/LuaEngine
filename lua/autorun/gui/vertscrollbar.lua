@@ -49,7 +49,7 @@ function PANEL:init()
 		scroll:setPos( 0, y )
 		scroll.delta = d
 	end
-	self.scroll:setDelta( 0 )
+	self.scroll:setDelta( 0.9 )
 
 	function self.scroll.getDelta( scroll )
 		return scroll.delta
@@ -71,10 +71,10 @@ function PANEL:init()
 
 	function self.scroll.think( scroll )
 		if scroll:isDragging() then
+			local y = love.mouse.getY() - (self:getY() + self.up:getHeight()) - scroll.offsetY
 			local minY = self.up:getY() + self.up:getHeight()
 			local maxY = self.down:getY() - scroll:getHeight()
-			local y = love.mouse.getY()
-			y = math.clamp( minY, maxY )
+			scroll:setDelta( y/(maxY-minY) )
 		end
 	end
 
@@ -97,6 +97,14 @@ function PANEL:onSizeChanged()
 	self.scroll:setSize( self:getWidth(), 150 )
 	self.scroll:setDelta( self.scroll:getDelta() )
 
+end
+
+function PANEL:setDelta( d )
+	self.scroll:setDelta( d )
+end
+
+function PANEL:getDelta()
+	return self.scroll:getDelta()
 end
 
 function PANEL:paint()
