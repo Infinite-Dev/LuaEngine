@@ -1,7 +1,7 @@
 draw = {}
 
-local lg = love.graphics 
-local rad = math.pi*2 
+local lg = love.graphics
+local rad = math.pi*2
 
 -- r should not be greater than the w or h of the rectangle.
 function draw.roundedRect( x, y, w, h, r, m, s )
@@ -9,7 +9,7 @@ function draw.roundedRect( x, y, w, h, r, m, s )
     r = r or 14
     m = m or "fill"
     s = s or 10
-    
+
     lg.rectangle( m, x + r, y + r, w - r*2, h - r*2 )
     lg.arc( m, x + r, y + r, r, -rad*0.5, -rad*0.25, s )
     lg.arc( m, x + w - r, y + r, r, 0, -rad*0.25, s )
@@ -21,5 +21,4 @@ function draw.roundedRect( x, y, w, h, r, m, s )
     lg.rectangle( m, x + w - r, y + r, r, h - r*2 )
     lg.rectangle( m, x + r, y + h - r, w - r*2, r )
 
-end 
- 
+end

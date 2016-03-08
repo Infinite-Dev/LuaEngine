@@ -1,12 +1,12 @@
 
 --[[--
- ▄▀▀█▄▄   ▄▀▀█▄▄▄▄  ▄▀▀▀▀▄  ▄▀▀▄ ▀▀▄  ▄▀▀▄ ▀▄  ▄▀▄▄▄▄  
-█ ▄▀   █ ▐  ▄▀   ▐ █ █   ▐ █   ▀▄ ▄▀ █  █ █ █ █ █    ▌ 
-▐ █    █   █▄▄▄▄▄     ▀▄   ▐     █   ▐  █  ▀█ ▐ █      
-  █    █   █    ▌  ▀▄   █        █     █   █    █      
- ▄▀▄▄▄▄▀  ▄▀▄▄▄▄    █▀▀▀       ▄▀    ▄▀   █    ▄▀▄▄▄▄▀ 
-█     ▐   █    ▐    ▐          █     █    ▐   █     ▐  
-▐         ▐                    ▐     ▐        ▐   
+ ▄▀▀█▄▄   ▄▀▀█▄▄▄▄  ▄▀▀▀▀▄  ▄▀▀▄ ▀▀▄  ▄▀▀▄ ▀▄  ▄▀▄▄▄▄
+█ ▄▀   █ ▐  ▄▀   ▐ █ █   ▐ █   ▀▄ ▄▀ █  █ █ █ █ █    ▌
+▐ █    █   █▄▄▄▄▄     ▀▄   ▐     █   ▐  █  ▀█ ▐ █
+  █    █   █    ▌  ▀▄   █        █     █   █    █
+ ▄▀▄▄▄▄▀  ▄▀▄▄▄▄    █▀▀▀       ▄▀    ▄▀   █    ▄▀▄▄▄▄▀
+█     ▐   █    ▐    ▐          █     █    ▐   █     ▐
+▐         ▐                    ▐     ▐        ▐
 --]]--
 
 local lg = love.graphics
@@ -19,6 +19,7 @@ local textBorder = 20
 local border = 15
 local hText = "HIGHSCORES"
 function PANEL:init()
+
 	local w, h = love.graphics.getDimensions()
 	self:setSize( w, h )
 
@@ -38,7 +39,7 @@ function PANEL:init()
 	end
 	function b:doClick()
 		prnt:moveTo( 0, 0, 0.7, 0.5, 0.5 )
-	end  
+	end
 
 	local b = 6
 	local fw,fh = titleFont:getWidth( hText ),titleFont:getHeight( hText )
@@ -51,8 +52,13 @@ function PANEL:init()
 
 		lg.setColor( 3, 3, 3, 255 )
 		lg.rectangle( "fill", b, b, w - b*2, h - b*2 )
-	end 
-end 
+	end
+
+	local scroll = gui.create( "scrollPanel", self )
+	scroll:setSize( self:getWidth(), self:getHeight() )
+	scroll:enableVertScrollbar( true )
+
+end
 
 function PANEL:paint( w, h )
 

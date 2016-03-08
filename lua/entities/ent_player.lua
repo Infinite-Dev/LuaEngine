@@ -6,14 +6,14 @@ function ENT:initialize()
 	local sz = 7
 	self.tbl = {}
 	local points = 3
-	local incr = 360/points 
-	for i = 1,points do 
-		if i == 3 then 
+	local incr = 360/points
+	for i = 1,points do
+		if i == 3 then
 			sz = 13
-		end 
-		self.tbl[ #self.tbl+1 ] = math.sin( math.rad( incr*i ) )*sz 
-		self.tbl[ #self.tbl+1 ] = math.cos( math.rad( incr*i ) )*sz 
-	end 
+		end
+		self.tbl[ #self.tbl+1 ] = math.sin( math.rad( incr*i ) )*sz
+		self.tbl[ #self.tbl+1 ] = math.cos( math.rad( incr*i ) )*sz
+	end
 
 	local poly = love.physics.newPolygonShape( unpack( self.tbl ) )
 	self:setShape( poly )
@@ -26,7 +26,7 @@ function ENT:initialize()
 	body:setSleepingAllowed( false )
 	self:setBody( body )
 
-	local d = 5 
+	local d = 5
 	local fix = love.physics.newFixture( self:getBody(), self:getShape(), 1 )
 	fix:setRestitution( 1 )
 	fix:setFriction( 0 )
@@ -36,72 +36,72 @@ function ENT:initialize()
 
 	self:setHealth( asteroids.playerHealth )
 	self:setMaxHealth( asteroids.playerHealth )
-	self.damage = 1 
+	self.damage = 1
 
-	self.bulletDelay = 0 
+	self.bulletDelay = 0
 	self.fireDelay = 0.15
 	self.shouldGib = false
-	self.gibDelay = 0 
+	self.gibDelay = 0
 
-	self.moving = false 
+	self.moving = false
 
-end 
+end
 
 function ENT:setRespawnTime( t )
-	self.respawnTime = love.timer.getTime() + t 
-end 
+	self.respawnTime = love.timer.getTime() + t
+end
 
 function ENT:getRespawnTime()
-	return self.respawnTime or 0 
-end 
+	return self.respawnTime or 0
+end
 
 function ENT:getDisplayRespawnTime()
 	return math.max( self:getRespawnTime() - love.timer.getTime(), 0 )
-end 
+end
 
 function ENT:shouldRespawn()
 	return self:getRespawnTime() < love.timer.getTime()
-end 
+end
 
 local godTime = 1
 function ENT:onTakeDamage( dmgInfo )
-	if self:isGod() then 
+	if self:isGod() then
 		dmgInfo:scaleDamage( 0 )
-	else 
+	else
 		self:doFlashAnim( godTime, 0.05 )
 		self:godMode( godTime )
-	end 
-end 
+	end
+end
 
 function ENT:godMode( dur )
 	local t = love.timer.getTime()
-	self.godTimer = t + dur 
+	self.godTimer = t + dur
 	self:setGod( true )
-end 
+end
 
 function ENT:setGod( b )
-	self.god = b 
-end 
+	self.god = b
+end
 
 function ENT:isGod()
-	return self.god 
-end 
+	return self.god
+end
 
 function ENT:doFlashAnim( dur, ftime )
 	local t = love.timer.getTime()
-	self.flashDrawTime = ftime 
-	self.flashTime = t + ftime 
+	self.flashDrawTime = ftime
+	self.flashTime = t + ftime
 	self.flashNum = math.floor( dur/ftime )
-	self.curFlash = 0 
-	self.flashing = true 
-end 
+	self.curFlash = 0
+	self.flashing = true
+end
 
 function ENT:onDeath()
 
 	self:gib()
 	self:remove()
 
-end 
+end
 
 function ENT:getShootPos()
 	local body = self:getBody()
@@ -109,7 +109,7 @@ function ENT:getShootPos()
 	local x = points[ 3 ]
 	local y = points[ 4 ]
 	return vector( x, y )
-end 
+end
 
 function ENT:getAimDir()
 	local b = self:getBody()
@@ -117,7 +117,7 @@ function ENT:getAimDir()
 	local x = math.cos( a )
 	local y = math.sin( a )
 	return vector( x, y )
-end 
+end
 
 local isDown = love.keyboard.isDown
 local rMax = math.pi*2
@@ -126,68 +126,68 @@ local sens = 6
 function ENT:think()
 
 	local t = love.timer.getTime()
-	if self:isAlive() then 
+	if self:isAlive() then
 
 		local b = self:getBody()
 
-		if isDown( "w" ) and t > self.bulletDelay then 
+		if isDown( "w" ) and t > self.bulletDelay then
 
 			local bulletData = {}
 			bulletData.damage = 1
 			bulletData.force = 50
 			bulletData.startPos = self:getShootPos()
 			bulletData.dir = self:getAimDir()
-			bulletData.angle = self:getAngle() 
+			bulletData.angle = self:getAngle()
 			bulletData.size = 3
-			bulletData.owner = self 
+			bulletData.owner = self
 			bulletData.speed = 400
 			bulletData.color = { 255, 125, 30, 255 }
 			bulletData.drawMode = BULLET_DRAWMODE_LINE
 			game.createBullet( bulletData )
 
-			self.bulletDelay = t + self.fireDelay 
-		end 
+			self.bulletDelay = t + self.fireDelay
+		end
 
-		if isDown( "s" ) then 
+		if isDown( "s" ) then
 			local a = b:getAngle() + math.pi/2
 			local x = math.cos( a )*speed
 			local y = math.sin( a )*speed
 			b:applyForce( x, y )
-			self.moving = true 
-		else 
-			self.moving = false 
-		end 
+			self.moving = true
+		else
+			self.moving = false
+		end
 
 		local dt = love.timer.getDelta()
-		if isDown( "a" ) then 
+		if isDown( "a" ) then
 			local a = b:getAngle()
 			self:setAngle( a - sens*dt )
-		end 
+		end
 
-		if isDown( "d" ) then 
+		if isDown( "d" ) then
 			local a = b:getAngle()
 			self:setAngle( a + sens*dt )
-		end 
+		end
 
 	end
 
-	if self:isGod() then 
-		if t > self.godTimer then 
+	if self:isGod() then
+		if t > self.godTimer then
 			self:setGod( false )
-		end 
-	end 
+		end
+	end
 
-	if self.flashing then 
-		if t > self.flashTime then 
+	if self.flashing then
+		if t > self.flashTime then
 			self:setDraw( not self:shouldDraw() )
 			self.flashNum = self.flashNum - 1
-			self.flashTime = self.flashTime + self.flashDrawTime 
-			if self.flashNum <= 0 then 
-				self.flashing = false 
+			self.flashTime = self.flashTime + self.flashDrawTime
+			if self.flashNum <= 0 then
+				self.flashing = false
 				self:setDraw( true )
-			end 
-		end 
-	end 
+			end
+		end
+	end
 
 	local x,y = self:getPos()
 	local w,h = love.graphics.getDimensions()
@@ -197,17 +197,17 @@ function ENT:think()
 	local x2,y2 = x + compare, y + compare
 	local x3,y3 = x - compare, y - compare
 
-	if x3 > w + compare/2 then 
+	if x3 > w + compare/2 then
 		self:setPos( -compare, y )
 	elseif y3 > h + compare/2 then
 		self:setPos( x, -compare )
-	elseif x2 < -compare/2 then 
+	elseif x2 < -compare/2 then
 		self:setPos( w + compare, y )
-	elseif y2 < -compare/2 then 
+	elseif y2 < -compare/2 then
 		self:setPos( x, h + compare )
-	end  
+	end
 
-end 
+end
 
 function ENT:gib()
 	local min,max = 0.9,1.1
@@ -217,15 +217,15 @@ function ENT:gib()
 	local bX,bY = body:getPosition()
 	local lpoints = self.tbl
 	local wpoints = {body:getWorldPoints( self:getShape():getPoints() )}
-	local pNo = 
-	{ 	
+	local pNo =
+	{
 		1,2,3,4,
 		3,4,5,6,
 		5,6,1,2
 	}
 	local xa = body:getAngularVelocity()
 
-	for i = 1,3 do 
+	for i = 1,3 do
 
 		local j = (3-i)*4
 		local xf,yf = body:getLinearVelocity()
@@ -243,20 +243,20 @@ function ENT:gib()
 
 		b:setAngularVelocity( xa*0.1 )
 
-	end 
+	end
 
-	local t = love.timer.getTime() + 3 
+	local t = love.timer.getTime() + 3
 	hook.add( "think", "playerDeathDelay", function()
-		if love.timer.getTime() >= t then 
+		if love.timer.getTime() >= t then
 			game.playerDeath()
 			hook.remove( "think", "playerDeathDelay" )
-		end 
+		end
 	end )
-end 
+end
 
-local lg = love.graphics 
+local lg = love.graphics
 local incr = 360/3
-local sz = 10 
+local sz = 10
 function ENT:draw()
 
 	local body = self:getBody()
@@ -265,8 +265,8 @@ function ENT:draw()
 	lg.polygon( "fill", unpack( points ) )
 	lg.setColor( 255, 255, 255, 255 )
 	lg.polygon( "line", unpack( points ) )
-	
-	if self.moving then 
+
+	if self.moving then
 		local x = points[ 1 ]
 		local y = points[ 2 ]
 
@@ -283,16 +283,16 @@ function ENT:draw()
 
 		local norm = (v2 - v):normalized()
 		local dist = math.distance( x, y, x2, y2 )
-		local distNorm = norm*dist 
-		local gap = norm*dist/3.5 
+		local distNorm = norm*dist
+		local gap = norm*dist/3.5
 
-		local x3 = x + gap.x - aX 
+		local x3 = x + gap.x - aX
 		local y3 = y + gap.y - aY
 
-		local x4 = x + distNorm.x - gap.x - aX 
-		local y4 = y + distNorm.y - gap.y - aY 
+		local x4 = x + distNorm.x - gap.x - aX
+		local y4 = y + distNorm.y - gap.y - aY
 
-		local midX = (x + x2)/2 
+		local midX = (x + x2)/2
 		local midY = (y + y2)/2
 
 		local r = love.math.random( 5, 6 )
@@ -301,8 +301,8 @@ function ENT:draw()
 
 		lg.setColor( 255, 120, 0, 255 )
 		lg.polygon( "line", x3, y3, x4, y4, x5, y5 )
-	end 
+	end
 
 
-end 
+end
 ents.registerEntity( "ent_player", ENT )

@@ -1,13 +1,13 @@
 
 
 --[[
- ▄▀▀█▄▄   ▄▀▀█▄▄▄▄  ▄▀▀▀▀▄  ▄▀▀▄ ▀▀▄  ▄▀▀▄ ▀▄  ▄▀▄▄▄▄  
-█ ▄▀   █ ▐  ▄▀   ▐ █ █   ▐ █   ▀▄ ▄▀ █  █ █ █ █ █    ▌ 
-▐ █    █   █▄▄▄▄▄     ▀▄   ▐     █   ▐  █  ▀█ ▐ █      
-  █    █   █    ▌  ▀▄   █        █     █   █    █      
- ▄▀▄▄▄▄▀  ▄▀▄▄▄▄    █▀▀▀       ▄▀    ▄▀   █    ▄▀▄▄▄▄▀ 
-█     ▐   █    ▐    ▐          █     █    ▐   █     ▐  
-▐         ▐                    ▐     ▐        ▐   
+ ▄▀▀█▄▄   ▄▀▀█▄▄▄▄  ▄▀▀▀▀▄  ▄▀▀▄ ▀▀▄  ▄▀▀▄ ▀▄  ▄▀▄▄▄▄
+█ ▄▀   █ ▐  ▄▀   ▐ █ █   ▐ █   ▀▄ ▄▀ █  █ █ █ █ █    ▌
+▐ █    █   █▄▄▄▄▄     ▀▄   ▐     █   ▐  █  ▀█ ▐ █
+  █    █   █    ▌  ▀▄   █        █     █   █    █
+ ▄▀▄▄▄▄▀  ▄▀▄▄▄▄    █▀▀▀       ▄▀    ▄▀   █    ▄▀▄▄▄▄▀
+█     ▐   █    ▐    ▐          █     █    ▐   █     ▐
+▐         ▐                    ▐     ▐        ▐
 ]]
 
 
@@ -25,14 +25,14 @@ function PANEL:_initialize()
 	self.__color = { 230, 230, 230, 240 }
 	self:setTextColor( 60, 60, 60, 255 )
 	self:setGradient( 2 )
+	self:setFont( defaultFont )
 	self:setText( "Click me!" )
 	self:setCanClick( true )
-	self:setFont( defaultFont )
 	self:setTextOffest( 0, 0 )
 end
 
 function PANEL:onSizeChanged()
-end 
+end
 
 function PANEL:setGradient( grad )
 	self.__gradient = grad
@@ -55,16 +55,16 @@ function PANEL:setTextOffest( x, y )
 end
 
 function PANEL:getTextOffset()
-	return self.__textOffset 
-end  
+	return self.__textOffset
+end
 
 function PANEL:setEnabled( bool )
-	self.__enabled = bool 
-end 
+	self.__enabled = bool
+end
 
 function PANEL:isEnabled()
-	return self.__enabled 
-end 
+	return self.__enabled
+end
 
 function PANEL:setTextColor( r, g, b, a )
 	if type( r ) == "table" then
@@ -75,16 +75,19 @@ function PANEL:setTextColor( r, g, b, a )
 end
 
 function PANEL:getTextColor()
-	return self.__textcolor 
+	return self.__textcolor
 end
 
 function PANEL:setFont( font )
-	self.__font = font 
+	self.__font = font
 end
 
 function PANEL:getFont()
-	return self.__font 
-end 
+	return self.__font
+end
+
+function PANEL:onReleased( button )
+end
 
 function PANEL:doClick()
 end
@@ -92,7 +95,7 @@ end
 function PANEL:doRightClick()
 end
 
-local key_funcs = 
+local key_funcs =
 {
 	[ 1 ] = function( pnl )
 		if pnl.doClick then
@@ -135,10 +138,9 @@ function PANEL:paintOver( w, h )
 
 	local offset = self:getTextOffset()
 	local x = ( w - w2 )/2 - offset.x
-	local y = (h - h2)/2 - offset.y 
+	local y = (h - h2)/2 - offset.y
 	lg.print( text, x, y )
 
 end
 
 gui.register( "button", PANEL, "base" )
-

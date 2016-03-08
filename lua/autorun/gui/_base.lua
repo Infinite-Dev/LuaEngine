@@ -2,23 +2,22 @@
 
 --[[
 
- ▄▀▀█▄▄   ▄▀▀█▄▄▄▄  ▄▀▀▀▀▄  ▄▀▀▄ ▀▀▄  ▄▀▀▄ ▀▄  ▄▀▄▄▄▄  
-█ ▄▀   █ ▐  ▄▀   ▐ █ █   ▐ █   ▀▄ ▄▀ █  █ █ █ █ █    ▌ 
-▐ █    █   █▄▄▄▄▄     ▀▄   ▐     █   ▐  █  ▀█ ▐ █      
-  █    █   █    ▌  ▀▄   █        █     █   █    █      
- ▄▀▄▄▄▄▀  ▄▀▄▄▄▄    █▀▀▀       ▄▀    ▄▀   █    ▄▀▄▄▄▄▀ 
-█     ▐   █    ▐    ▐          █     █    ▐   █     ▐  
-▐         ▐                    ▐     ▐        ▐   
+ ▄▀▀█▄▄   ▄▀▀█▄▄▄▄  ▄▀▀▀▀▄  ▄▀▀▄ ▀▀▄  ▄▀▀▄ ▀▄  ▄▀▄▄▄▄
+█ ▄▀   █ ▐  ▄▀   ▐ █ █   ▐ █   ▀▄ ▄▀ █  █ █ █ █ █    ▌
+▐ █    █   █▄▄▄▄▄     ▀▄   ▐     █   ▐  █  ▀█ ▐ █
+  █    █   █    ▌  ▀▄   █        █     █   █    █
+ ▄▀▄▄▄▄▀  ▄▀▄▄▄▄    █▀▀▀       ▄▀    ▄▀   █    ▄▀▄▄▄▄▀
+█     ▐   █    ▐    ▐          █     █    ▐   █     ▐
+▐         ▐                    ▐     ▐        ▐
 
 ]]
 
 local lg = love.graphics
 local lm = love.mouse
- 
+
 local PANEL = {}
 
 function PANEL:_initialize()
-
 end
 
 function PANEL:init()
@@ -44,7 +43,7 @@ function PANEL:setParent( pnl )
 end
 
 function PANEL:getParent()
-	return self.__parent or false 
+	return self.__parent or false
 end
 
 function PANEL:isChild()
@@ -56,33 +55,33 @@ end
 
 function PANEL:isParent()
 	return #self:getChildren() > 0
-end	
+end
 
 function PANEL:getChildren()
 	return self.__children
-end 
+end
 
 function PANEL:isChildOf( pnl )
-	if pnl then 
+	if pnl then
 		local c = pnl:getChildren()
-		for i = 1,#c do 
-			if c[ i ] == self then 
-				return true 
-			end 
-		end 
+		for i = 1,#c do
+			if c[ i ] == self then
+				return true
+			end
+		end
 	end
-	return false 
-end 
+	return false
+end
 
 function PANEL:isParentOf( pnl )
-	if pnl then 
+	if pnl then
 		local p = pnl:getParent()
-		if p == self then 
-			return true 
-		end 
+		if p == self then
+			return true
+		end
 	end
-	return false  
-end 
+	return false
+end
 
 function PANEL:setSize( w, h )
 	local oldw, oldh = self:getSize()
@@ -96,16 +95,16 @@ end
 
 function PANEL:center()
 	if self:isChild() then
-	
+
 		local parent = self:getParent()
 		local x,y = parent:getPos()
 		local w,h = parent:getSize()
 		local w2,h2 = self:getSize()
-		
+
 		self:setPos( w/2 - w2/2 , h/2 - h2/2 )
-		
+
 		self.__centred = true
-		
+
 	else
 		local x,y = lg.getWidth()/2 - self:getWidth()/2, lg.getHeight()/2 - self:getHeight()/2
 		self:setPos( x, y )
@@ -126,10 +125,10 @@ function PANEL:getWidth()
 end
 
 function PANEL:setPos( x, y )
-	if type( x ) == "table" then 
+	if type( x ) == "table" then
 		y = x.y
-		x = x.x  
-	end 
+		x = x.x
+	end
 	local oldX,oldY = self:getPos()
 	if self:isChild() then
 		local prnt = self:getParent()
@@ -140,7 +139,7 @@ function PANEL:setPos( x, y )
 		self.__x = x
 		self.__y = y
 	end
-	
+
 	if self:isParent() then
 		local cTbl = self:getChildren()
 		for i = 1,#cTbl do
@@ -158,13 +157,13 @@ function PANEL:getPos()
 end
 
 function PANEL:getLocalPos()
-	if self:isChild() then 
+	if self:isChild() then
 		local x,y = self:getParent():getPos()
-		return self.__x - x,self.__y - y 
-	else 
+		return self.__x - x,self.__y - y
+	else
 		return self.__x,self.__y
-	end 
-end 
+	end
+end
 
 function PANEL:getX()
 	return self.__x
@@ -190,14 +189,14 @@ function PANEL:think()
 end
 
 function PANEL:onCursorEntered()
-end	
+end
 
 function PANEL:onCursorExited()
 end
 
 function PANEL:setCanClick( b )
-	self.__canClick = b 
-end 
+	self.__canClick = b
+end
 
 function PANEL:canClick()
 	return self.__canClick
@@ -215,45 +214,45 @@ function PANEL:__mouseThink()
 	elseif self.__hovered == true and not in_area( x, y, self.__x, self.__y, self:getSize() ) then
 		self.__hovered = false
 		self:onCursorExited()
-	end 
+	end
 end
 
 function PANEL:getID()
-	return self.__id 
+	return self.__id
 end
 
 function PANEL:setZ( num, b )
 	self.__z = num
-	if num > gui.getMaxZ() then 
+	if num > gui.getMaxZ() then
 		gui.setMaxZ( num )
-	elseif num < gui.getMinZ() then 
+	elseif num < gui.getMinZ() then
 		gui.setMinZ( num )
-	end 
+	end
 	if self:isParent() then
 		local c = self:getChildren()
-		for i = 1,#c do 
+		for i = 1,#c do
 			c[ i ]:setZ( num + 1 )
-		end 
-	end 
+		end
+	end
 	gui.generateDrawOrder()
-end 
+end
 
 function PANEL:getZ()
-	return self.__z 
-end 
+	return self.__z
+end
 
 function PANEL:bringToFront()
 	local z = gui.getMaxZ()+1
 	self:setZ( z )
-end 
+end
 
 function PANEL:sendToBack()
 	self:setZ( gui.getMinZ() - 1 )
-end 
+end
 
 function PANEL:getClass()
 	return self.__class
-end 
+end
 
 function PANEL:moveTo( x, y, time, easein, easeout, callback, ... )
 	local pX,pY = self:getPos()
@@ -263,53 +262,53 @@ function PANEL:moveTo( x, y, time, easein, easeout, callback, ... )
 	local norm = (vec-vec2):normalized()
 	local add = (norm*dist)
 	local t = love.timer.getTime()
-	local tEnd = t + time 
+	local tEnd = t + time
 	local hname = "MoveHook"..tostring( self )
 	local delay = 0.01
-	local thinkTime = t 
+	local thinkTime = t
 	hook.add( "think", hname, function()
-		if self then 
+		if self then
 			local t2 = love.timer.getTime()
-			if t2 > thinkTime then  
+			if t2 > thinkTime then
 				local p = (t2-t)/(time)
 				local drawP = math.easeInOut( p, easein, easeout )
-				self:setPos( (vec2 + add*drawP) ) 
-				if p >= 1 then 
+				self:setPos( (vec2 + add*drawP) )
+				if p >= 1 then
 					self:setPos( x, y )
 					hook.remove( "think", hname )
-					if callback then 
+					if callback then
 						callback( self, unpack( args ) )
 					end
-				end 
-				thinkTime = t2 + delay 
-			end 
-		else 
+				end
+				thinkTime = t2 + delay
+			end
+		else
 			hook.remove( "think", hname )
-		end  
-	end ) 
-end 
+		end
+	end )
+end
 
 function PANEL:doModal( b )
 	if b then
 		gui.setModal( self )
-	elseif gui.getModal == self then 
+	elseif gui.getModal == self then
 	    gui.setModal()
 	end
 	gui.generateDrawOrder()
 end
 
 function PANEL:isModal()
-	return gui.getModal() == self 
-end 
+	return gui.getModal() == self
+end
 
 function PANEL:blurBackground( b, fadetime )
-	if b then 
+	if b then
 		local startTime = love.timer.getTime()
 		local time = startTime + (fadetime or 0)
 		local endAlpha = 200
-		self.__backblur = b 
+		self.__backblur = b
 		self.__blurpnl = gui.create( "panel" )
-		local p = self.__blurpnl 
+		local p = self.__blurpnl
 
 		local scrw, scrh = lg.getDimensions()
 		p:setSize( scrw, scrh )
@@ -319,17 +318,17 @@ function PANEL:blurBackground( b, fadetime )
 			lg.setColor( 0, 0, 0, p*endAlpha )
 			lg.rectangle( "fill", 0, 0, scrw, scrh )
 		end
-	else 
-		if self.__blurpnl then 
+	else
+		if self.__blurpnl then
 			self.__blurpnl:remove()
-		end 
-		self.__backblur = false 
-	end 
+		end
+		self.__backblur = false
+	end
 	gui.generateDrawOrder()
-end 
+end
 
 function PANEL:onScale( n )
-end 
+end
 
 function PANEL:remove()
 
@@ -349,16 +348,19 @@ function PANEL:remove()
 		child:remove()
 	end
 
-	if self.__backblur then 
+	if self.__backblur then
 		self.__blurpnl:remove()
-	end 
+	end
 
-	if self:isModal() then 
+	if self:isModal() then
 		gui.setModal( nil )
-	end 
+	end
 	gui.remove( self )
 	gui.generateDrawOrder()
 
+end
+
+function PANEL:onWheelMoved( delta )
 end
 
 gui.register( "base", PANEL )

@@ -3,28 +3,29 @@ local WAVE      = {}
 WAVE.printName  = "Wave 1"
 WAVE.desc       = "Easy peasy."
 WAVE.duration   = 15
-WAVE.spawnList  = 
+WAVE.spawnList  =
 {
-    [ "npc_ufo" ] = 2
+    [ "npc_droneboss" ] = { 1, 1 }
 }
 WAVE.spawnWaveDelay = 2
 
+
 function WAVE:onSet()
-end 
+end
 
 function WAVE:onStart()
-end 
+end
 
 function WAVE:onFinish()
-end 
+end
 
 function WAVE:finish()
-end 
+end
 
 function WAVE:think()
-end 
+end
 
 function WAVE:entityDeath( ent )
-end 
+end
 
 game.addWave( WAVE, 1, "wave_time_base" )

@@ -1,12 +1,12 @@
 
 --[[--
- ▄▀▀█▄▄   ▄▀▀█▄▄▄▄  ▄▀▀▀▀▄  ▄▀▀▄ ▀▀▄  ▄▀▀▄ ▀▄  ▄▀▄▄▄▄  
-█ ▄▀   █ ▐  ▄▀   ▐ █ █   ▐ █   ▀▄ ▄▀ █  █ █ █ █ █    ▌ 
-▐ █    █   █▄▄▄▄▄     ▀▄   ▐     █   ▐  █  ▀█ ▐ █      
-  █    █   █    ▌  ▀▄   █        █     █   █    █      
- ▄▀▄▄▄▄▀  ▄▀▄▄▄▄    █▀▀▀       ▄▀    ▄▀   █    ▄▀▄▄▄▄▀ 
-█     ▐   █    ▐    ▐          █     █    ▐   █     ▐  
-▐         ▐                    ▐     ▐        ▐   
+ ▄▀▀█▄▄   ▄▀▀█▄▄▄▄  ▄▀▀▀▀▄  ▄▀▀▄ ▀▀▄  ▄▀▀▄ ▀▄  ▄▀▄▄▄▄
+█ ▄▀   █ ▐  ▄▀   ▐ █ █   ▐ █   ▀▄ ▄▀ █  █ █ █ █ █    ▌
+▐ █    █   █▄▄▄▄▄     ▀▄   ▐     █   ▐  █  ▀█ ▐ █
+  █    █   █    ▌  ▀▄   █        █     █   █    █
+ ▄▀▄▄▄▄▀  ▄▀▄▄▄▄    █▀▀▀       ▄▀    ▄▀   █    ▄▀▄▄▄▄▀
+█     ▐   █    ▐    ▐          █     █    ▐   █     ▐
+▐         ▐                    ▐     ▐        ▐
 --]]--
 
 local lg = love.graphics
@@ -38,21 +38,21 @@ function PANEL:init()
 	end
 	function b:doClick()
 		prnt:moveTo( 0, 0, 0.7, 0.5, 0.5 )
-	end  
+	end
 
 	local b = 6
 	local fw,fh = titleFont:getWidth( hText ),titleFont:getHeight( hText )
 	local panel = gui.create( "panel", self )
 
-	self.pnlh =  h - fh - textBorder - border*2 
+	self.pnlh =  h - fh - textBorder - border*2
 	panel:setSize( w - border*2, self.pnlh )
 	panel:setPos( border, fh + textBorder + border )
 	function panel:paint( w, h )
 		lg.setColor( 44, 44, 44, 255 )
 		lg.rectangle( "fill", 0, 0, w, h )
-	end 
+	end
 
-	self.container = panel 
+	self.container = panel
 
 	local pw,ph = panel:getSize()
 	local px,py = panel:getPos()
@@ -64,12 +64,12 @@ function PANEL:init()
 		lg.rectangle( "fill", 0, 0, w, h )
 	end
 	self:setUpOptions( self.panel:getSize() )
-end 
+end
 
 local border = 4
 function PANEL:setUpOptions( w, h )
 
-	local panel = self.panel 
+	local panel = self.panel
 
 	local opW = w/8
 	local opH = h/15
@@ -77,45 +77,50 @@ function PANEL:setUpOptions( w, h )
 	res:setSize( opW, opH )
 	res:setPos( border, border )
 	res:setDefaultText( "800x600" )
-	res:addOption( 
+	res:addOption(
 
 		"1920x1080",
 
 		function()
 			gui.changeResolution( 1920, 1080 )
-		end 
+		end
+
 	)
-	res:addOption( 
+	res:addOption(
 
 		"1366x768",
-		
+
 		function()
 			gui.changeResolution( 1336, 768 )
-		end 
-	)	
-	res:addOption( 
+		end
+
+	)
+	res:addOption(
 
 		"1024x768",
-		
+
 		function()
 			gui.changeResolution( 1024, 768 )
-		end 
-	)	
-	res:addOption( 
+		end
+
+	)
+	res:addOption(
 
 		"800x600",
-		
+
 		function()
 			gui.changeResolution( 800, 600 )
-		end 
+		end
+
 	)
-	res:addOption( 
+	res:addOption(
 
 		"600x400",
-		
+
 		function()
 			gui.changeResolution( 600, 400 )
-		end 
+		end
+
 	)
 
 	function res:onSizeChanged( oldw, oldh, w, h )
@@ -125,12 +130,12 @@ function PANEL:setUpOptions( w, h )
 		self:setFont( love.graphics.newFont( math.round( median*16 ) ) )
 	end
 
-end 
+end
 
 function PANEL:paint( w, h )
 
 	local dw,dh = love.graphics.getDimensions()
-	local pw,ph = self:getSize() 
+	local pw,ph = self:getSize()
 
 	lg.setColor( 11, 11, 11, 120 )
 	lg.rectangle( "fill", 0, 0, w, h )
@@ -139,7 +144,7 @@ function PANEL:paint( w, h )
 	lg.setFont( titleFont )
 	local fW,fH = titleFont:getWidth( hText ),titleFont:getHeight( hText )
 
-	local con = self.container 
+	local con = self.container
 	local conHeight = con:getHeight()
 	local cony = con:getY()
 
