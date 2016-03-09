@@ -55,8 +55,32 @@ function PANEL:init()
 	end
 
 	local scroll = gui.create( "scrollPanel", self )
-	scroll:setSize( self:getWidth(), self:getHeight() )
+	scroll:setSize( self:getWidth(), self:getHeight()*0.75 )
 	scroll:enableVertScrollbar( true )
+
+	local pnl = gui.create( "panel", scroll )
+	pnl:setSize( 400, 400 )
+	pnl:setPos( 5, scroll:getHeight()/2 - 200 )
+	function pnl:paint( w, h )
+		lg.setColor( 40, 255, 40, 255 )
+		lg.rectangle( "fill", 0, 0, w, h )
+	end
+
+	local pnl2 = gui.create( "panel", pnl )
+	pnl2:setSize( 20, 20 )
+	pnl2:setPos( 0, 0 )
+	function pnl2:paint( w, h )
+		lg.setColor( 255, 40, 40, 255 )
+		lg.rectangle( "fill", 0, 0, w, h )
+	end
+
+	local pnl3 = gui.create( "panel", scroll )
+	pnl3:setSize( 400, 1250 )
+	pnl3:setPos( scroll:getWidth() - 400, scroll:getHeight()/2 + 200 )
+	function pnl3:paint( w, h )
+		lg.setColor( 40, 40, 255, 255 )
+		lg.rectangle( "fill", 0, 0, w, h )
+	end
 
 end
 

@@ -48,8 +48,9 @@ function PANEL:init()
 		local y = (maxY-minY)*d + minY
 		scroll:setPos( 0, y )
 		scroll.delta = d
+		self:onDeltaSet( d )
 	end
-	self.scroll:setDelta( 0.9 )
+	self.scroll:setDelta( 0 )
 
 	function self.scroll.getDelta( scroll )
 		return scroll.delta
@@ -82,6 +83,11 @@ end
 
 function PANEL:onWheelMoved( delta )
 	self.scroll:setDelta( self.scroll:getDelta() + delta*-0.01 )
+end
+
+function PANEL:onDeltaSet( d )
+	local p = self:getParent()
+	p:onDeltaSet( d )
 end
 
 function PANEL:onSizeChanged()

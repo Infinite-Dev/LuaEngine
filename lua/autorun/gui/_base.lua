@@ -23,8 +23,14 @@ end
 function PANEL:init()
 end
 
+function PANEL:performLayout()
+end
+
 function PANEL:setClampDrawing( bool )
 	self.__clampDrawing = bool
+end
+
+function PANEL:onChildAdded( pnl )
 end
 
 function PANEL:setParent( pnl )
@@ -40,6 +46,7 @@ function PANEL:setParent( pnl )
 	end
 	self.__parent = pnl
 	pnl.__children[ #pnl.__children + 1] = self
+	pnl:onChildAdded( self )
 end
 
 function PANEL:getParent()
