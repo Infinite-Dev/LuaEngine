@@ -21,7 +21,6 @@ function loadFiles( dir )
 end
 
 function love.load()
-	starImage = love.graphics.newImage( "materials/star.png" )
 	loadFiles( "lua/autorun" )
 	game.changeState( "menu" )
 	love.math.setRandomSeed( os.time() )
@@ -35,24 +34,25 @@ end
 
 love.graphics.setDefaultFilter( "nearest", "nearest", 16 )
 function love.draw()
+
 	local t = love.timer.getTime()
-	game.drawBackground( t )
 	ents.draw( t )
 	game.drawHUD( t )
 	hook.call( "paint", t )
 	gui.draw( t )
+
 	local fps = love.timer.getFPS()
 	local p = fps/60
 	love.graphics.setColor( 255*(1-p), 255*p, 0, 255 )
 	love.graphics.setFont( debugFont )
 	love.graphics.print("FPS: "..tostring( fps ), 10, 10)
+
 end
 
 --[[----------------------------------------
 	Run these functions on tick.
 --]]----------------------------------------
 function love.update( dt )
-	game.think( dt )
 	ents.cleanUp()
 end
 
