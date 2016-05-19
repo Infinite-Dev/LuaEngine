@@ -27,6 +27,7 @@ function love.load()
 	love.math.setRandomSeed( os.time() )
 end
 
+
 --[[----------------------------------------
 	Call our basic draw functions and call
 	the draw hook.

@@ -33,6 +33,7 @@ function gui.create( class, parent )
 	panel.__hovered = false
 	panel.__canClick = false
 	panel.__clampDrawing = true
+	panel.__childClick = false
 	panel.__x = 0
 	panel.__y = 0
 	panel.__w = 15
@@ -151,27 +152,66 @@ end
 
 --Internal.
 function gui.draw()
+
 	local tbl = gui.getObjects()
 	for i = 1,#tbl do
+
 		local panel = tbl[ i ]
 		local w,h = panel:getSize()
 		local x,y = panel:getPos()
 
 		local transx, transy = x, y
+
 		local clipx, clipy = x, y
 		local clipw, cliph = w, h
+
+		local parent = panel:getParent()
+		while parent do
+
+			local px, py = parent:getPos()
+			local pw, ph = parent:getSize()
+			local oldcx, oldcy = clipx, clipy
+			local oldcw, oldch = clipw, cliph
+			if parent.__clampDrawing then
+
+				if px > clipx then
+					clipx = math.min( px, ( clipx + clipw ) )
+					clipw = oldcx + clipw - clipx
+				end
+
+				if clipx + clipw > px + pw then
+						local dif = px + pw - (clipx + clipw)
+						clipw = math.max( 0, clipw + dif )
+				end
+
+				if py > clipy then
+					clipy = math.min( py, ( clipy + cliph ) )
+					cliph = oldcy + cliph - clipy
+				end
+
+				if clipy + cliph > py + ph then
+						local dif = py + ph - (clipy + cliph)
+						cliph = math.max( 0, cliph + dif )
+				end
+
+			end
+			parent = parent:getParent()
+
+		end
 
 		local paintw,painth = w,h
 
 		lg.translate( transx, transy )
-			if panel.__clampDrawing then
+		--	if panel.__clampDrawing then
 				lg.setScissor( clipx, clipy, clipw, cliph )
-			end
+		--	end
 			panel:paint( paintw, painth )
 			panel:paintOver( paintw, painth )
 			lg.setScissor()
 		lg.origin()
+
 	end
+
 end
 
 --Internal.
@@ -214,7 +254,7 @@ function gui.buttonCheck( x, y, button, istouch )
 		if targ then
 			if targ:canClick() then
 				targ:__click( button )
-				gui.curButton = targ 
+				gui.curButton = targ
 			end
 			if not targ:isChild() then
 				targ:bringToFront()
@@ -227,7 +267,13 @@ function gui.buttonCheck( x, y, button, istouch )
 	for k, panel in pairs( gui.objects ) do
 		local p_x,p_y = panel:getPos()
 		local p_w,p_h = panel:getSize()
-		if in_area( x, y, p_x, p_y, p_w, p_h ) then
+		local prnt = panel:getParent()
+		if prnt and prnt:restrictChildClick() then
+			local prntx, prnty, prntw, prnth = prnt:getPos(), prnt:getSize()
+			if in_area( x, y, p_x, p_y, p_w, p_h ) and in_area( x, y, prntx, prnty, prntw, prnth ) then
+				tbl[ #tbl + 1 ] = panel
+			end
+		elseif in_area( x, y, p_x, p_y, p_w, p_h ) then
 			tbl[ #tbl + 1 ] = panel
 		end
 	end
@@ -237,8 +283,8 @@ function gui.buttonCheck( x, y, button, istouch )
 	for i = 1,#tbl do
 		local pnl = tbl[ i ]
 		if pnl:getZ() >= z then
-			z = pnl:getZ()
-			p = pnl
+				z = pnl:getZ()
+				p = pnl
 		end
 	end
 	if p then

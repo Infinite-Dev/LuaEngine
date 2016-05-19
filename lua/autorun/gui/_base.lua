@@ -26,8 +26,16 @@ end
 function PANEL:performLayout()
 end
 
-function PANEL:setClampDrawing( bool )
-	self.__clampDrawing = bool
+function PANEL:setClampDrawing( b )
+	self.__clampDrawing = b
+end
+
+function PANEL:setRestrictChildClick( b )
+	self.__childClick = b
+end
+
+function PANEL:restrictChildClick()
+	return self.__childClick
 end
 
 function PANEL:onChildAdded( pnl )

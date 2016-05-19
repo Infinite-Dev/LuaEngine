@@ -14,9 +14,6 @@ local lm = love.mouse
 local PANEL = {}
 
 function PANEL:_initialize()
-	self.__panel = gui.create( "panel", self )
-	self.__panel:setSize( self:getSize() )
-	self.__panel.paint = self.paint
 	self.__vertScroll = false
 	self:setClampDrawing( true )
 end
@@ -31,9 +28,9 @@ function PANEL:enableVertScrollbar( b )
 
 		self.scroll = gui.create( "vertScrollbar", self )
 
-		local w =  self:getWidth()*0.03
+		local w =  self:getWidth()*0.037
 		self.scroll:setSize( w, self:getHeight() )
-		self.scroll:setPos( self:getWidth() - w, 0 )
+		self.scroll:setPos( self:getWidth() - w*2, 0 )
 
 		self:setSize( self:getWidth() - w, self:getHeight() )
 
@@ -55,13 +52,13 @@ function PANEL:onWheelMoved( delta )
 end
 
 function PANEL:onSizeChanged()
-	self.__panel:setSize( self:getSize() )
 end
 
 function PANEL:onChildAdded( pnl )
 end
 
 function PANEL:onDeltaSet( d )
+
  	local children = self:getChildren()
 	local highY = self:getY() + self:getHeight()
 	local targ = nil
@@ -78,7 +75,7 @@ function PANEL:onDeltaSet( d )
 	if targ then
 
 		local panelMaxY = self:getY() + self:getHeight()
-		local dif = highY - panelMaxY + 2
+		local dif = highY - panelMaxY
 		for k,v in pairs( children ) do
 			if v ~= self.scroll then
 				if not v.originY then

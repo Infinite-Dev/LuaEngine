@@ -41,14 +41,21 @@ function PANEL:init()
 	self.scroll.offsetY = 0
 	self.scroll:setText( "" )
 	function self.scroll.setDelta( scroll, d )
+
 		d = math.min( d, 1 )
 		d = math.max( 0, d )
-		local minY = self.up:getY() + self.up:getHeight()
-		local maxY = self.down:getY() - scroll:getHeight()
-		local y = (maxY-minY)*d + minY
+
+		local lx,ly = self.down:getLocalPos()
+		local minY = self.up:getHeight()
+
+		local lx,ly = self.down:getLocalPos()
+		local maxY = ly - scroll:getHeight() - self.down:getHeight()
+
+		local y = (maxY)*d + minY
 		scroll:setPos( 0, y )
 		scroll.delta = d
 		self:onDeltaSet( d )
+
 	end
 	self.scroll:setDelta( 0 )
 
@@ -100,7 +107,7 @@ function PANEL:onSizeChanged()
 	self.down:setPos( 0, self:getHeight() - h )
 	self.down:setSize( self:getWidth(), h )
 
-	self.scroll:setSize( self:getWidth(), 150 )
+	self.scroll:setSize( self:getWidth(), 200 )
 	self.scroll:setDelta( self.scroll:getDelta() )
 
 end

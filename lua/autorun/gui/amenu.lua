@@ -56,6 +56,7 @@ local buttonD =
 local padding = 40
 function PANEL:init()
 
+	self:setClampDrawing( false )
 	self.buttons = {}
 	local w, h = love.graphics.getDimensions()
 	self:setSize( w, h )
