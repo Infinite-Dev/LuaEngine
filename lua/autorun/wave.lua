@@ -25,7 +25,7 @@ function game.addWave( wave, class, base )
 
     print( wave.id )
     l[ wave.id ]:initInternal()
-    l[ wave.id ]:init()
+    l[ wave.id ]:initialize()
 
 end 
 

@@ -18,7 +18,7 @@ local titleFont = lg.newFont( 30 )
 local textBorder = 20
 local border = 15
 local hText = "HIGHSCORES"
-function PANEL:init()
+function PANEL:initialize()
 
 	local w, h = love.graphics.getDimensions()
 	self:setSize( w, h )
@@ -52,35 +52,6 @@ function PANEL:init()
 
 		lg.setColor( 3, 3, 3, 255 )
 		lg.rectangle( "fill", b, b, w - b*2, h - b*2 )
-	end
-
-	local scroll = gui.create( "scrollPanel", self )
-	scroll:setPos( 40, 40 )
-	scroll:setSize( self:getWidth()/2, self:getHeight()*0.75 )
-	scroll:enableVertScrollbar( true )
-
-	local pnl = gui.create( "panel", scroll )
-	pnl:setSize( 400, 400 )
-	pnl:setPos( -200, scroll:getHeight()/2 - 200 )
-	function pnl:paint( w, h )
-		lg.setColor( 40, 255, 40, 255 )
-		lg.rectangle( "fill", 0, 0, w, h )
-	end
-
-	local pnl2 = gui.create( "panel", pnl )
-	pnl2:setSize( 20, 20 )
-	pnl2:setPos( 0, 0 )
-	function pnl2:paint( w, h )
-		lg.setColor( 255, 40, 40, 255 )
-		lg.rectangle( "fill", 0, 0, w, h )
-	end
-
-	local pnl3 = gui.create( "panel", scroll )
-	pnl3:setSize( 450, 1250 )
-	pnl3:setPos( scroll:getWidth() - 400, scroll:getHeight()/2 + 200 )
-	function pnl3:paint( w, h )
-		lg.setColor( 40, 40, 255, 255 )
-		lg.rectangle( "fill", 0, 0, w, h )
 	end
 
 end

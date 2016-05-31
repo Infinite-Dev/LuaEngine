@@ -30,7 +30,7 @@ local buttonD =
 }
 
 local padding = 40 
-function PANEL:init() 
+function PANEL:initialize() 
 
 	self.buttons = {}
 	local w, h = love.graphics.getDimensions()

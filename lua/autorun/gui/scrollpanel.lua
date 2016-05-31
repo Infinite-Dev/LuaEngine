@@ -16,6 +16,15 @@ local PANEL = {}
 function PANEL:_initialize()
 	self.__vertScroll = false
 	self:setClampDrawing( true )
+
+	self.displayPanel = gui.create( "panel", self )
+	self.displayPanel:setSize( self:getSize() )
+	self.displayPanel.paint = function() end
+	self.displayPanel:setRestrictChildClick( true )
+
+	self.scroll = gui.create( "vertScrollbar", self )
+
+	self.initialized = true
 end
 
 function PANEL:vertScrollbarIsEnabled()
@@ -26,18 +35,16 @@ function PANEL:enableVertScrollbar( b )
 
 	if b then
 
-		self.scroll = gui.create( "vertScrollbar", self )
+		local scrollw =  math.min( self:getWidth()*0.037, 40 )
+		self.scroll:setSize( scrollw, self:getHeight() )
+		self.scroll:setPos( self:getWidth() - scrollw, 0 )
 
-		local w =  self:getWidth()*0.037
-		self.scroll:setSize( w, self:getHeight() )
-		self.scroll:setPos( self:getWidth() - w*2, 0 )
-
-		self:setSize( self:getWidth() - w, self:getHeight() )
+		local w, h = self:getSize()
+		self.displayPanel:setSize( w - scrollw, h )
 
 	elseif self.scroll then
 
 		self.scroll:setVisible( false )
-		self:setSize( self:getWidth() + self.scroll:getWidth(), self:getHeight() )
 
 	end
 
@@ -52,42 +59,47 @@ function PANEL:onWheelMoved( delta )
 end
 
 function PANEL:onSizeChanged()
+	local b = self:vertScrollbarIsEnabled()
+	if b then
+		local scrollw =  math.min( self:getWidth()*0.037, 40 )
+		self.scroll:setSize( scrollw, self:getHeight() )
+		self.scroll:setPos( self:getWidth() - scrollw, 0 )
+
+		local w, h = self:getSize()
+		self.displayPanel:setSize( w - scrollw, h )
+	end
 end
 
 function PANEL:onChildAdded( pnl )
+	if self.initialized then
+		pnl:setParent( self.displayPanel )
+	end
 end
 
 function PANEL:onDeltaSet( d )
 
- 	local children = self:getChildren()
+ 	local children = self.displayPanel:getChildren()
 	local highY = self:getY() + self:getHeight()
-	local targ = nil
+	local targ = false
 	for k,v in pairs( children ) do
-		if v ~= self.scroll then
-			local targY = ( v.originY or v:getY() ) + v:getHeight()
-			if targY > highY then
-				highY = targY
-				targ = v
-			end
+		local targY = ( v.originY or v:getY() ) + v:getHeight()
+		if targY > highY then
+			highY = targY
+			targ = v
 		end
 	end
 
 	if targ then
-
 		local panelMaxY = self:getY() + self:getHeight()
 		local dif = highY - panelMaxY
-		for k,v in pairs( children ) do
-			if v ~= self.scroll then
-				if not v.originY then
-					local x,y = v:getLocalPos()
-					v.localOriginY = y
-					v.originY = v:getY()
-				end
-				local x,y = v:getLocalPos()
-				v:setPos( x, v.localOriginY - dif*d )
-			end
+		local v = self.displayPanel
+		if not v.originY then
+			local x,y = v:getLocalPos()
+			v.localOriginY = y
+			v.originY = v:getY()
 		end
-
+		local x,y = v:getLocalPos()
+		v:setPos( x, v.localOriginY - dif*d )
 	end
 
 end

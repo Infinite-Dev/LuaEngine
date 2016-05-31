@@ -17,28 +17,56 @@ local lm = love.mouse
 
 local PANEL = {}
 
+--[[----------------------------------------
+	PANEL:_initialize()
+	Called immediately after the panel is created.
+--]]----------------------------------------
 function PANEL:_initialize()
 end
 
-function PANEL:init()
+--[[----------------------------------------
+	PANEL:initialize()
+	Called immediately after _initialize.
+--]]----------------------------------------
+function PANEL:initialize()
 end
 
-function PANEL:performLayout()
-end
-
+--[[----------------------------------------
+	PANEL:setClampDrawing( b )
+	When true, the panels draw function will be
+	clipped to its width and height. This also
+	includes any children.
+--]]----------------------------------------
 function PANEL:setClampDrawing( b )
 	self.__clampDrawing = b
 end
 
+--[[----------------------------------------
+	PANEL:setRestrictChildClick( b )
+	When true, for any of the panels children
+	to be clicked, the click event must occur
+	inside the boundaries of the panel.
+--]]----------------------------------------
 function PANEL:setRestrictChildClick( b )
 	self.__childClick = b
 end
 
-function PANEL:restrictChildClick()
+--[[----------------------------------------
+	PANEL:getRestrictChildClick()
+	When true, for any of the panels children
+	to be clicked, the click event must occur
+	inside the boundaries of the panel.
+--]]----------------------------------------
+function PANEL:getRestrictChildClick()
 	return self.__childClick
 end
 
-function PANEL:onChildAdded( pnl )
+--[[----------------------------------------
+	PANEL:onChildAdded( c )
+	Called when a child, c, has its parent
+	set to the panel.
+--]]----------------------------------------
+function PANEL:onChildAdded( c )
 end
 
 function PANEL:setParent( pnl )

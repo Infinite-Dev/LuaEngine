@@ -6,7 +6,7 @@ WAVE.desc       = "The fuck are you doing?"
 function WAVE:initInternal()
 end 
 
-function WAVE:init()
+function WAVE:initialize()
 end
 
 function WAVE:onSet()

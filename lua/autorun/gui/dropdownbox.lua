@@ -17,7 +17,7 @@ local PANEL = {}
 
 local defaultFont = lg.newFont( 16 )
 
-function PANEL:init()
+function PANEL:initialize()
 	self.__options = {}
 	self:setFont( defaultFont )
 	self:setTextColor( 225, 225, 225, 255 )

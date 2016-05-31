@@ -30,10 +30,10 @@ function gui.create( class, parent )
 	end
 
 	panel.__children = {}
-	panel.__hovered = false
-	panel.__canClick = false
-	panel.__clampDrawing = true
-	panel.__childClick = false
+	panel.__hovered = false -- Is the panel being hovered over by the mouse?
+	panel.__canClick = false -- Can the panel be clicked?
+	panel.__clampDrawing = true -- Should we limit drawing to the x,y/w,h of the panel?
+	panel.__childClick = false -- Can we click on child objects if they are outside the panels boundaries?
 	panel.__x = 0
 	panel.__y = 0
 	panel.__w = 15
@@ -47,7 +47,7 @@ function gui.create( class, parent )
 
 	panel:setZ( gui.getMaxZ() + 1 )
 	panel:_initialize()
-	panel:init()
+	panel:initialize()
 	gui.generateDrawOrder()
 	return panel
 end
@@ -150,6 +150,40 @@ function gui.generateDrawOrder()
 	end )
 end
 
+local function findDrawClips( parent, x, y, w, h )
+	while parent do
+		local px, py = parent:getPos()
+		local pw, ph = parent:getSize()
+		local oldx, oldy = x, y
+		local oldw, oldh = w, h
+		if parent.__clampDrawing then
+
+			if px > x then
+				x = math.min( px, ( x + w ) )
+				w = oldx + w - x
+			end
+
+			if x + w > px + pw then
+					local dif = px + pw - (x + w)
+					w = math.max( 0, w + dif )
+			end
+
+			if py > y then
+				y = math.min( py, ( y + h ) )
+				h = oldy + h - y
+			end
+
+			if y + h > py + ph then
+				local dif = py + ph - (y + h)
+				h = math.max( 0, h + dif )
+			end
+
+		end
+		parent = parent:getParent()
+	end
+	return x, y, w, h
+end
+
 --Internal.
 function gui.draw()
 
@@ -162,42 +196,8 @@ function gui.draw()
 
 		local transx, transy = x, y
 
-		local clipx, clipy = x, y
-		local clipw, cliph = w, h
-
 		local parent = panel:getParent()
-		while parent do
-
-			local px, py = parent:getPos()
-			local pw, ph = parent:getSize()
-			local oldcx, oldcy = clipx, clipy
-			local oldcw, oldch = clipw, cliph
-			if parent.__clampDrawing then
-
-				if px > clipx then
-					clipx = math.min( px, ( clipx + clipw ) )
-					clipw = oldcx + clipw - clipx
-				end
-
-				if clipx + clipw > px + pw then
-						local dif = px + pw - (clipx + clipw)
-						clipw = math.max( 0, clipw + dif )
-				end
-
-				if py > clipy then
-					clipy = math.min( py, ( clipy + cliph ) )
-					cliph = oldcy + cliph - clipy
-				end
-
-				if clipy + cliph > py + ph then
-						local dif = py + ph - (clipy + cliph)
-						cliph = math.max( 0, cliph + dif )
-				end
-
-			end
-			parent = parent:getParent()
-
-		end
+		local clipx, clipy, clipw, cliph = findDrawClips( parent, x, y, w, h )
 
 		local paintw,painth = w,h
 
@@ -268,8 +268,9 @@ function gui.buttonCheck( x, y, button, istouch )
 		local p_x,p_y = panel:getPos()
 		local p_w,p_h = panel:getSize()
 		local prnt = panel:getParent()
-		if prnt and prnt:restrictChildClick() then
-			local prntx, prnty, prntw, prnth = prnt:getPos(), prnt:getSize()
+		if prnt and prnt:getRestrictChildClick() then
+			local prntx, prnty = prnt:getPos()
+			local prntw, prnth = prnt:getSize()
 			if in_area( x, y, p_x, p_y, p_w, p_h ) and in_area( x, y, prntx, prnty, prntw, prnth ) then
 				tbl[ #tbl + 1 ] = panel
 			end

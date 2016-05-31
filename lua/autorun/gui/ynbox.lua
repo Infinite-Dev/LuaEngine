@@ -15,7 +15,7 @@ local PANEL = {}
 
 local titleFont = lg.newFont( 20 )
 
-function PANEL:init()
+function PANEL:initialize()
 	self.yButton = gui.create( "button", self )
 	self.yButton:setText( "Yes" )
 	self.yButton.doClick = function( btn )

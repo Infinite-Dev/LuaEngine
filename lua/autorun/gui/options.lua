@@ -18,7 +18,7 @@ local titleFont = lg.newFont( 30 )
 local textBorder = 20
 local border = 15
 local hText = "OPTIONS"
-function PANEL:init()
+function PANEL:initialize()
 	local w, h = love.graphics.getDimensions()
 	self:setSize( w, h )
 

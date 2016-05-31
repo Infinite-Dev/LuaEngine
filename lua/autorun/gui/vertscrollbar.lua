@@ -13,7 +13,7 @@ local lg = love.graphics
 local lm = love.mouse
 local PANEL = {}
 
-function PANEL:init()
+function PANEL:initialize()
 
 	self.up = gui.create( "button", self )
 	self.up:setText( "/\\" )

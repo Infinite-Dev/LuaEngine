@@ -54,7 +54,7 @@ local buttonD =
 }
 
 local padding = 40
-function PANEL:init()
+function PANEL:initialize()
 
 	self:setClampDrawing( false )
 	self.buttons = {}
