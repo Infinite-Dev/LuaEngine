@@ -18,11 +18,11 @@ function ENT:initialize()
 	local poly = love.physics.newPolygonShape( unpack( self.tbl ) )
 	self:setShape( poly )
 
-	local x,y = self:getPos()
-	local body = love.physics.newBody( game.getWorld(), x, y, "dynamic" )
-	body:setMass( 35 )
+	local p = self:getPos()
+	local body = love.physics.newBody( game.getWorld(), p.x, p.y, "dynamic" )
+	body:setMass( 3000^3000 )
 	body:setAngularDamping( 100 )
-	body:setLinearDamping( 1.5 )
+	body:setLinearDamping( 0 )
 	body:setSleepingAllowed( false )
 	self:setBody( body )
 
@@ -121,7 +121,7 @@ end
 
 local isDown = love.keyboard.isDown
 local rMax = math.pi*2
-local speed = 12
+local speed = 120
 local sens = 6
 function ENT:think()
 
@@ -152,7 +152,7 @@ function ENT:think()
 			local a = b:getAngle() + math.pi/2
 			local x = math.cos( a )*speed
 			local y = math.sin( a )*speed
-			b:applyForce( x, y )
+			self:applyForce( x, y )
 			self.moving = true
 		else
 			self.moving = false
@@ -189,7 +189,8 @@ function ENT:think()
 		end
 	end
 
-	local x,y = self:getPos()
+	local p = self:getPos()
+	local x,y = p.x, p.y
 	local w,h = love.graphics.getDimensions()
 
 	local mult = 1.1

@@ -3,70 +3,71 @@ local ENT = {}
 BULLET_DRAWMODE_CIRCLE = 1
 BULLET_DRAWMODE_LINE = 2
 
-function ENT:initialize() 
+function ENT:initialize()
 	self.bulletColor = { 255, 255, 255, 255 }
 	self:setDrawMode( BULLET_DRAWMODE_CIRCLE )
-end 
+end
 
 function ENT:setDrawMode( n )
-	self.__drawMode = n 
-end 
+	self.__drawMode = n
+end
 
 function ENT:getDrawMode()
 	return self.__drawMode
-end 
+end
 
 function ENT:setDamageInfo( dmg )
-	self.__dInfo = dmg 
-end 
+	self.__dInfo = dmg
+end
 
 function ENT:getDamageInfo()
-	return self.__dInfo 
-end 
+	return self.__dInfo
+end
 
 function ENT:setSize( n )
 	self.r = n
 	local circle = love.physics.newCircleShape( self.r )
 	self:setShape( circle )
 
-	local x,y = self:getPos()
+	local p = self:getPos()
+	local x,y = p.x, p.y
 	local body = love.physics.newBody( game.getWorld(), x, y, "dynamic" )
 	body:setMass( 1 )
 	body:setLinearDamping( 0 )
 	body:setBullet( true )
 	self:setBody( body )
 
-	local d = 5 
+	local d = 5
 	local fix = love.physics.newFixture( self:getBody(), self:getShape(), 1 )
 	self:setFixture( fix )
 
-	self.drawx = x 
-	self.drawy = y 
-end 
+	self.drawx = x
+	self.drawy = y
+end
 
 function ENT:setThinkFunc( func )
-	self.thinkFunc = func 
-end 
+	self.thinkFunc = func
+end
 
 function ENT:setCalLBack( func )
-	self.callBack = func 
-end 
+	self.callBack = func
+end
 
 function ENT:setBulletData( bulletData )
 
-	local pos = bulletData.startPos 
-	local dir = bulletData.dir 
-	local speed = bulletData.speed 
+	local pos = bulletData.startPos
+	local dir = bulletData.dir
+	local speed = bulletData.speed
 	local damage = bulletData.damage
-	local force = bulletData.force 
+	local force = bulletData.force
 	local angle = bulletData.angle or 0
-	local size = bulletData.size 
+	local size = bulletData.size
 	local callBack = bulletData.callBack
 	local thinkFunc = bulletData.thinkFunc
-	local owner = bulletData.owner 
-	local color = bulletData.color 
-	local paintFunc = bulletData.paintFunc 
-	local drawMode = bulletData.drawMode 
+	local owner = bulletData.owner
+	local color = bulletData.color
+	local paintFunc = bulletData.paintFunc
+	local drawMode = bulletData.drawMode
 
 	self:setSize( size )
 	self:setPos( pos )
@@ -74,30 +75,30 @@ function ENT:setBulletData( bulletData )
 	self:setAngle( angle )
 	self:setCollisionType( COLLISION_TYPE_BULLET )
 
-	if thinkFunc then 
+	if thinkFunc then
 		self:setThinkFunc( thinkFunc )
-	end 
+	end
 
-	if callBack then 
+	if callBack then
 		self:setCallBack( callBack )
-	end 
+	end
 
-	if owner then 
+	if owner then
 		local i = owner:getGroupIndex()
 		self:setGroupIndex( i )
-	end 
+	end
 
-	if color then 
-		self.bulletColor = color 
-	end 
+	if color then
+		self.bulletColor = color
+	end
 
-	if paintFunc then 
-		self.draw = paintFunc 
-	end 
+	if paintFunc then
+		self.draw = paintFunc
+	end
 
-	if drawMode then 
+	if drawMode then
 		self:setDrawMode( drawMode )
-	end 
+	end
 
 
 	local dmgInfo = damageInfo()
@@ -109,25 +110,26 @@ function ENT:setBulletData( bulletData )
 
 	local a = angle + math.pi/2
 	local a2 = angle + math.pi*1.5
-	self.xadd = math.cos( a )*self.r 
-	self.xadd2 = math.cos( a2 )*self.r 
+	self.xadd = math.cos( a )*self.r
+	self.xadd2 = math.cos( a2 )*self.r
 	self.yadd = math.sin( a )*self.r
-	self.yadd2 = math.sin( a2 )*self.r 
+	self.yadd2 = math.sin( a2 )*self.r
 
-end 
+end
 
 function ENT:collisionPreSolve( ent, coll )
-	if self.callBack then 
+	if self.callBack then
 		self:callBack( ent )
-	end 
+	end
 	ent:takeDamageInfo( self:getDamageInfo() )
 	self:remove()
 	coll:setEnabled( false )
-end 
+end
 
 function ENT:think()
 
-	local x,y = self:getPos()
+	local p = self:getPos()
+	local x,y = p.x, p.y
 	local w,h = love.graphics.getDimensions()
 
 	local compW = w*1.4
@@ -138,47 +140,49 @@ function ENT:think()
 	local x2,y2 = x + compare, y + compare
 	local x3,y3 = x - compare, y - compare
 
-	if x3 > compW + compare/2 then 
+	if x3 > compW + compare/2 then
 		self:remove()
 	elseif y3 > compH + compare/2 then
 		self:remove()
-	elseif x2 < -compare/2 - (compW-w) then 
+	elseif x2 < -compare/2 - (compW-w) then
 		self:remove()
-	elseif y2 < -compare/2 - (compH-h) then 
+	elseif y2 < -compare/2 - (compH-h) then
 		self:remove()
-	end 
+	end
 
-	if self.thinkFunc then 
+	if self.thinkFunc then
 		self:thinkFunc()
-	end 
+	end
 
-end  
+end
 
-local math = math 
-local lg = love.graphics 
-local drawModes = 
+local math = math
+local lg = love.graphics
+local drawModes =
 {
 	function( self )
-		local x,y = self:getPos()
+		local p = self:getPos()
+		local x,y = p.x, p.y
 		lg.circle( "fill", x, y, self.r )
 	end,
 
 	function( self )
-		local x,y = self:getPos()
+		local p = self:getPos()
+		local x,y = p.x, p.y
 		local x1,y1 = self.xadd + x,self.yadd + y
 		local x2,y2 = self.xadd2 + x,self.yadd2 + y
 		lg.line( x1, y1, x2, y2 )
-	end 
+	end
 }
 function ENT:draw()
 
 	lg.setColor( unpack( self.bulletColor ) )
 	local dMode = self:getDrawMode()
-	if drawModes[ dMode ] then 
+	if drawModes[ dMode ] then
 		drawModes[ dMode ]( self )
-	else 
+	else
 		drawMode[ 2 ]( self )
-	end 
+	end
 
-end 
+end
 ents.registerEntity( "bullet_base", ENT )

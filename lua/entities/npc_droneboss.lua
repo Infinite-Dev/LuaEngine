@@ -17,7 +17,8 @@ local laserSpeed = 200
 local eTable =
 {
 	function( self )
-		local x,y = self:getPos()
+		local p = self:getPos()
+		local x,y = p.x, p.y
 		local spawnArea = size*1.5
 		for i = 1,numDrones do
 			local r = (i/numDrones)*(2*math.pi)
@@ -29,7 +30,8 @@ local eTable =
 		end
 	end,
 	function( self )
-		local x,y = self:getPos()
+		local p = self:getPos()
+		local x,y = p.x, p.y
 		for i = 1,numBullets do
 			local p = (i/numBullets)*(2*math.pi)
 			local bulletX = math.sin( p )*(size*1.05) + x
@@ -63,7 +65,8 @@ function ENT:initialize()
 	local circle = love.physics.newCircleShape( size )
 	self:setShape( circle )
 
-	local x,y = self:getPos()
+	local p = self:getPos()
+	local x,y = p.x, p.y
 	local body = love.physics.newBody( game.getWorld(), x, y, "dynamic" )
 	body:setMass( 100 )
 	body:setLinearDamping( 0.45 )
@@ -93,10 +96,8 @@ local bounceForce = 300
 function ENT:collisionPostSolve( ent, coll, norm1, tan1, norm2, tan2  )
 	if not isEntity( ent ) then return end
 	if ent:getClass() == "ent_player" and ent:isAlive() then
-		local x,y = ent:getPos()
-		local vec1 = vector( x, y )
-		local x,y = self:getPos()
-		local vec2 = vector( x, y )
+		local vec1 = ent:getPos()
+		local vec2 = self:getPos()
 		local norm = ( vec1 - vec2 ):normalized()
 		ent:setVelocity( norm*bounceForce )
 		ent:takeDamage( self.damage )
@@ -106,9 +107,8 @@ end
 function ENT:spawn()
 	local w,h = love.graphics.getDimensions()
 	local midx, midy = w/2, h/2
-	local x,y = self:getPos()
 	local vec1 = vector( midx, midy )
-	local vec2 = vector( x, y )
+	local vec2 = self:getPos()
 	local norm = (vec1-vec2):normalized()
 	self:setVelocity( norm*200 )
 end
@@ -252,7 +252,7 @@ end
 
 function ENT:getSpawnPos()
 	local w,h = love.graphics.getDimensions()
-	return w/2 - size/2, -size
+	return vector( w/2 - size/2, -size )
 end
 
 local lg = love.graphics

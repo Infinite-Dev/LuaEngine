@@ -1,110 +1,110 @@
 
 game = {}
-game.paused = false 
+game.paused = false
 game.states = {}
 game.state = ""
 game.__curScore = 0
 game.__highScore = 0
 game.__spawnTime = 0
-game.__wave = 1 
+game.__wave = 1
 
 function game.pause()
-	game.paused = true 
+	game.paused = true
 	game.pauseMenu = gui.create( "pMenu" )
-end 
+end
 
 function game.unpause()
 	game.paused = false
-end 
+end
 
 function game.isPaused()
-	return game.paused 
-end 
+	return game.paused
+end
 
 function game.getState()
-	return game.state 
-end 
+	return game.state
+end
 
 function game.changeState( state )
 	local func = game.states.changeFuncs[ state ]
 	local tFunc = game.states.thinkFuncs[ state ]
 	if func then
 		func()
-	end 
-	game.state = state 
-	game.think = tFunc 
+	end
+	game.state = state
+	game.think = tFunc
 end
 
 function game.stop()
-	
+
 end
 
 function game.getWorld()
-	return game.__world 
-end 
+	return game.__world
+end
 
 
-local p = pairs 
+local p = pairs
 function game.beginContact( a, b, coll )
 	hook.call( "beginContact", a, b, coll )
-end 
+end
 
 function game.endContact( a, b, coll )
 	hook.call( "endContact", a, b, coll )
-end 
+end
 
 function game.preSolve( a, b, coll )
 	local ent1
-	local ent2 
+	local ent2
 	local data1 = a:getUserData()
-	if data1 then 
-		if data1.isEntity then 
+	if data1 then
+		if data1.isEntity then
 			ent1 = entity( data1.index )
-		end 
-	end 
+		end
+	end
 
 	local data2 = b:getUserData()
-	if data2 then 
-		if data2.isEntity then 
+	if data2 then
+		if data2.isEntity then
 			ent2 = entity( data2.index )
-		end 
-	end 
+		end
+	end
 
-	if ent1 and ent2 then 
+	if ent1 and ent2 then
 		ent1:collisionPreSolve( ent2, coll )
 		ent2:collisionPreSolve( ent1, coll )
-	end 
+	end
 	hook.call( "preSolve", a, b, coll )
-end 
+end
 
 function game.postSolve( a, b, coll, normalimpulse1, tangentimpulse1, normalimpulse2, tangentimpulse2 )
 	local ent1
-	local ent2 
+	local ent2
 	local data1 = a:getUserData()
-	if data1 then 
-		if data1.isEntity then 
+	if data1 then
+		if data1.isEntity then
 			ent1 = entity( data1.index )
-		end 
-	end 
+		end
+	end
 
 	local data2 = b:getUserData()
-	if data2 then 
-		if data2.isEntity then 
+	if data2 then
+		if data2.isEntity then
 			ent2 = entity( data2.index )
-		end 
-	end 
+		end
+	end
 
-	if ent1 and ent2 then 
+	if ent1 and ent2 then
 		ent1:collisionPostSolve( ent2, coll, normalimpulse1, tangentimpulse1, normalimpulse2, tangentimpulse2 )
 		ent2:collisionPostSolve( ent1, coll, normalimpulse1, tangentimpulse1, normalimpulse2, tangentimpulse2 )
-	end 
+	end
 	hook.call( "postSolve", a, b, coll, normalimpulse1, tangentimpulse1, normalimpulse2, tangentimpulse2 )
-end 
+end
 
 function game.setWorld( world )
 	world:setCallbacks( game.beginContact, game.endContact, game.preSolve, game.postSolve )
-	game.__world = world 
-end 
+	game.__world = world
+end
 
 game.states.changeFuncs =
 {
@@ -129,81 +129,88 @@ game.states.changeFuncs =
 
 		game.setCurrentWave( 1 )
 		game.getCurrentWave():start()
+		game.getCurrentWave():onStart()
+		game.getCurrentWave():setInProgress( true )
 
 	end,
 	menu = function()
 
 		local mainMenu = gui.create( "aMenu" )
+		-- mainMenu:setSize( 600, 600 )
+		-- mainMenu:center()
+
 		game.cleanUp()
 		game.generateBackground()
 
-		if game.endGame then 
+		if game.endGame then
 			game.endGame:remove()
 		end
 
 		hook.remove( "think", "playerDeathDelay" )
 
-	end 
-} 
+	end
+}
 
-game.states.thinkFuncs = 
+game.states.thinkFuncs =
 {
 	paused = function()
 		gui.update()
-	end, 
+	end,
 	game = function( dt )
 		gui.update()
 		timer.think()
-		if not game.isPaused() then 
+		if not game.isPaused() then
 			game.logic()
 			ents.think()
-			game.getWorld():update( dt )
-		end 
+			if not game.getWorld():isDestroyed() then
+				game.getWorld():update( dt )
+			end
+		end
 		hook.call( "think" )
 	end,
 	menu = function()
 		gui.update()
 		timer.think()
 		hook.call( "think" )
-	end 
+	end
 }
 
 
 function game.getPlayer()
-	return game.player 
-end 
+	return game.player
+end
 
 function game.setUp()
 	love.keyboard.setKeyRepeat(true)
 
 	game.player = ents.create( "ent_player" )
 	game.player:setPos( 400, 400 )
-end 
+end
 
 function game.cleanUp()
-	for k,v in pairs( ents.getAll() ) do 
+	for k,v in pairs( ents.getAll() ) do
 		v:remove()
 	end
 	local w = game.getWorld()
-	if w then 
-		w:destroy() 
-	end 
+	if w then
+		w:destroy()
+	end
 end
 
 function game.restart()
 	game.cleanUp()
 	game.changeState( "game" )
-	if game.endGame then 
+	if game.endGame then
 		game.endGame:remove()
 	end
 	hook.remove( "think", "playerDeathDelay" )
-end 
+end
 
 function game.logic()
 	game.waveThink()
-end 
+end
 
-local lg = love.graphics 
+local lg = love.graphics
 local bossFont = lg.newFont( 30 )
 local bossFontSmall = lg.newFont( 15 )
 local barw = 150
@@ -222,14 +229,14 @@ function game.drawHP( w, h )
 
 	lg.setColor( unpack( c ) )
 	lg.rectangle( "fill", x, h - y - barh, barw*p, barh )
-end 
+end
 
-function game.drawBossHealth( w, h ) 
+function game.drawBossHealth( w, h )
 
-end 
+end
 
 function game.drawHUD()
-	if game.player and game.getState() == "game" then 
+	if game.player and game.getState() == "game" then
 		local w,h = love.graphics.getDimensions()
 
 		game.drawHP( w, h )
@@ -239,20 +246,20 @@ function game.drawHUD()
 end
 
 local targStars = 30
-local border = 5 
+local border = 5
 local starMin = 2
 local starMax = 4
 local starTable = {}
 function game.generateBackground()
-	
+
 	local w,h = love.graphics.getDimensions()
 	local r = math.ceil( math.sqrt( targStars ) )
 	local c = math.floor( math.sqrt( targStars ) )
-	local grid = r*c 
-	local gw = w/c 
-	local gh = h/r 
-	local j = 1 
-	for i = 1,grid do 
+	local grid = r*c
+	local gw = w/c
+	local gh = h/r
+	local j = 1
+	for i = 1,grid do
 		local x = gw*(j-1) + love.math.random( border, gw - border )
 		local y = math.floor( (i-1)/c )*gh + love.math.random( border, gh - border )
 		starTable[ i ] = {x, y, love.math.random( 10, 20 )/100 }
@@ -261,52 +268,56 @@ function game.generateBackground()
 
 	game.backGroundCanvas = love.graphics.newCanvas()
 	love.graphics.setCanvas( game.backGroundCanvas )
-	for i = 1,#starTable do 
+	for i = 1,#starTable do
 		local t = starTable[ i ]
 		love.graphics.setColor( 255, 255, 255, 255 )
 		love.graphics.draw(starImage, t[ 1 ], t[ 2 ], 0, t[ 3 ], t[ 3 ] )
 	end
 	love.graphics.setCanvas()
 
-end 
+end
 
 function game.drawBackground()
-	if game.getState() == "game" then 
+	if game.getState() == "game" then
 		love.graphics.setColor( 255, 255, 255, 255 )
 		love.graphics.draw( game.backGroundCanvas )
-	end 
-end 
+	end
+end
 
 function game.setScore( num )
-	game.__curScore = num 
-end 
+	game.__curScore = num
+end
 
 function game.addScore( num )
 	game.setScore( game.getScore() + num )
-end 
+end
 
 function game.getScore()
 	return game.__curScore
-end 
+end
 
 function game.setHighScore( num )
 
-end 
+end
 
 function game.playerDeath()
 	local w,h = love.graphics.getDimensions()
 	game.endGame = gui.create( "gameOverScreen" )
 	game.endGame:setSize( w*0.4, h*0.3 )
-	game.endGame:center()	
+	game.endGame:center()
 	game.endGame:createButton()
-end 
+end
 
 
 function game.createBullet( tbl )
 	local e = ents.create( "bullet_base" )
 	e:setBulletData( tbl )
-end 
+end
 
 function game.entityDeath( ent )
 	game.waveEntityDeath( ent )
-end 
+end
+
+function game.onEntCreated( ent )
+
+end
